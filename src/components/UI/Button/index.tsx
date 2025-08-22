@@ -1,7 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
-import { Link } from 'react-router-dom';
-
+import Link from 'next/link';
 const cx = classNames.bind(styles);
 // ...passProps phải được đặt ở cuối nó là lấy những cái gì được truyền ngoài những cái trước nó
 function Button({
