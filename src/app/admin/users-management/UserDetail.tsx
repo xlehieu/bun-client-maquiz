@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQuery } from '@tanstack/react-query';
 import { message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import * as UserManagementService from '@/services/admin/usermanagement.service';
+import { useParams, useRouter } from 'next/navigation';
 const UserDetail = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
+    const router = useRouter();
     const [userDetail, setUserDetail] = useState<any>({});
     const userDetailQuery = useQuery({
         queryKey: ['userDetailQuery', id],
@@ -24,7 +24,7 @@ const UserDetail = () => {
     }, [userDetailQuery.data]);
     return (
         <section className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-xl overflow-hidden">
-            <button onClick={() => navigate(-1)} className="rounded-lg float-end bg-red-600 px-2 py-1 text-white">
+            <button onClick={() => router.back()} className="rounded-lg float-end bg-red-600 px-2 py-1 text-white">
                 <FontAwesomeIcon icon={faReply} className="mr-1" />
                 Quay lại
             </button>
