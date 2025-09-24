@@ -5,7 +5,7 @@ FROM oven/bun:1 AS base
 WORKDIR /app
 
 # 3. Copy package và lockfile để cache deps
-COPY package.json bun.lockb ./
+COPY package.json bun.lock* ./
 
 # 4. Install dependencies
 RUN bun install --frozen-lockfile
