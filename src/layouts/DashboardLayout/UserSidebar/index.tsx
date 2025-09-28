@@ -73,6 +73,7 @@ const sidebarAdmin = {
 const setItem = new Set(items.map((item) => item.key));
 const UserSidebar = () => {
     const router = useRouter();
+    const [path, setPath] = useState(location.pathname);
     const user = useSelector((state: any) => state.user);
     if (!setItem.has('3') && user.isAdmin) {
         console.log(setItem);
@@ -101,7 +102,7 @@ const UserSidebar = () => {
                         className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
                         href="/"
                     >
-                        <MaquizLogo className={'w-44'} />
+                        <MaquizLogo className={'w-44 hover:scale-120 transition-all duration-300'} />
                     </Link>
                     {/* User */}
                     <ul className="md:hidden items-center flex flex-wrap list-none">
@@ -166,8 +167,13 @@ const UserSidebar = () => {
                                                         key={i}
                                                         onClick={() => {
                                                             router.push(child.to);
+                                                            setPath(child.to);
                                                         }}
-                                                        className={`pl-8 text-gray-700 flex-1 text-base text-left py-3 px-2 hover:text-primary ease-linear duration-200 transition-all  hover:bg-slate-600/10 hover:rounded-3xl`}
+                                                        className={`pl-8 text-gray-700 flex-1 text-base text-left py-3 px-2 hover:text-primary ease-linear duration-200 transition-all  hover:bg-slate-600/10 hover:rounded-3xl ${
+                                                            path == child.to
+                                                                ? 'text-primary bg-slate-600/10 rounded-3xl'
+                                                                : ''
+                                                        }`}
                                                     >
                                                         <FontAwesomeIcon className="mr-2" icon={child.icon} />
                                                         {child.label}

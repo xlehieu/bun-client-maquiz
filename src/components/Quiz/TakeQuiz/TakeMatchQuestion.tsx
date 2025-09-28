@@ -32,6 +32,7 @@ export default function TakeMatchQuestion({
     const [xArrows, setXArrows] = useState<any[]>([]);
     const [dragging, setDragging] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         // refQuestion.current.forEach((el: any, i) => {
         //     if (el) {
@@ -82,38 +83,35 @@ export default function TakeMatchQuestion({
             }) || [];
         setXArrows([...answerValue]);
     }, [shuffleMatchQuestion, answerMatchingQuestion]);
-    const [keyXArrows, setKeyXArrows] = useState<number | null>(null);
-    const [loading, setLoading] = useState(false);
     useEffect(() => {
-        if (xArrows.length > 0) {
-            setKeyXArrows(new Date().getTime() + Math.random());
-            setTimeout(() => {
-                setLoading(true);
-            }, 500);
-        }
-        console.log(xArrows);
+        // console.log('xArrows', xArrows);
     }, [xArrows]);
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, indexElement: number, match: any) => {
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 500);
+    }, [answerChoices]);
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, match: any) => {
         e.preventDefault(); // chặn default drag
         setDragging(true);
         const startId = e.currentTarget.id;
         if (startId) setElementCurrentMouseDown(startId);
         setXArrows((prevValue: any[]) => {
-            const newValue = [...prevValue];
+            const newValue = [...(prevValue || [])];
             // tìm index trong mảng và chỉnh sửa index đó {idx và indexElement hoàn toàn khác nhau}
-            const idxArr = newValue?.findIndex((item) => item?.indexStart === indexElement);
+            const idxArr = newValue?.findIndex((item) => item?.match === match);
             if (idxArr === -1) {
                 newValue.push({
                     start: startId,
-                    indexStart: indexElement,
+                    match,
                 });
             } else {
                 newValue[idxArr] = {
                     start: startId,
-                    indexStart: indexElement,
+                    match,
                 };
             }
-            return newValue;
+            return newValue?.filter(Boolean);
         });
         setCurrentQuestion(match);
         dispatchAnswerMatchingQuestion({
@@ -124,7 +122,7 @@ export default function TakeMatchQuestion({
             },
         });
     };
-    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>, indexElement: number, match: any) => {
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>, match: any) => {
         const endId = e.currentTarget.id;
         // nếu nhả chuột vào ô hiện tại thì return, xóa luôn current element
 
@@ -135,16 +133,15 @@ export default function TakeMatchQuestion({
         //lấy id của current => gán vào thằng nhả ra là ok
         setXArrows((prevValue: any[]) => {
             const newValue = [...prevValue];
-            // tìm index trong mảng và chỉnh sửa index đó {idx và indexElement hoàn toàn khác nhau}
+            // start cũng đang là element current luôn => tìm ông nào bắt đầu bằng startId và gán thêm end => phần tử hiện tại vừa mouse up
             const idxArr = newValue?.findIndex((item) => item?.start === elementCurrentMouseDown);
             if (newValue && newValue.length > 0 && newValue?.[idxArr]) {
                 newValue[idxArr] = {
                     ...newValue[idxArr],
                     end: endId,
-                    indexEnd: indexElement,
                 };
             }
-            return newValue;
+            return newValue?.filter(Boolean);
         });
         dispatchAnswerMatchingQuestion({
             // Không có action
@@ -157,10 +154,9 @@ export default function TakeMatchQuestion({
         });
         setElementCurrentMouseDown('');
         setDragging(false);
+        // mouseRef.current = null;
     };
-
     const mouseRef = useRef<HTMLDivElement>(null);
-
     // di chuyển div ẩn theo chuột
     const containerRef = useRef<HTMLDivElement>(null);
     const [left, setLeft] = useState(0);
@@ -171,6 +167,7 @@ export default function TakeMatchQuestion({
                 const rect = containerRef.current?.getBoundingClientRect();
                 mouseRef.current.style.left = e.clientX - (rect?.x || 0) + 'px';
                 mouseRef.current.style.top = e.clientY - (rect?.y || 0) + 'px';
+                // console.log(mouseRef.current.style.left, mouseRef.current.style.top);
                 setLeft(e.clientX);
                 setTop(e.clientY);
             }
@@ -210,8 +207,8 @@ export default function TakeMatchQuestion({
                                         refQuestion.current[index] = el;
                                     }}
                                     id={`question-${matchQuestion.match}`}
-                                    onMouseDown={(e) => handleMouseDown(e, matchQuestion.match, matchQuestion.match)}
-                                    className="px-2 py-2 bg-amber-500"
+                                    onMouseDown={(e) => handleMouseDown(e, matchQuestion.match)}
+                                    className="px-2 py-2 border-2 border-camdat rounded"
                                 >
                                     {matchQuestion?.questionContent}
                                 </div>
@@ -227,8 +224,8 @@ export default function TakeMatchQuestion({
                                         refQuestion.current[index] = el;
                                     }}
                                     id={`answer-${matchAnswer.match}`}
-                                    onMouseUp={(e) => handleMouseUp(e, matchAnswer.match, matchAnswer.match)}
-                                    className="px-2 py-2 bg-blue-500"
+                                    onMouseUp={(e) => handleMouseUp(e, matchAnswer.match)}
+                                    className="px-2 py-2 border-2 border-primary rounded"
                                 >
                                     {matchAnswer?.answer}
                                 </div>
@@ -236,8 +233,8 @@ export default function TakeMatchQuestion({
                         )}
                     </div>
                 </div>
-                <Fragment key={keyXArrows}>
-                    {loading &&
+                <Fragment key={top + left + Math.random()}>
+                    {!loading &&
                         xArrows?.map((el: any, index: number) => (
                             <Fragment key={index}>
                                 {el?.start && el?.end && (
@@ -260,21 +257,24 @@ export default function TakeMatchQuestion({
                         position: 'absolute',
                         width: 1,
                         height: 1,
+                        top: 0,
+                        left: 0,
                         pointerEvents: 'none', // tránh block chuột
                     }}
                 />
 
                 {/* Xarrow khi drag */}
-                {dragging && elementCurrentMouseDown && (
-                    <Xarrow
-                        key={left + top}
-                        start={elementCurrentMouseDown}
-                        end="mousePointer"
-                        color="#f28b30"
-                        headSize={3}
-                        strokeWidth={3}
-                    />
-                )}
+                <Fragment key={left + top + Math.random()}>
+                    {dragging && elementCurrentMouseDown && (
+                        <Xarrow
+                            start={elementCurrentMouseDown}
+                            end="mousePointer"
+                            color="#f28b30"
+                            headSize={3}
+                            strokeWidth={3}
+                        />
+                    )}
+                </Fragment>
                 <div className="flex flex-1 justify-end">
                     <Button className="mt-4" onClick={handleOpenModal}>
                         Xác nhận
@@ -288,6 +288,7 @@ export default function TakeMatchQuestion({
                 centered
                 okText="Xác nhận"
                 cancelText="Hủy"
+                title="Xác nhận⚠️⚠️⚠️⚠️⚠️"
             >
                 <p>Xác nhận sau khi xác nhận sẽ không còn được trả lời lại</p>
             </Modal>

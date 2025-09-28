@@ -71,6 +71,9 @@ body {
 button {
     cursor: pointer;
 }
+.border-camdat {
+    border-color: var(--color-camdat) !important;
+}
 .border-primary {
     border-color: var(--color-primary) !important;
 }

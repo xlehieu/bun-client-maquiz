@@ -83,15 +83,15 @@ const HeaderComponent = () => {
                         />
                     </Link>
                 </div>
-                <nav className="hidden md:flex items-center justify-end">
+                <nav className="hidden md:flex items-center justify-end gap-12">
                     <Link
-                        className="w-24 hover:scale-110 hover:rotate-1 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
+                        className=" hover:scale-115 hover:rotate-2 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
                         href={siteRouter.news}
                     >
                         Tin tức
                     </Link>
                     <Link
-                        className="w-24 hover:scale-110 hover:rotate-1 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
+                        className=" hover:scale-115 hover:rotate-2 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
                         href={siteRouter.contact}
                     >
                         Liên hệ
@@ -128,7 +128,7 @@ const HeaderComponent = () => {
                                         {headerTippyMenu.map((item, index) => (
                                             <button
                                                 key={index}
-                                                className="text-start px-2 py-2 text-black hover:rounded hover:bg-black/5"
+                                                className="text-start px-2 py-2 text-black hover:rounded hover:bg-black/5 transition-all duration-100 ease-in-out"
                                                 onClick={() => handleClick(item, index)}
                                             >
                                                 <div className="flex items-center">
@@ -158,7 +158,7 @@ const HeaderComponent = () => {
                         </Tippy>
                     ) : (
                         <Link
-                            className="w-24 flex items-center justify-center text-primary text-lg duration-300 hover:text-secondary"
+                            className=" flex items-center justify-center text-primary text-lg hover:scale-115 hover:rotate-2 duration-300 hover:text-camdat"
                             href={siteRouter.signIn}
                         >
                             Đăng nhập

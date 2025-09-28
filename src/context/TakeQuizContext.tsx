@@ -40,6 +40,7 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
             }
         }
     }, [queryQuizDetail.data]);
+
     //Đếm tất cả số câu hỏi trong câu trả lời (answer choices)
     useEffect(() => {
         if (answerChoices) {

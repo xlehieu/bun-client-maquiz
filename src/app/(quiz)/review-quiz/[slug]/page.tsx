@@ -14,6 +14,7 @@ import QuizPreviewQuestion from '@/components/Quiz/QuizPreviewQuestion';
 const ReviewQuizPage = () => {
     const params = useParams();
     const slug = params?.slug as string;
+    const path = location.pathname;
     const queryQuizDetail = useQuery({
         queryKey: ['QueryQuizPreviewBySlug', slug],
         queryFn: () => QuizService.getQuizPreviewBySlug(slug),

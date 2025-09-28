@@ -1,22 +1,19 @@
 'use client';
 import { Select } from 'antd';
-import React, { createContext, Fragment, ReactNode, useContext, useEffect, useReducer, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Lottie from 'lottie-react';
 import congratsAnimation from '@/asset/animations/congratulations-2.json';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
 //component
-import * as QuizService from '@/services/quiz.service';
 import Timer from './Timer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
-import HTMLReactParser from 'html-react-parser';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import siteRouter from '@/config';
-import { useQuery } from '@tanstack/react-query';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import * as QuizHistoryService from '@/services/quizHistory.service';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
@@ -151,7 +148,7 @@ const checkQuestionCorrectQuestionType2 = (
 };
 // đếm số câu đúng trong 1 câu hỏi
 const countCorrectAnswerQuizDetail = (question: any) => {
-    if (!(question.answers.length > 0)) return 0;
+    if (!(question?.answers?.length > 0)) return 0;
     let count = 0;
     question.answers.forEach((answer: any) => {
         if (answer?.isCorrect) count++;
@@ -161,22 +158,49 @@ const countCorrectAnswerQuizDetail = (question: any) => {
 // đếm đáp án đúng trong câu trả lời
 const countCorrectAnswerChoices = (answerChoices: any, quizDetail: any) => {
     let count = 0;
+    console.log(answerChoices, quizDetail);
     //lặp qua từng phần
     Object.entries(answerChoices).forEach(([keyOfPart, valueOfPart]) => {
         if (typeof valueOfPart === 'object') {
+            // đang tính theo question
             Object.entries(valueOfPart as any).forEach(([keyOfQuestion, valueOfQuestion]: any) => {
-                if (typeof valueOfQuestion === 'object') {
+                // nếu là loại 1
+                if (
+                    typeof valueOfQuestion === 'object' &&
+                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 1
+                ) {
                     if (valueOfQuestion?.isCorrect) {
+                        console.log('OK 1');
                         count++;
                     }
-                } else if (Array.isArray(valueOfQuestion)) {
+                } else if (
+                    Array.isArray(valueOfQuestion) &&
+                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 2
+                ) {
+                    //đếm xem đã chọn đủ số đáp án đúng chưa => check bằng length của đáp án được chọn so với số câu dúng của question đó
+                    // => không quan tâm đến question answer có đúng hay không đã
                     if (
                         countCorrectAnswerQuizDetail(quizDetail.quiz[keyOfPart].questions[keyOfQuestion]) ===
                         valueOfQuestion.length
                     ) {
                         if (valueOfQuestion.every((answer) => answer.isCorrect === true)) {
+                            console.log('OK 2');
+
                             count++;
                         }
+                    }
+                } else if (
+                    Array.isArray(valueOfQuestion) &&
+                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 3
+                ) {
+                    // nếu tất cả giống nhau thì trả lời đúng
+                    if (
+                        valueOfQuestion.every(
+                            (itemQuestionAnswer) => itemQuestionAnswer.question == itemQuestionAnswer.answer,
+                        )
+                    ) {
+                        console.log('OK 3');
+                        count++;
                     }
                 }
             });
@@ -240,7 +264,7 @@ const TakeQuizInfo = () => {
                 <div className="border-b border-gray-300 font-medium py-2">
                     <p className="text-lg">{quizDetail?.name}</p>
                     <p className="font-normal mt-2">
-                        Chế độ:<span className="font-bold ml-1">Ôn thi</span>
+                        <span className="text-2xl text-rose-800 font-bold ml-1">Ôn thi</span>
                     </p>
                 </div>
                 <div className="border-b border-gray-300 py-2">
@@ -424,6 +448,7 @@ const ChooseAnswer = () => {
 };
 // region table of question
 //Phàn bên phải chọn câu hỏi
+
 const TableOfQuestion = () => {
     const {
         quizDetail,
@@ -433,6 +458,34 @@ const TableOfQuestion = () => {
         setCurrentQuestionIndex,
         currentQuestionType,
     } = useContext(TakeQuizContext);
+    const checkCorrectAnswer = (index: number) => {
+        if (currentPartIndex in answerChoices) {
+            if (
+                index in answerChoices[currentPartIndex] &&
+                quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 1
+            ) {
+                return answerChoices[currentPartIndex][index]?.isCorrect;
+            } else if (
+                index in answerChoices[currentPartIndex] &&
+                quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 2
+            ) {
+                return checkQuestionCorrectQuestionType2(quizDetail, answerChoices, 2, currentPartIndex, index);
+            } else if (
+                index in answerChoices[currentPartIndex] &&
+                quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 3
+            ) {
+                if (
+                    answerChoices[currentPartIndex][index].every(
+                        (itemQuestionAnswer: any) => itemQuestionAnswer.question == itemQuestionAnswer.answer,
+                    )
+                ) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return null;
+    };
     return (
         <div className="px-2 py-2 bg-white rounded shadow lg:max-w-80 lg:min-w-72 w-full">
             <div className="mb-2 flex flex-row justify-between">
@@ -445,34 +498,11 @@ const TableOfQuestion = () => {
                         key={index}
                         onClick={() => setCurrentQuestionIndex(index)}
                         className={`${
-                            question.questionType === 1 &&
-                            currentPartIndex in answerChoices &&
-                            answerChoices[currentPartIndex][index]?.isCorrect === true &&
-                            'bg-green-700 border-green-700 text-white'
-                        } ${
-                            question.questionType === 1 &&
-                            currentPartIndex in answerChoices &&
-                            currentQuestionIndex !== index &&
-                            answerChoices[currentPartIndex][index]?.isCorrect === false &&
-                            'bg-red-600 border-red-600 text-white'
-                        } 
-                        ${
-                            currentQuestionIndex !== index &&
-                            question.questionType === 2 &&
-                            checkQuestionCorrectQuestionType2(quizDetail, answerChoices, 2, currentPartIndex, index) ===
-                                true &&
-                            'bg-green-700 border-green-700 text-white'
-                        }
-                        ${
-                            currentQuestionIndex !== index &&
-                            question.questionType === 2 &&
-                            checkQuestionCorrectQuestionType2(quizDetail, answerChoices, 2, currentPartIndex, index) ===
-                                false &&
-                            'bg-red-600 border-red-600 text-white'
-                        }
-                        ${
-                            currentQuestionIndex === index ? 'border-primary bg-primary text-white' : 'border-gray-300'
-                        } border-2 rounded-lg min-w-10 h-10 font-medium`}
+                            currentQuestionIndex === index ? 'border-primary !bg-primary text-white' : 'border-gray-300'
+                        } border-2 rounded-lg min-w-10 h-10 font-medium ${
+                            checkCorrectAnswer(index) === true && 'bg-green-700 border-green-700 text-white'
+                        } ${checkCorrectAnswer(index) === false && 'bg-red-600 border-red-600 text-white'} 
+                        `}
                     >
                         {Number(index + 1)}
                     </button>
@@ -487,7 +517,7 @@ const TakeQuizPageMain = () => {
     const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
     const handleSaveTakeQuizHistory = useMutationHooks((data: any) => QuizHistoryService.saveQuizHistory(data));
     useEffect(() => {
-        if (!answerChoices || !quizDetail.id) return;
+        if (!answerChoices || !quizDetail) return;
         if (isTimeout) {
             toast.warning('Bạn đã hết giờ làm bài');
         }
@@ -495,7 +525,7 @@ const TakeQuizPageMain = () => {
             const score = calculateScore(answerChoices, countQuestionQuizDetail, quizDetail) || 0;
             setScore(Number(score));
             handleSaveTakeQuizHistory.mutate({
-                quizId: quizDetail.id,
+                quizId: quizDetail._id,
                 score: score,
                 answerChoices,
             });

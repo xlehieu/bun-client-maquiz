@@ -71,11 +71,11 @@ const SideBar = () => {
     return (
         <aside className="z-10 bg-white w-56 shadow-lg hidden md:block rounded py-5">
             <div>
-                <FontAwesomeIcon icon={faFilter} className="ml-4 text-orange-300 text-xl" />
+                <FontAwesomeIcon icon={faFilter} className="ml-4 text-camdat text-xl" />
             </div>
             <div className="flex flex-col mx-4 mt-3 text-[#333]">
                 <p>
-                    <FontAwesomeIcon icon={faCalendarDays} /> Năm học
+                    <FontAwesomeIcon className="text-camdat" icon={faCalendarDays} /> Năm học
                 </p>
                 <Slider
                     value={schoolYear}
@@ -89,7 +89,7 @@ const SideBar = () => {
             </div>
             <div className="flex flex-col mx-4 mt-3 text-[#333]">
                 <p>
-                    <FontAwesomeIcon icon={faSchool} /> Trình độ
+                    <FontAwesomeIcon className="text-camdat" icon={faSchool} /> Trình độ
                 </p>
                 <Select
                     className="mt-2"
@@ -134,7 +134,7 @@ const MainResult = () => {
                 <>
                     <div className="flex justify-between border-b pb-2">
                         <div className="flex items-center rounded-md px-2 py-1 border border-gray-400 text-gray-700 focus-within:border-primary focus-within:shadow">
-                            <FontAwesomeIcon icon={faSearch} className="text-gray-700" />
+                            <FontAwesomeIcon icon={faSearch} className="text-camdat" />
                             <input
                                 value={searchName}
                                 onChange={(e) => setSearchName(e.target.value)}
