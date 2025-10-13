@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useState } from 'react';
+
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import * as UserService from '@/services/user.service';
 import UploadComponent from '@/components/UI/UploadComponent';
@@ -7,7 +8,6 @@ import useMutationHooks from '@/hooks/useMutationHooks';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-console.log(">>> Rendering thong-tin-tai-khoan page on server");
 const ProfileUser = () => {
     const router = useRouter();
     const [email, setEmail] = useState('');
@@ -57,9 +57,6 @@ const ProfileUser = () => {
             }, 1500);
         }
     }, [updateUserMutation.isError, updateUserMutation.isSuccess]);
-    const [mounted, setMounted] = useState(false);
-        useEffect(() => setMounted(true), []);
-        if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <>
             {userDetailQuery.isLoading || updateUserMutation.isPending ? (

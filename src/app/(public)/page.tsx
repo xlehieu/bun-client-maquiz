@@ -1,24 +1,21 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
 import Aos from 'aos';
+import 'aos/dist/aos.css';
 import siteRouter, { userDashboardRouter } from '@/config';
 import searchIcon from '@/asset/image/search.png';
 import knowledgeIcon from '@/asset/image/knowledge.png';
 import quizIcon from '@/asset/image/qna.png';
 import classroomIcon from '@/asset/image/classroom.png';
 import newsIcon from '@/asset/image/megaphone.png';
-import 'aos/dist/aos.css';
 
 export default function HomePage() {
     const router = useRouter();
     useEffect(() => {
         Aos.init({ duration: 1000 });
     }, []);
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     return (
         <>
             {/* <img src={bgImg.src} className="absolute w-full left-0 opacity-30" /> */}

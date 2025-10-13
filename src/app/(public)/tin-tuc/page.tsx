@@ -55,10 +55,6 @@ export type NewsContextType = {
 };
 const NewsContext = createContext<NewsContextType | null>(null);
 const NewsProvider = ({ children }: { children: React.ReactNode }) => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     const newsQuery = useQuery({ queryKey: ['news'], queryFn: () => NewsService.getNews() });
     const [news, dispatchNews] = useReducer(NewsReducer, []);
     useEffect(() => {
@@ -72,10 +68,6 @@ if (!mounted) return null; // ngăn lỗi khi prerender
     return <NewsContext.Provider value={{ news, dispatchNews }}>{children}</NewsContext.Provider>;
 };
 const NewsCard = ({ news, isOpenModal, currentId }: any) => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     const newsContext = useContext(NewsContext);
     const dispatchNews = newsContext?.dispatchNews;
     const [openPopover, setOpenPopover] = useState<boolean>(false);
@@ -237,9 +229,6 @@ const NewsPageMain = () => {
             deleteNewsMutation.reset();
         }
     }, [deleteNewsMutation.isSuccess, deleteNewsMutation.data]);
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
-    if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <>
             <Masonry
@@ -290,10 +279,6 @@ const NewsPageMain = () => {
     );
 };
 const NewsPage = () => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     return (
         <NewsProvider>
             <NewsPageMain />

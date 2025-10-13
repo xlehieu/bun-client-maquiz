@@ -20,10 +20,6 @@ const QuizzesProvider = ({ children }: any) => {
     const [searchName, setSearchName] = useState('');
     const [schoolYear, setSchoolYear] = useState([2000, nowYear]);
     const [educationLevel, setEducationLevel] = useState([]);
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     return (
         <QuizzesContext.Provider
             value={{
@@ -42,10 +38,6 @@ if (!mounted) return null; // ngăn lỗi khi prerender
     );
 };
 const SideBar = () => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     const { setQuizzes, searchName, schoolYear, setSchoolYear, educationLevel, setEducationLevel } =
         useContext(QuizzesContext);
     const findQuizMutation = useMutationHooks((data: any) => QuizService.getDiscoveryQuizzes(data));
@@ -118,10 +110,6 @@ if (!mounted) return null; // ngăn lỗi khi prerender
     );
 };
 const MainResult = () => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     const { quizzes, setQuizzes, searchName, setSearchName, schoolYear } = useContext(QuizzesContext);
 
     const debouncedValueSearch = useDebounce(searchName);
@@ -190,10 +178,6 @@ if (!mounted) return null; // ngăn lỗi khi prerender
     );
 };
 const DiscoverPage = () => {
-    const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null; // ngăn lỗi khi prerender
-
     return (
         <QuizzesProvider>
             <div className="relative">
