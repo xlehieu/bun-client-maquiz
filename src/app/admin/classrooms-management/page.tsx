@@ -84,10 +84,7 @@ const ClassroomManagement = () => {
                 id,
             },
         });
-        toast.success('Cập nhật trạng thái thành công');
-        // setTimeout(() => {
-        //     location.reload();
-        // }, 1000);
+        toast.success('Cập nhật trạng thái thành công')
     };
     useEffect(() => {
         console.log(classroomList);

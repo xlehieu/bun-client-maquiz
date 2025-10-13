@@ -1,4 +1,6 @@
 import axios, { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+const router = useRouter();
 import Cookies from 'js-cookie';
 const axiosApplicationJson = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -17,11 +19,11 @@ axiosApplicationJson.interceptors.response.use(
 
             // Xử lý chung cho từng mã lỗi
             if (status === 401) {
-                window.location.href = '/dang-nhap';
+                router.replace('/dang-nhap');
                 return;
             }
             if (status === 403) {
-                window.location.href = '/page-not-found';
+                router.replace('/page-not-found');
                 return;
             }
 

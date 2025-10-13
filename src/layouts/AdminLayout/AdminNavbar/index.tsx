@@ -7,11 +7,14 @@ import Link from 'next/link';
 import siteRouter, { userDashboardRouter } from '@/config';
 import * as AuthService from '@/services/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
+import { useRouter } from 'next/navigation';
 export default function AdminNavbar({ user }: any) {
+    const router =useRouter()
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const handleLogout = () => {
         logoutMutation.mutate();
-        return window.location.assign('/');
+        router.replace("/")
+        return
     };
     return (
         <>
@@ -22,7 +25,7 @@ export default function AdminNavbar({ user }: any) {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => window.location.reload()}
+                        onClick={() => router.refresh()}
                     >
                         Dashboard
                     </a>
