@@ -47,6 +47,7 @@ const SignInPage = () => {
     const getUserDetailMutation = useMutationHooks(() => UserService.getUserDetail());
     useEffect(() => {
         if (loginMutation.isSuccess) {
+            localStorage.setItem("access_token",loginMutation.data.access_token)
             getUserDetailMutation.mutate();
         } else if (loginMutation.isError) {
             console.log('OK');

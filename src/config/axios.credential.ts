@@ -38,10 +38,10 @@ axiosCredentials.interceptors.response.use(
     },
 );
 axiosCredentials.interceptors.request.use((config) => {
-    const token = Cookies.get('access_token');
+    const token = localStorage.get('access_token');
     console.log(token);
     if (token) {
-        config.headers.Authorization = token;
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
