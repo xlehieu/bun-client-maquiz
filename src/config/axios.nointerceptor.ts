@@ -20,7 +20,7 @@ axiosNoInterceptor.interceptors.response.use(
     },
 );
 axiosNoInterceptor.interceptors.request.use((config) => {
-    const token = localStorage.get('access_token');
+    const token = localStorage.getItem('access_token');
     console.log(token);
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
