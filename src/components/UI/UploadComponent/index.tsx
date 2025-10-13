@@ -1,4 +1,5 @@
-import React, { useRef, useState, memo } from 'react';
+'use client'
+import React, { useRef, useState, memo, useEffect } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -37,18 +38,27 @@ const UploadComponent = ({ imageUrl, setImageUrl, className, ...props }: any) =>
     const handleClickOpenInputFile = () => {
         inputRef?.current?.click();
     };
-    const UploadButton = () => (
-        <button className="w-full hover:cursor-pointer" type="button" onClick={handleClickOpenInputFile}>
+    const UploadButton = () => {
+        const [mounted, setMounted] = useState(false);
+                useEffect(() => setMounted(true), []);
+                if (!mounted) return null; // ngăn lỗi khi prerender
+        return(
+
+            <button className="w-full hover:cursor-pointer" type="button" onClick={handleClickOpenInputFile}>
             {loading ? <LoadingOutlined /> : <FontAwesomeIcon className="text-[#333]" icon={faImage} />}
             <div
                 style={{
                     marginTop: 8,
                 }}
-            >
+                >
                 <span className="font-semibold">Tải liên</span>
             </div>
         </button>
-    );
+)
+}
+const [mounted, setMounted] = useState(false);
+            useEffect(() => setMounted(true), []);
+            if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <div className={`${className} hover:cursor-pointer`} {...props}>
             <input

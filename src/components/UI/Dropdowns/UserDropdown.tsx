@@ -1,3 +1,4 @@
+'use client'
 import React, { createRef } from 'react';
 import { createPopper } from '@popperjs/core';
 import Tippy from '@tippyjs/react';

@@ -1,3 +1,4 @@
+'use client'
 import siteRouter from '@/config';
 import Link from 'next/link';
 

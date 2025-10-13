@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { ClockLoader } from 'react-spinners';
 import { colors } from '@/common/constants';

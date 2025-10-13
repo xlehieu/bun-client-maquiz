@@ -3,8 +3,6 @@ import dynamic from 'next/dynamic';
 import React, { useState, useCallback, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { LoadingOutlined, DeleteOutlined, PlusOutlined, DeliveredProcedureOutlined } from '@ant-design/icons';
-
-const JoditEditor = dynamic(() => import('jodit-react'));
 //Components
 import UploadComponent from '@/components/UI/UploadComponent';
 import * as QuizService from '@/services/quiz.service';
@@ -12,13 +10,11 @@ import * as FileService from '@/services/file.service';
 import Button from '@/components/UI/Button';
 import CreateQuizPart from '@/components/UI/CreateQuizPart';
 import BlurBackground from '@/components/UI/BlurBackground';
-//
 import { Input, Select } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { educationLevels, imageQuizThumbDefault } from '@/common/constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faFileImport, faPlusCircle, faQuestionCircle, faReply } from '@fortawesome/free-solid-svg-icons';
-
 import configEditor from '@/config/editor';
 import { useSelector } from 'react-redux';
 import siteRouter, { userDashboardRouter } from '@/config';
@@ -27,10 +23,14 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import CreateMatchQuestion from '@/components/Quiz/Questions/CreateMatchQuestion';
-
 const TabIndexContext = createContext<any>({});
 const QuizIdContext = createContext<any>({});
+const JoditEditor = dynamic(() => import('jodit-react'));
 const QuizContextProvider = ({ children }: { children: ReactNode }) => {
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
+
     //region Tab index context
     const [currentTabIndex, setCurrentTabIndex] = useState(0);
     const [quizId, setQuizId] = useState();
@@ -41,6 +41,10 @@ const QuizContextProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 const CreateQuizGeneralInfo = () => {
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
+
     const { currentTabIndex, setCurrentTabIndex } = useContext(TabIndexContext);
     const { setQuizId } = useContext(QuizIdContext);
     //region General information
@@ -281,6 +285,10 @@ const CreateQuizGeneralInfo = () => {
 };
 //region Create question
 const CreateQuizQuestion = () => {
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
+
     const { quizId } = useContext(QuizIdContext);
     // region QUIZ
     const [currentQuizPartName, setCurrentQuizPartName] = useState('Phần 1'); //lấy sate này để lưu thông tin phần của câu hỏi
@@ -408,6 +416,7 @@ const CreateQuizQuestion = () => {
     };
     //1 -n đáp án
     const OneNNAnswer = () => (
+        
         <React.Fragment>
             {[1, 2].includes(questionType) && (
                 <React.Fragment>
@@ -581,6 +590,7 @@ const CreateQuizQuestion = () => {
     );
 };
 const ImportQuestions = () => {
+    
     const { quizId } = useContext(QuizIdContext);
     const [file, setFile] = useState(null);
     const importDataMutation = useMutationHooks((data: any) => FileService.ImportData(data));
@@ -613,7 +623,9 @@ const ImportQuestions = () => {
             router.push(userDashboardRouter.editMyQuizNoParam + quizId);
         }
     }, [importDataMutation.isSuccess, importDataMutation.isError, countdown]);
-    useEffect(() => {}, []);
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <section className="px-3 py-4 rounded-lg border-2 shadow-sm w-full bg-white">
             <Input
@@ -668,6 +680,9 @@ const CreateQuizPageMain = () => {
         if (!quizId) return toast.warning('Bạn phải tạo thông tin chung của đề thi trước 😉');
         setCurrentTabIndex(2);
     };
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <div className="bg-opacity-40 py-10">
             <div className="w-full m-auto flex justify-between">
@@ -721,6 +736,9 @@ const CreateQuizPage = () => {
             setLoading(false);
         }, 2222);
     }, []);
+    const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return null; // ngăn lỗi khi prerender
     return <QuizContextProvider>{loading ? <LoadingComponent /> : <CreateQuizPageMain />}</QuizContextProvider>;
 };
 export default CreateQuizPage;
