@@ -1,5 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+
 const axiosCredentials = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
@@ -14,7 +16,10 @@ axiosCredentials.interceptors.response.use(
         if (error.response) {
             const status = error.response.status;
             const message = (error.response.data as any)?.message || 'Có lỗi xảy ra';
-
+            if (typeof window === 'undefined') {
+                // Tránh lỗi khi prerender / SSR
+                return Promise.reject(error);
+              }
             // Xử lý chung cho từng mã lỗi
             if (status === 401) {
                 window.location.href = '/dang-nhap';
@@ -22,6 +27,7 @@ axiosCredentials.interceptors.response.use(
             }
             if (status === 403) {
                 window.location.href = '/page-not-found';
+
                 return;
             }
 
@@ -32,10 +38,10 @@ axiosCredentials.interceptors.response.use(
     },
 );
 axiosCredentials.interceptors.request.use((config) => {
-    const token = Cookies.get('access_token');
+    const token = localStorage.getItem('access_token');
     console.log(token);
     if (token) {
-        config.headers.Authorization = token;
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });

@@ -10,7 +10,11 @@ const ResetPasswordForm = () => {
     useEffect(() => {
         document.title = 'Đặt lại mật khẩu';
     }, []);
+<<<<<<< HEAD
     const router = useRouter();
+=======
+    const router =useRouter()
+>>>>>>> 9806a37d28a305f33faa7a6823d799ddf23d89d9
     const searchParams = useSearchParams();
     const token = searchParams?.get('token');
     const [password, setPassword] = useState('');
@@ -25,7 +29,11 @@ const ResetPasswordForm = () => {
         if (resetPasswordMutation.isSuccess) {
             toast.success('Đổi mật khẩu thành công.');
             setTimeout(() => {
+<<<<<<< HEAD
                 router.push('/');
+=======
+                router.refresh()
+>>>>>>> 9806a37d28a305f33faa7a6823d799ddf23d89d9
             }, 1500);
         } else if (resetPasswordMutation.isError) {
             toast.error('Đổi mật khẩu thất bại.');

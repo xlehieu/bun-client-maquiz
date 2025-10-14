@@ -1,4 +1,4 @@
-import React from 'react';
+'use client'
 const BlurBackground = ({ isActive, onClick = () => {}, ...props }: any) => {
     return (
         <div

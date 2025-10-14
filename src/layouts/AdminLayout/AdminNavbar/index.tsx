@@ -9,11 +9,13 @@ import * as AuthService from '@/services/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useRouter } from 'next/navigation';
 export default function AdminNavbar({ user }: any) {
+    const router = useRouter();
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const router = useRouter();
     const handleLogout = () => {
         logoutMutation.mutate();
-        return router.push('/');
+        router.replace('/');
+        return;
     };
     return (
         <>
@@ -24,7 +26,7 @@ export default function AdminNavbar({ user }: any) {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => router.push(adminRouter.userList)}
+                        onClick={() => router.refresh()}
                     >
                         Dashboard
                     </a>

@@ -1,7 +1,6 @@
 'use client';
 import Xarrow from 'react-xarrows';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-
 export default function DoMatchQuestion() {
     const refQuestion = useRef<any[]>([]);
     const refAnswers = useRef<any[]>([]);
@@ -16,6 +15,7 @@ export default function DoMatchQuestion() {
             }
         });
     }, []);
+    
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, indexElement: number) => {
         e.preventDefault(); // chặn default drag
         setDragging(true);
@@ -90,6 +90,9 @@ export default function DoMatchQuestion() {
         }
         return () => document.removeEventListener('mousemove', handleMouseMove);
     }, [dragging]);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <>
             <div className="grid grid-cols-2 gap-10">

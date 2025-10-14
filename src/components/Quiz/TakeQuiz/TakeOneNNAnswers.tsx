@@ -1,3 +1,4 @@
+'use client'
 import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
 import HTMLReactParser from 'html-react-parser/lib/index';
 import React from 'react';

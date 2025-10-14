@@ -111,7 +111,11 @@ const NewsFeedComponent = () => {
         } else if (uploadPostMutation.isSuccess) {
             if (typeof window == 'undefined') return;
             toast.success('Thêm thông báo lớp học thành công');
+<<<<<<< HEAD
             router.refresh();
+=======
+            router.refresh()
+>>>>>>> 9806a37d28a305f33faa7a6823d799ddf23d89d9
         }
     }, [uploadPostMutation.isError, uploadPostMutation.isSuccess]);
 
@@ -132,7 +136,11 @@ const NewsFeedComponent = () => {
             setIsShowModal(false);
             deletePostMutation.reset();
         } else if (deletePostMutation.isSuccess) {
+<<<<<<< HEAD
             router.refresh();
+=======
+            router.refresh()
+>>>>>>> 9806a37d28a305f33faa7a6823d799ddf23d89d9
         }
     }, [deletePostMutation.isError, deletePostMutation.isSuccess]);
     //region edit classroom

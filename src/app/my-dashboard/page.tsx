@@ -1,6 +1,6 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import QuizCard from '@/components/Quiz/QuizCard';
 import * as UserService from '@/services/user.service';
 
@@ -13,6 +13,9 @@ const MyLibrary = () => {
         document.title = 'My Dashboard';
     });
     console.log(userQuery.data);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <>
             <section className="pb-5">

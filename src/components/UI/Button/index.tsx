@@ -1,3 +1,4 @@
+'use client'
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
 import Link from 'next/link';

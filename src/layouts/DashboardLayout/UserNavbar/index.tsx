@@ -12,7 +12,7 @@ export default function UserNavbar({ user }: { user: IUser }) {
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const handleLogout = () => {
         logoutMutation.mutate();
-        return router.push('/');
+        return router.replace('/');
     };
     return (
         <>
@@ -23,7 +23,7 @@ export default function UserNavbar({ user }: { user: IUser }) {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => router.refresh()}
+                        onClick={() => router.push(userDashboardRouter.myDashboard)}
                     >
                         Dashboard
                     </a>
