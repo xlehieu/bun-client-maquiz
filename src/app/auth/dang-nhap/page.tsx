@@ -8,7 +8,7 @@ import * as UserService from '@/services/user.service';
 import * as AuthService from '@/services/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { toast } from 'sonner';
-import { updateUser } from '@/redux/slices/user.slice';
+import { fetchUserProfile, updateUser } from '@/redux/slices/user.slice';
 import siteRouter from '@/config';
 import Cookies from 'js-cookie';
 import { ILoginForm } from '@/interface';
@@ -47,6 +47,8 @@ const SignInPage = () => {
     const getUserDetailMutation = useMutationHooks(() => UserService.getUserDetail());
     useEffect(() => {
         if (loginMutation.isSuccess) {
+            console.log(loginMutation.data.data.access_token);
+            localStorage.setItem('access_token', loginMutation.data?.data?.access_token || '');
             getUserDetailMutation.mutate();
         } else if (loginMutation.isError) {
             console.log('OK');
@@ -55,7 +57,7 @@ const SignInPage = () => {
     }, [loginMutation.isSuccess, loginMutation.isError]);
     useEffect(() => {
         if (getUserDetailMutation.data) {
-            dispatch(updateUser({ ...getUserDetailMutation.data }));
+            dispatch(fetchUserProfile() as any);
             toast.success('Đăng nhập thành công');
             router.push('/');
         } else if (getUserDetailMutation.isError) {

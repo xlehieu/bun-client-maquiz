@@ -4,14 +4,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
-import siteRouter, { userDashboardRouter } from '@/config';
+import siteRouter, { adminRouter, userDashboardRouter } from '@/config';
 import * as AuthService from '@/services/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
+import { useRouter } from 'next/navigation';
 export default function AdminNavbar({ user }: any) {
     const logoutMutation = useMutationHooks(() => AuthService.logout());
+    const router = useRouter();
     const handleLogout = () => {
         logoutMutation.mutate();
-        return window.location.assign('/');
+        return router.push('/');
     };
     return (
         <>
@@ -22,7 +24,7 @@ export default function AdminNavbar({ user }: any) {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => window.location.reload()}
+                        onClick={() => router.push(adminRouter.userList)}
                     >
                         Dashboard
                     </a>

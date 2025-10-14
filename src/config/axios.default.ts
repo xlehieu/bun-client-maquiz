@@ -17,10 +17,12 @@ axiosApplicationJson.interceptors.response.use(
 
             // Xử lý chung cho từng mã lỗi
             if (status === 401) {
+            if (typeof window == 'undefined') return;
                 window.location.href = '/dang-nhap';
                 return;
             }
             if (status === 403) {
+            if (typeof window == 'undefined') return;
                 window.location.href = '/page-not-found';
                 return;
             }

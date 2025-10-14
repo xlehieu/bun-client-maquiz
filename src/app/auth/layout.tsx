@@ -21,7 +21,7 @@ function SignInUpLayout({ children, title }: any) {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
     useEffect(() => {
-        document.title = title;
+        document.title = title || 'Maquiz';
     }, []);
     return (
         <div className="relative md:px-0 min-h-screen">

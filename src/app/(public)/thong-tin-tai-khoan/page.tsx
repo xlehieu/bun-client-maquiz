@@ -53,7 +53,7 @@ const ProfileUser = () => {
         } else if (updateUserMutation.isSuccess) {
             toast.success('Thay đổi thông tin thành công');
             setTimeout(() => {
-                location.href = location.origin;
+                router.push('/');
             }, 1500);
         }
     }, [updateUserMutation.isError, updateUserMutation.isSuccess]);
