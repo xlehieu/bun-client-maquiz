@@ -12,15 +12,11 @@ import LoadingComponent from '@/components/UI/LoadingComponent';
 import { useQuery } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import QuizPreviewQuestion from '@/components/Quiz/QuizPreviewQuestion';
-import { usePathname } from 'next/navigation';
 const ReviewQuizPage = () => {
     const params = useParams();
     const slug = params?.slug as string;
-<<<<<<< HEAD
-    // const path = usePathname()
-=======
+
     const path = usePathname();
->>>>>>> 9806a37d28a305f33faa7a6823d799ddf23d89d9
     const queryQuizDetail = useQuery({
         queryKey: ['QueryQuizPreviewBySlug', slug],
         queryFn: () => QuizService.getQuizPreviewBySlug(slug),

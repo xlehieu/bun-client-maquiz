@@ -9,7 +9,6 @@ import * as AuthService from '@/services/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useRouter } from 'next/navigation';
 export default function AdminNavbar({ user }: any) {
-    const router = useRouter();
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const router = useRouter();
     const handleLogout = () => {
