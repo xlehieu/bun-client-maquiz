@@ -611,7 +611,7 @@ const TakeQuizPageMain = () => {
                     <LoadingComponent />
                 )}
             </div>
-            {quizDetail.isUseChatBot && <ChatBot />}
+            <ChatBot />
         </React.Fragment>
     );
 };
