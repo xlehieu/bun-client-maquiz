@@ -4,7 +4,7 @@ import * as QuizService from '@/services/quiz.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { educationLevels, imageQuizThumbDefault } from '@/common/constants';
 import UploadComponent from '@/components/UI/UploadComponent';
-import { Input, Select } from 'antd';
+import { Input, Select, Switch } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { faSave } from '@fortawesome/free-regular-svg-icons';
@@ -24,6 +24,7 @@ const EditGeneralInformationTab = () => {
     const [quizTopic, setQuizTopic] = useState('');
     const [quizSchoolYear, setQuizSchoolYear] = useState<number>(new Date().getFullYear());
     const [quizEducationLevel, setQuizEducationLevel] = useState([]);
+    const [isUseChatBot, setIsUseChatBot] = useState(false);
 
     const refQuizName = useRef<any>({});
     const refQuizDesc = useRef<any>({});
@@ -74,6 +75,7 @@ const EditGeneralInformationTab = () => {
             topic: quizTopic,
             schoolYear: quizSchoolYear,
             educationLevel: quizEducationLevel,
+            isUseChatBot
         });
     };
     useEffect(() => {
@@ -85,6 +87,7 @@ const EditGeneralInformationTab = () => {
         setQuizEducationLevel(quizDetail?.educationLevel);
         setQuizTopic(quizDetail?.topic);
         setQuizSchoolYear(quizDetail?.schoolYear);
+        setIsUseChatBot(quizDetail?.isUseChatBot);
     }, [quizDetail]);
     useEffect(() => {
         if (updateQuizGeneralMutation.isSuccess) {
@@ -175,7 +178,7 @@ const EditGeneralInformationTab = () => {
                         <Select
                             mode="multiple"
                             allowClear
-                            placeholder="Please select"
+                            placeholder="Chọn trình độ"
                             value={quizEducationLevel}
                             onChange={(e) => setQuizEducationLevel(e)}
                         >
@@ -238,6 +241,9 @@ const EditGeneralInformationTab = () => {
                         ></TextArea>
                         <span className="text-sm text-red-600" ref={refQuizDesc}></span>
                     </div>
+                    <div className='columns-2'>
+                        <span className='mr-2'>Cho phép sử dụng Chatbot</span><Switch checked={isUseChatBot} onChange={(checked) => setIsUseChatBot(checked)} />
+                </div>
                 </div>
             </div>
             <div className="mt-4 w-full flex justify-end bg-white py-3 px-4 rounded shadow-sm">

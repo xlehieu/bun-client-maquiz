@@ -109,14 +109,14 @@ const TakeOneNNAnswers = ({
                 <div className="my-2 font-medium">
                     {/* Hiển thị nội dung câu hỏi */}
                     {HTMLReactParser(
-                        quizDetail.quiz[currentPartIndex].questions[currentQuestionIndex].questionContent || '',
+                        quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent || '',
                     )}
                 </div>
                 <div className="flex flex-col gap-5">
                     {/* Render các câu trả lời và chọn */}
-                    {quizDetail.quiz[currentPartIndex].questions[currentQuestionIndex].answers instanceof Array && (
+                    {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers instanceof Array && (
                         <>
-                            {quizDetail.quiz[currentPartIndex].questions[currentQuestionIndex].answers.map(
+                            {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
                                 (answer: any, index: number) => (
                                     <label
                                         key={index}

@@ -13,7 +13,7 @@ import Button from '@/components/UI/Button';
 import CreateQuizPart from '@/components/UI/CreateQuizPart';
 import BlurBackground from '@/components/UI/BlurBackground';
 //
-import { Input, Select } from 'antd';
+import { Input, Select, Switch } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { educationLevels, imageQuizThumbDefault } from '@/common/constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -52,6 +52,7 @@ const CreateQuizGeneralInfo = () => {
     const [quizEducationLevel, setQuizEducationLevel] = useState([]);
     const [quizSchoolYear, setQuizSchoolYear] = useState(new Date().getFullYear());
     const [quizTopic, setQuizTopic] = useState('');
+    const [isUseChatBot, setIsUseChatBot] = useState(false);
     // ref vào các span để hiển  thị validate
     const refQuizName = useRef<any>('');
     const refQuizDesc = useRef<any>('');
@@ -113,6 +114,7 @@ const CreateQuizGeneralInfo = () => {
             schoolYear: quizSchoolYear,
             topic: quizTopic,
             educationLevel: quizEducationLevel,
+            isUseChatBot
         });
     };
     //END
@@ -158,7 +160,7 @@ const CreateQuizGeneralInfo = () => {
                     <Select
                         mode="multiple"
                         allowClear
-                        placeholder="Please select"
+                        placeholder="Chọn trình độ"
                         value={quizEducationLevel}
                         onChange={(e) => setQuizEducationLevel(e)}
                     >
@@ -261,6 +263,9 @@ const CreateQuizGeneralInfo = () => {
                         ></Input>
                         <span className="text-sm text-red-600" ref={refQuizSubject}></span>
                     </div>
+                </div>
+                <div className='columns-2'>
+                    <span className='mr-2'>Cho phép sử dụng Chatbot</span><Switch checked={isUseChatBot} onChange={(checked) => setIsUseChatBot(checked)} />
                 </div>
                 <div>
                     <button

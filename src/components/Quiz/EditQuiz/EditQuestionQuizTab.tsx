@@ -271,8 +271,7 @@ const EditQuestionQuizTab = () => {
                                         <div className="flex justify-between content-center">
                                             <div className="flex text-xl pb-2">
                                                 {quizDetail.quiz &&
-                                                quizDetail.quiz[currentPartIndex].questions[currentQuestionIndex]
-                                                    .questionType == 1 ? (
+                                                quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionType == 1 ? (
                                                     <input
                                                         name="isCorrect"
                                                         checked={answer.isCorrect}

@@ -41,7 +41,7 @@ const QuizDetailPage = () => {
     const handleChangeQuestionIndex = (index: number) => {
         setCurrentQuestionIndex(index);
         if (data) {
-            if (data.quiz[currentPartIndex].questions[index]) {
+            if (data?.quiz?.[currentPartIndex]?.questions?.[index]) {
                 setCurrentQuestionIndex(index);
             }
         }
@@ -127,13 +127,12 @@ const QuizDetailPage = () => {
                                     ]
                                 }
                             </p>
-                            {data?.quiz[currentPartIndex].questions[currentQuestionIndex].questionContent && (
+                            {data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent && (
                                 <div>
                                     <h4 className="mt-3 text-xl font-bold flex">Câu hỏi:</h4>
                                     <div className="mt-1 text-xl">
                                         {HTMLReactParser(
-                                            data?.quiz[currentPartIndex].questions[currentQuestionIndex]
-                                                .questionContent,
+                                            data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent,
                                         )}
                                     </div>
                                 </div>

@@ -42,7 +42,7 @@ const CreateMatchQuestion = ({
                 const newQuizDetail = { ...preValue };
                 if (Number.isInteger(currentPartIndex) && Number.isInteger(currentQuestionIndex) && newQuizDetail?.quiz)
                     newQuizDetail.quiz[currentPartIndex].questions[currentQuestionIndex] = {
-                        questionType: newQuizDetail.quiz[currentPartIndex].questions[currentQuestionIndex].questionType,
+                        questionType: newQuizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionType,
                         matchQuestions,
                     };
                 return newQuizDetail;
