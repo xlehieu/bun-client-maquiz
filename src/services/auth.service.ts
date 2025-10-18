@@ -13,7 +13,7 @@ export const login = async (data: ILoginForm) => {
 export const loginWithGoogle = async () => {
     if (typeof window !== 'undefined') {
         window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
-      }
+    }
 };
 export const logout = async () => {
     const res = await axiosCredentials.post(`/auth/log-out`);

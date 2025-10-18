@@ -1,0 +1,27 @@
+'use client'
+
+import { useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import LoadingComponent from '@/components/UI/LoadingComponent';
+
+const LoginSuccessPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = searchParams.get('token'); // Lấy token từ URL
+    if (token) {
+      localStorage.setItem('access_token', token); // Lưu vào localStorage
+      // Có thể redirect về trang home hoặc dashboard
+      router.replace('/'); // ví dụ redirect về home
+    }
+  }, [searchParams, router]);
+
+  return (
+    <div>
+      <LoadingComponent/>
+    </div>
+  );
+}
+
+export default LoginSuccessPage;
