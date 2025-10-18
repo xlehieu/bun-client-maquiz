@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGauge, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import siteRouter, { userDashboardRouter } from '@/config';
+import { useRouter } from 'next/navigation';
 
 const UserDropdown = ({ user }: any) => {
+    const router = useRouter()
     // dropdown props
     const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
     const btnDropdownRef = createRef<HTMLAnchorElement>();
@@ -54,7 +56,10 @@ const UserDropdown = ({ user }: any) => {
                         </Link>
                         <button
                             className="text-start px-2 py-2 text-gray-600 duration-200 hover:rounded hover:bg-black hover:bg-opacity-5"
-                            onClick={() => {}}
+                            onClick={() => {
+                                localStorage.clear()
+                                router.replace("/")
+                            }}
                         >
                             <FontAwesomeIcon icon={faRightFromBracket} className="pr-2" />
                             Đăng xuất

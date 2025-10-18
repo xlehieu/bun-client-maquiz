@@ -12,7 +12,7 @@ export default function AdminNavbar({ user }: any) {
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const router = useRouter();
     const handleLogout = () => {
-        logoutMutation.mutate();
+        localStorage.clear()
         router.replace('/');
         return;
     };

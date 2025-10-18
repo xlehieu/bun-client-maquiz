@@ -11,7 +11,7 @@ export default function UserNavbar({ user }: { user: IUser }) {
     const router = useRouter();
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const handleLogout = () => {
-        logoutMutation.mutate();
+        localStorage.clear()
         return router.replace('/');
     };
     return (

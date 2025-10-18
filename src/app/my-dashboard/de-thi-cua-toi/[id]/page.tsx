@@ -138,12 +138,12 @@ const QuizDetailPage = () => {
                                 </div>
                             )}
                             <div className="text-base">
-                                {data?.quiz[currentPartIndex].questions[currentQuestionIndex].answers.map(
+                                {data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
                                     (answer: any, index: number) => (
                                         <div key={index} className="mt-3 flex">
                                             <input
                                                 type={`${
-                                                    data?.quiz[currentPartIndex].questions[currentQuestionIndex]
+                                                    data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
                                                         ?.questionType == 1
                                                         ? 'radio'
                                                         : 'checkbox'
