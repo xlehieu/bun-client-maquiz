@@ -3,13 +3,17 @@ import React from 'react';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
 import siteRouter, { userDashboardRouter } from '@/config';
-import * as AuthService from '@/services/auth.service';
+import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { IUser } from '@/interface';
-export default function UserNavbar({ user }: { user: IUser }) {
+import { useAppSelector } from '@/redux/hooks';
+import { persistor } from '@/redux/store';
+export default function UserNavbar() {
     const logoutMutation = useMutationHooks(() => AuthService.logout());
+    const {userProfile} = useAppSelector(state=>state.user) 
     const handleLogout = () => {
         logoutMutation.mutate();
+        persistor.purge()
         return window.location.assign('/');
     };
     return (
@@ -56,10 +60,10 @@ export default function UserNavbar({ user }: { user: IUser }) {
                         }
                     >
                         <div className="flex justify-between items-center hover:cursor-pointer">
-                            {user?.avatar && (
-                                <img className="rounded-full mr-1 w-8 h-8" src={user?.avatar} alt={user?.name} />
+                            {userProfile?.avatar && (
+                                <img className="rounded-full mr-1 w-8 h-8" src={userProfile?.avatar} alt={userProfile?.name} />
                             )}
-                            <p className="text-lg text-white ">{user?.name}</p>
+                            <p className="text-lg text-white ">{userProfile?.name}</p>
                         </div>
                     </Tippy>
                 </div>

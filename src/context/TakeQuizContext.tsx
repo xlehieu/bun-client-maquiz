@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { createContext, ReactNode, useEffect, useReducer, useState } from 'react';
 import { toast } from 'sonner';
-import * as QuizService from '@/services/quiz.service';
+import * as QuizService from '@/api/quiz.service';
 export const TakeQuizContext = createContext<any>({});
 export const TakeMatchingQuestionContext = createContext<any>({});
 const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNode; answerChoiceReducer: any }) => {
@@ -54,7 +54,6 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
             });
             setCountAnswerChoices(count);
         }
-        console.log('answerChoices', answerChoices);
     }, [answerChoices]);
     //
 

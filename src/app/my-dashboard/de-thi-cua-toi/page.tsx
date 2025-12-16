@@ -1,7 +1,7 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import React, { createContext, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
-import * as QuizService from '@/services/quiz.service';
+import * as QuizService from '@/api/quiz.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Pagination } from 'antd';

@@ -103,7 +103,8 @@ export const imageQuizThumbDefault = [
 ];
 export const classroomImageFallback = `https://iteach.net/wp-content/uploads/new-teacher-classroom-setup.jpg`;
 export const colors = {
-    primary: '#0d99a6',
+    // primary: '#0d99a6',
+    primary: '#3178C6',
 };
 export const educationLevels = [
     'Tiểu học',

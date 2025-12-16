@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined, LoadingOutlined } from '@ant-design/icons';
 
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as UserService from '@/services/user.service';
+import * as UserService from '@/api/user.service';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 

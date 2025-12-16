@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
-import * as QuizService from '@/services/quiz.service';
+import * as QuizService from '@/api/quiz.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';

@@ -17,14 +17,17 @@ import { Popover } from 'antd';
 import { toast } from 'sonner';
 import LazyImage from '@/components/UI/LazyImage';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as UserService from '@/services/user.service';
-import * as FileService from '@/services/file.service';
+import * as UserService from '@/api/user.service';
+import * as FileService from '@/api/file.service';
 import { useDispatch, useSelector } from 'react-redux';
 import { favoriteQuiz } from '@/redux/slices/user.slice';
-import { IQuiz } from '@/interface';
 import { useRouter } from 'next/navigation';
-
-const GeneralInformation = ({ quizDetail }: { quizDetail: IQuiz }) => {
+import { QuizDetailRecord } from '@/types/quiz.type';
+import { FavoriteQuiz } from '@/types/user.type';
+type GeneralInformationProps = {
+    quizDetail: QuizDetailRecord | null;
+};
+const GeneralInformation = ({ quizDetail }: GeneralInformationProps) => {
     const router = useRouter();
     const dispatch = useDispatch();
     const user = useSelector((state: any) => state.user);
@@ -44,10 +47,10 @@ const GeneralInformation = ({ quizDetail }: { quizDetail: IQuiz }) => {
             index,
             isLoading: true,
         });
-        if (user?.favoriteQuiz?.some((quiz: IQuiz) => quiz?.slug === quizDetail?.slug))
+        if (user?.favoriteQuiz?.some((quiz: FavoriteQuiz) => quiz?.slug === quizDetail?.slug))
             return toast.info('Đề thi đã có trong danh sách yêu thích! ❤️❤️❤️');
         favoriteMutation.mutate({ id: quizDetail?._id });
-        dispatch(favoriteQuiz({ slug: quizDetail?.slug }));
+        dispatch(favoriteQuiz({ slug: quizDetail.slug }));
     };
     const [loading, setLoading] = useState({
         index: -1,
@@ -62,7 +65,7 @@ const GeneralInformation = ({ quizDetail }: { quizDetail: IQuiz }) => {
     const exportPdfMutation = useMutationHooks((data: any) => FileService.ExportPdf(data));
     const handleExportPdf = (index: number) => {
         exportPdfMutation.mutate({
-            id: quizDetail.id || quizDetail._id,
+            id: quizDetail?._id,
             collection: 'quiz',
         });
         setLoading({

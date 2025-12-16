@@ -1,6 +1,8 @@
+import { ApiResponse } from '@/types/api.type';
 import axiosCredentials from '../config/axios.credential';
 import axiosApplicationJson from '../config/axios.default';
 import { IQuerySkipLimit, IQuiz } from '@/interface';
+import { QuizDetailRecord } from '@/types/quiz.type';
 
 export const getQuizzes = async (data: IQuerySkipLimit) => {
     const params = new URLSearchParams();
@@ -23,27 +25,34 @@ export const createQuiz = async (data: IQuiz) => {
 
     const res = await axiosCredentials.post(
         `/quizzes/create`,
-        data,
+        JSON.stringify({
+            name,
+            description,
+            school,
+            subject,
+            topic,
+            schoolYear,
+            educationLevel,
+            thumb,
+        }),
     );
     return res.data.data;
 };
 export const createQuestion = async (data: any) => {
-    const res = await axiosCredentials.put(`/quizzes/createQuestion`, data);
+    const res = await axiosCredentials.put(`/quizzes/createQuestion`, JSON.stringify(data));
     return res.data.data;
 };
 export const updateQuizGeneralInfo = async (data: any) => {
-    const res = await axiosCredentials.put(`/quizzes/updateGeneralInfo`,data);
+    const res = await axiosCredentials.put(`/quizzes/updateGeneralInfo`, JSON.stringify(data));
     return res.data.data;
 };
 export const updateQuizQuestion = async (data: any) => {
-    const res = await axiosCredentials.put(`/quizzes/updateQuestion`, data);
+    const res = await axiosCredentials.put(`/quizzes/updateQuestion`, JSON.stringify(data));
 
     return res.data.data;
 };
 export const getQuizPreviewBySlug = async (slug: string) => {
-    if (!slug) return null;
-    const res = await axiosApplicationJson.get(`/quizzes/preview/${slug}`);
-    return res.data.data; // data 1 là của axios còn data sau là của mình viết api trả về
+    return axiosCredentials.get<ApiResponse<QuizDetailRecord>>(`/quizzes/preview/${slug}`);
 };
 export const getQuizForExamBySlug = async (slug: string) => {
     if (!slug) {

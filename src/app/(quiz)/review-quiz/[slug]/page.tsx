@@ -1,34 +1,27 @@
 'use client';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { message } from 'antd';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import HTMLReactParser from 'html-react-parser';
-import * as QuizService from '@/services/quiz.service';
-import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
-import GeneralInformation from './GeneralInformation';
-import { questionTypeContent } from '@/common/constants';
-import LoadingComponent from '@/components/UI/LoadingComponent';
-import { useQuery } from '@tanstack/react-query';
 import QuizPreviewQuestion from '@/components/Quiz/QuizPreviewQuestion';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { fetchQuizPreview } from '@/redux/slices/quizV2.slice';
+import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Spin } from 'antd';
+import { useParams } from 'next/navigation';
+import { ReactNode, useEffect, useState } from 'react';
+import GeneralInformation from './GeneralInformation';
+import LoadingComponent from '@/components/UI/LoadingComponent';
 const ReviewQuizPage = () => {
+    const dispatch = useAppDispatch();
+    const { isFetching, currentQuizDetail } = useAppSelector((state) => state.quizV2);
     const params = useParams();
     const slug = params?.slug as string;
-    const path = location.pathname;
-    const queryQuizDetail = useQuery({
-        queryKey: ['QueryQuizPreviewBySlug', slug],
-        queryFn: () => QuizService.getQuizPreviewBySlug(slug),
-    });
+    useEffect(() => {
+        if (slug) dispatch(fetchQuizPreview(slug));
+    }, [slug]);
     const [currentTabIndex, setCurrentTabIndex] = useState(1);
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     useEffect(() => {
-        document.title = queryQuizDetail?.data?.name || 'Maquiz';
-    }, [queryQuizDetail.data]);
-    useEffect(() => {
-        if (queryQuizDetail?.isError) {
-            message.error(queryQuizDetail.error.message);
-        }
-    }, [queryQuizDetail.isError]);
+        document.title = currentQuizDetail?.name || 'Maquiz';
+    }, [currentQuizDetail?._id]);
     const tabButtons = [
         {
             key: 1,
@@ -39,10 +32,10 @@ const ReviewQuizPage = () => {
     const tabs: Record<number, ReactNode> = {
         1: (
             <>
-                {queryQuizDetail?.data?.quiz && (
+                {currentQuizDetail?.quiz && (
                     <>
                         <div className="flex gap-5  pb-4 w-full no-vertical-scroll maquiz-scroll">
-                            {queryQuizDetail?.data?.quiz.map((part: any, index: number) => (
+                            {currentQuizDetail?.quiz.map((part: any, index: number) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrentPartIndex(index)}
@@ -56,7 +49,7 @@ const ReviewQuizPage = () => {
                                 </button>
                             ))}
                         </div>
-                        <QuizPreviewQuestion quizDetail={queryQuizDetail?.data} currentPartIndex={currentPartIndex} />
+                        <QuizPreviewQuestion quizDetail={currentQuizDetail} currentPartIndex={currentPartIndex} />
                     </>
                 )}
             </>
@@ -65,32 +58,29 @@ const ReviewQuizPage = () => {
     };
     return (
         <div className="w-full">
-            {queryQuizDetail.isLoading ? (
-                <LoadingComponent />
-            ) : (
-                <>
-                    <GeneralInformation quizDetail={queryQuizDetail.data} />
-                    <div className="px-2 py-2 mt-5 rounded shadow-md border bg-white">
-                        <div className="flex gap-3 flex-wrap">
-                            {tabButtons.map((tabButton) => (
-                                <button
-                                    key={tabButton.key}
-                                    className={`${
-                                        currentTabIndex === tabButton.key
-                                            ? 'border-b-4 border-b-primary text-primary cursor-default'
-                                            : 'hover:opacity-50 cursor-pointer border-b-4 border-b-white'
-                                    } flex flex-wrap tabButtons-center text-lg pb-2 px-1 transition-all duration-200 ease-linear text-gray-500 items-center`}
-                                    onClick={() => setCurrentTabIndex(tabButton.key)}
-                                >
-                                    <FontAwesomeIcon className="block" icon={tabButton.icon} />
-                                    <p className="pl-2">{tabButton.label}</p>
-                                </button>
-                            ))}
-                        </div>
-                        <div className="mt-6">{tabs[currentTabIndex]}</div>
+            {/* <Spin spinning={isFetching}></Spin> */}
+            <LoadingComponent isLoading={isFetching}>
+                <GeneralInformation quizDetail={currentQuizDetail} />
+                <div className="px-2 py-2 mt-5 rounded shadow-md border bg-white">
+                    <div className="flex gap-3 flex-wrap">
+                        {tabButtons.map((tabButton) => (
+                            <button
+                                key={tabButton.key}
+                                className={`${
+                                    currentTabIndex === tabButton.key
+                                        ? 'border-b-4 border-b-primary text-primary cursor-default'
+                                        : 'hover:opacity-50 cursor-pointer border-b-4 border-b-white'
+                                } flex flex-wrap tabButtons-center text-lg pb-2 px-1 transition-all duration-200 ease-linear text-gray-500 items-center`}
+                                onClick={() => setCurrentTabIndex(tabButton.key)}
+                            >
+                                <FontAwesomeIcon className="block" icon={tabButton.icon} />
+                                <p className="pl-2">{tabButton.label}</p>
+                            </button>
+                        ))}
                     </div>
-                </>
-            )}
+                    <div className="mt-6">{tabs[currentTabIndex]}</div>
+                </div>
+            </LoadingComponent>
         </div>
     );
 };

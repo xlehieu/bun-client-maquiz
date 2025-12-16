@@ -5,7 +5,7 @@ import Tippy from '@tippyjs/react';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as ClassroomService from '@/services/classroom.service';
+import * as ClassroomService from '@/api/classroom.service';
 import { LoadingOutlined } from '@ant-design/icons';
 import { userDashboardRouter } from '@/config';
 import { useQuery } from '@tanstack/react-query';

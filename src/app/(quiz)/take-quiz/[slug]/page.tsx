@@ -2,7 +2,7 @@
 import { Select } from 'antd';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Lottie from 'lottie-react';
 import congratsAnimation from '@/asset/animations/congratulations-2.json';
 import Aos from 'aos';
@@ -15,7 +15,7 @@ import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import siteRouter from '@/config';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as QuizHistoryService from '@/services/quizHistory.service';
+import * as QuizHistoryService from '@/api/quizHistory.service';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { toast } from 'sonner';
 import 'react-circular-progressbar/dist/styles.css';
@@ -23,6 +23,8 @@ import ChatBot from '@/components/UI/ChatBot';
 import TakeOneNNAnswers from '@/components/Quiz/TakeQuiz/TakeOneNNAnswers';
 import TakeMatchQuestion from '@/components/Quiz/TakeQuiz/TakeMatchQuestion';
 import TakeQuizProvider, { ShuffleProvider, TakeQuizContext } from '@/context/TakeQuizContext';
+import { useAppDispatch } from '@/redux/hooks';
+import { fetchQuizPreview } from '@/redux/slices/quizV2.slice';
 //end
 
 const answerChoiceReducer = (state: any, action: any) => {
@@ -512,7 +514,13 @@ const TableOfQuestion = () => {
     );
 };
 const TakeQuizPageMain = () => {
+    const dispatch = useAppDispatch();
     const { quizDetail, answerChoices, isEnded, isTimeout, countQuestionQuizDetail } = useContext(TakeQuizContext);
+    console.log(answerChoices);
+    const slug = useParams()?.slug as string;
+    useEffect(() => {
+        dispatch(fetchQuizPreview(slug));
+    }, []);
     const [score, setScore] = useState(0);
     const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
     const handleSaveTakeQuizHistory = useMutationHooks((data: any) => QuizHistoryService.saveQuizHistory(data));

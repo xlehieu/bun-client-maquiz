@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import { useEffect, useState } from 'react';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as AuthService from '@/services/auth.service';
+import * as AuthService from '@/api/auth.service';
 import { useSearchParams } from 'next/navigation';
 import { EyeInvisibleOutlined, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
 import { toast } from 'sonner';

@@ -14,8 +14,10 @@
     --color-foreground: var(--foreground);
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
-    --color-primary: #0d99a6;
-    --color-primary-bold: #0a6770;
+    /* --color-primary: #0d99a6; */
+    --color-primary: #3178c6;
+    /* --color-primary-bold: #0a6770; */
+    --color-primary-bold: #1b61ad;
     --color-link: #00bfa5;
     --color-secondary: #2b6bb5;
     --color-background: #fcfcfc;

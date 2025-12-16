@@ -1,14 +1,15 @@
 // src/app/layout.tsx
 'use client';
-import './globals.css';
-import React, { useContext, useEffect } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-import store from '@/redux/store';
+import store, { persistor } from '@/redux/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'sonner';
 import 'antd/dist/antd'; // bạn có thể bỏ nếu dùng babel import plugin để import theo nhu cầu
-import UserProvide from '@/context/UserContext';
+import React, { useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Toaster } from 'sonner';
+import './globals.css';
+import AppLayout from '@/layouts/AppLayout';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -22,15 +23,18 @@ const queryClient = new QueryClient({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         document.title = 'Maquiz';
-    });
+    }, []);
+
     return (
-        <html lang="en">
+        <html lang="en" title="Maquiz">
             <body>
                 <Toaster position="top-right" richColors />
                 <QueryClientProvider client={queryClient}>
-                    <ReduxProvider store={store}>
-                        <UserProvide>{children}</UserProvide>
-                    </ReduxProvider>
+                    <Provider store={store}>
+                        <PersistGate loading={null} persistor={persistor}>
+                            <AppLayout>{children}</AppLayout>
+                        </PersistGate>
+                    </Provider>
                     <ReactQueryDevtools initialIsOpen={false} />
                 </QueryClientProvider>
             </body>

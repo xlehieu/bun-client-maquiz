@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import Masonry from 'react-masonry-css';
 import HTMLReactParser from 'html-react-parser';
-import * as NewsService from '@/services/news.service';
+import * as NewsService from '@/api/news.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Dispatch } from 'react';
 import {

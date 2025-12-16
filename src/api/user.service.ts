@@ -1,12 +1,13 @@
 import axios from 'axios';
 import axiosCredentials from '../config/axios.credential';
 import axiosNoInterceptor from '../config/axios.nointerceptor';
+import { ApiResponse } from '@/types/api.type';
+import { ExamHistoryRecord, UserDetail } from '@/types/user.type';
 
 //sử dụng headers để truyền token và thằng middleware phía backend sẽ nhận được token
 //để kiểm tra xem có quyền lấy data người dùng không
 export const getUserDetail = async () => {
-    const res = await axiosNoInterceptor.get(`/users/detail`);
-    return res?.data?.data;
+    return axiosCredentials.get<ApiResponse<UserDetail>>(`/users/detail`);
 };
 export const register = async (data: any) => {
     const res = await axiosNoInterceptor.post(`/users/sign-up`, JSON.stringify(data));
@@ -43,3 +44,6 @@ export const getQuizzesAccessHistory = async (data: any) => {
     const res = await axiosCredentials.get(`/users/quizz-access-history?${params}`);
     return res?.data.data;
 };
+export const getExamHistory = async ()=>{
+    return axiosCredentials.get<ApiResponse<ExamHistoryRecord[]>>(`/users/exam-history`)
+}

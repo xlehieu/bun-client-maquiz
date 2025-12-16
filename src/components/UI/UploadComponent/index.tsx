@@ -23,7 +23,7 @@ const beforeUpload = (event: any) => {
     }
     return isJpgOrPng && isLt2M;
 };
-const UploadComponent = ({ imageUrl, setImageUrl, className, ...props }: any) => {
+const UploadComponent = ({ value, onChange, className, ...props }: any) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
     const handleChange = (event: any) => {
@@ -31,7 +31,7 @@ const UploadComponent = ({ imageUrl, setImageUrl, className, ...props }: any) =>
         setLoading(true);
         getBase64(event.target.files[0], (base64: any) => {
             setLoading(false);
-            setImageUrl(base64); // tra base64 từ event load của reader
+            onChange(base64); // tra base64 từ event load của reader
         });
     };
     const handleClickOpenInputFile = () => {
@@ -60,17 +60,17 @@ const UploadComponent = ({ imageUrl, setImageUrl, className, ...props }: any) =>
             />
             <div
                 className={`border-2 border-dashed h-44 w-full ${
-                    imageUrl?.length > 0 ? 'py-5' : ''
+                    value?.length > 0 ? 'py-5' : ''
                 } border-primary flex rounded-md justify-center content-center hover:cursor-pointer`}
             >
-                {imageUrl ? (
+                {value ? (
                     <button className="w-full h-full" onClick={() => handleClickOpenInputFile()}>
                         {/* <img
                             src={imageUrl}
                             className="rounded-md cursor-pointer w-full object-cover h-full"
                             alt="thumbnail"
                         /> */}
-                        <LazyImage src={imageUrl} alt="thumbnail" className="w-full h-full hover:cursor-pointer" />
+                        <LazyImage src={value} alt="thumbnail" className="w-full h-full hover:cursor-pointer" />
                     </button>
                 ) : (
                     <UploadButton />

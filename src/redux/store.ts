@@ -1,9 +1,36 @@
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './slices/user.slice';
+import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
+import { Action, configureStore, ThunkAction, combineReducers } from '@reduxjs/toolkit';
+import storage from 'redux-persist/lib/storage'; // localStorage
+import userSlice from './slices/user.slice';
 import quizReducer from './slices/quiz.slice';
-export default configureStore({
-    reducer: {
-        user: userReducer,
-        quiz: quizReducer,
-    },
+import authReducer from './slices/auth.slice';
+import takeQuizReducer from './slices/takeQuiz';
+import quizV2Reducer from './slices/quizV2.slice';
+const rootReducer = combineReducers({
+    auth: authReducer,
+    user: userSlice,
+    quiz: quizReducer,
+    takeQuiz: takeQuizReducer,
+    quizV2: quizV2Reducer,
 });
+const persistConfig = {
+    key: 'root',
+    storage,
+    whitelist: [], // chỉ lưu 2 thằng này
+    blacklist: [], // muốn bỏ thằng nào thì thêm vào đây
+};
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+export const store = configureStore({
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }),
+});
+export const persistor = persistStore(store);
+export default store;
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;

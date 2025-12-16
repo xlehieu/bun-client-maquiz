@@ -5,7 +5,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
 import siteRouter, { userDashboardRouter } from '@/config';
-import * as AuthService from '@/services/auth.service';
+import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 export default function AdminNavbar({ user }: any) {
     const logoutMutation = useMutationHooks(() => AuthService.logout());

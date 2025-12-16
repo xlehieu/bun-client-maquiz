@@ -1,7 +1,7 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import * as UserService from '@/services/user.service';
+import * as UserService from '@/api/user.service';
 import QuizCard from '@/components/Quiz/QuizCard';
 // import useMutationHooks from '@/hooks/useMutationHooks';
 import { IQuiz } from '@/interface';

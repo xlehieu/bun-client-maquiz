@@ -9,10 +9,11 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/redux/hooks';
 export default function UserInfoHeader() {
     const router = useRouter();
-    const user = useSelector((state: any) => state.user);
     const [isExpand, setIsExpand] = useState(false);
+    const {userProfile} = useAppSelector(state=>state.user)
     const handleToggle = () => {
         if (!isExpand) {
             // document.documentElement.requestFullscreen?.() documentElement dùng để chuyển tất c ả các phần tử trong trang sang chế độ toàn màn hình
@@ -50,7 +51,7 @@ export default function UserInfoHeader() {
             <button onClick={handleToggle}>
                 <FontAwesomeIcon icon={faExpand} className="text-primary" />
             </button>
-            {user?.email ? ( // Menu tippy
+            {userProfile?.email ? ( // Menu tippy
                 <Tippy
                     trigger="click"
                     interactive
@@ -74,8 +75,8 @@ export default function UserInfoHeader() {
                     }
                 >
                     <div className="flex justify-between items-center hover:cursor-pointer">
-                        {user?.avatar && (
-                            <img className="rounded-full mr-1 w-10 h-10" src={user?.avatar} alt={user?.name} />
+                        {userProfile?.avatar && (
+                            <img className="rounded-full mr-1 w-10 h-10" src={userProfile?.avatar} alt={userProfile?.name} />
                         )}
                     </div>
                 </Tippy>

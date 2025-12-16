@@ -1,23 +1,32 @@
+import { useAppSelector } from '@/redux/hooks';
 import axios, { AxiosError } from 'axios';
-import Cookies from 'js-cookie';
+import { store } from '@/redux/store';
+import { setAccessToken } from '@/redux/slices/auth.slice';
 const axiosCredentials = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
-    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
 });
+axiosCredentials.interceptors.request.use((config) => {
+    const state = store.getState();
+    const access_token = state.auth.access_token;
+    if (access_token) {
+        config.headers.Authorization = 'Bearer ' + access_token;
+    }
+    return config;
+});
 axiosCredentials.interceptors.response.use(
     (response) => response, // Trả về reponse nếu không có lỗi,)
     (error: AxiosError<any>) => {
-        console.log('error', error);
         if (error.response) {
             const status = error.response.status;
             const message = (error.response.data as any)?.message || 'Có lỗi xảy ra';
 
             // Xử lý chung cho từng mã lỗi
             if (status === 401) {
-                window.location.href = '/dang-nhap';
+                store.dispatch(setAccessToken(null));
+                window.location.href = '/auth/dang-nhap';
                 return;
             }
             if (status === 403) {
@@ -31,12 +40,5 @@ axiosCredentials.interceptors.response.use(
         throw new Error('Không thể kết nối đến server'); // Trả về l��i nếu có l��i
     },
 );
-axiosCredentials.interceptors.request.use((config) => {
-    const token = Cookies.get('access_token');
-    console.log(token);
-    if (token) {
-        config.headers.Authorization = token;
-    }
-    return config;
-});
+
 export default axiosCredentials;

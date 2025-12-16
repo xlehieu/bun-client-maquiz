@@ -1,11 +1,19 @@
 import React from 'react';
 import { ClockLoader } from 'react-spinners';
 import { colors } from '@/common/constants';
-const LoadingComponent = () => {
+const LoadingComponent = ({ isLoading, children }: { isLoading?: boolean; children?: React.ReactNode }) => {
     return (
-        <div className="w-full h-screen relative">
-            <ClockLoader color={colors.primary} size={100} className="absolute mx-auto top-1/2 -translate-y-full" />
-        </div>
+        <>
+            {isLoading && (
+                <div className="inset-0 absolute flex flex-col gap-2 items-center justify-center bg-[#fffdf3]/50">
+                    <ClockLoader color={colors.primary} size={100} className="" />
+                    <div>
+                        <p className="text-primary-bold font-bold">Maquiz</p>
+                    </div>
+                </div>
+            )}
+            {children}
+        </>
     );
 };
 

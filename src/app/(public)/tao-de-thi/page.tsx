@@ -7,8 +7,8 @@ import { LoadingOutlined, DeleteOutlined, PlusOutlined, DeliveredProcedureOutlin
 const JoditEditor = dynamic(() => import('jodit-react'));
 //Components
 import UploadComponent from '@/components/UI/UploadComponent';
-import * as QuizService from '@/services/quiz.service';
-import * as FileService from '@/services/file.service';
+import * as QuizService from '@/api/quiz.service';
+import * as FileService from '@/api/file.service';
 import Button from '@/components/UI/Button';
 import CreateQuizPart from '@/components/UI/CreateQuizPart';
 import BlurBackground from '@/components/UI/BlurBackground';

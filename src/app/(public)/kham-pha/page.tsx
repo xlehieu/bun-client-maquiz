@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import QuizCard from '@/components/Quiz/QuizCard';
 import useDebounce from '@/hooks/useDebounce';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as QuizService from '@/services/quiz.service';
+import * as QuizService from '@/api/quiz.service';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import { Pagination, Select, Slider } from 'antd';
 import { educationLevels, PAGE_SIZE } from '@/common/constants';

@@ -20,9 +20,10 @@ module.exports = {
         },
         extend: {
             colors: {
-                primary: '#0d99a6',
+                // primary: '#0d99a6',
+                primary: '#2e74bf',
                 camdat: '#f28b30',
-                'primary-bold': '#0a6770',
+                'primary-bold': '#1b61ad',
                 link: '#00bfa5',
                 secondary: '#2b6bb5',
                 background: '#fcfcfc',

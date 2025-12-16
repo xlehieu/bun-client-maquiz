@@ -1,28 +1,27 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { EyeOutlined, EyeInvisibleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import Link from 'next/link';
-import * as UserService from '@/services/user.service';
-import * as AuthService from '@/services/auth.service';
-import useMutationHooks from '@/hooks/useMutationHooks';
-import { toast } from 'sonner';
-import { updateUser } from '@/redux/slices/user.slice';
+import * as AuthService from '@/api/auth.service';
 import siteRouter from '@/config';
-import Cookies from 'js-cookie';
+import useMutationHooks from '@/hooks/useMutationHooks';
 import { ILoginForm } from '@/interface';
+import { useAppDispatch } from '@/redux/hooks';
+import { setAccessToken } from '@/redux/slices/auth.slice';
+import { EyeInvisibleOutlined, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
+import Cookies from 'js-cookie';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const SignInPage = () => {
     // const mutation = useMutation({
     //     mutationFn: (data: any) => UserService.login(data),
     // });
+    const dispatch = useAppDispatch();
     const router = useRouter();
     const emailCookie = Cookies.get('user_email');
     const [isShowPassword, setIsShowPassword] = useState(false);
     const [emailValue, setEmailValue] = useState(emailCookie == 'undefined' || !emailCookie ? '' : emailCookie);
     const [passwordValue, setPasswordValue] = useState('');
-    const dispatch = useDispatch();
 
     const handleOnChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmailValue(e.target.value);
@@ -30,7 +29,7 @@ const SignInPage = () => {
     const handleOnChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPasswordValue(e.target.value);
     };
-    const loginMutation = useMutationHooks((data: ILoginForm) => AuthService.login(data));
+    const loginMutation = useMutationHooks((data: ILoginForm) => AuthService.callLogin(data));
     const handleOnClick = (e: any) => {
         e.preventDefault();
         loginMutation.mutate({
@@ -44,24 +43,20 @@ const SignInPage = () => {
     };
     //Sau khi chạy đến hết đoạn code logic thì state mới được set lại để re-render component
     //vậy nên đến đây thì emailValue vẫn chưa được set lại
-    const getUserDetailMutation = useMutationHooks(() => UserService.getUserDetail());
     useEffect(() => {
         if (loginMutation.isSuccess) {
-            getUserDetailMutation.mutate();
+            dispatch(setAccessToken(loginMutation.data.data.access_token));
+            // dispatch(fetchUserProfile())
+            //đã gọi ở thằng AppLayout
+            toast.success('Đăng nhập thành công');
+            router.push('/');
         } else if (loginMutation.isError) {
-            console.log('OK');
             toast.error((loginMutation.error as { message?: string })?.message || 'Đăng nhập không thành công');
         }
     }, [loginMutation.isSuccess, loginMutation.isError]);
     useEffect(() => {
-        if (getUserDetailMutation.data) {
-            dispatch(updateUser({ ...getUserDetailMutation.data }));
-            toast.success('Đăng nhập thành công');
-            router.push('/');
-        } else if (getUserDetailMutation.isError) {
-            toast.error('Đăng nhập không thành công');
-        }
-    }, [getUserDetailMutation.isSuccess, getUserDetailMutation.isError]);
+        document.title = 'Đăng nhập';
+    }, []);
     return (
         <div className="w-full">
             <form className="mx-auto w-full md:max-w-96 space-y-6" method="post">

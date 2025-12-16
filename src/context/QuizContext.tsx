@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import * as QuizService from '@/services/quiz.service';
+import * as QuizService from '@/api/quiz.service';
 import { toast } from 'sonner';
 export const QuizDetailContext = createContext<any>(null);
 export const SetQuizDetailContext = createContext<any>(null);

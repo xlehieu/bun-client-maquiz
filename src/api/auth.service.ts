@@ -1,12 +1,17 @@
 import axiosCredentials from '@/config/axios.credential';
 import axiosNoCredential from '@/config/axios.nointerceptor';
 import { ILoginForm } from '@/interface';
-export const login = async (data: ILoginForm) => {
+export const callLogin = async (data: ILoginForm) => {
     const { email, password } = data;
     if (!email || !password) {
         throw new Error('Vui lòng điền đầy đủ thông tin');
     }
-    const res = await axiosNoCredential.post(`/auth/sign-in`, JSON.stringify(data));
+    const res = await axiosNoCredential.post<{
+        data: {
+            access_token: string;
+            email: string;
+        };
+    }>(`/auth/sign-in`, JSON.stringify(data));
     return res.data;
 };
 export const loginWithGoogle = async () => {

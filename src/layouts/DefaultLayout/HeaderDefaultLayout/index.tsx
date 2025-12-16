@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import * as AuthService from '@/services/auth.service';
+import * as AuthService from '@/api/auth.service';
 import Link from 'next/link';
 import { DashboardOutlined, IdcardOutlined, LogoutOutlined } from '@ant-design/icons';
 import { resetUser } from '@/redux/slices/user.slice';
@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LazyImage from '@/components/UI/LazyImage';
 import { useRouter } from 'next/navigation';
 import LoadingIcon from '@/components/UI/LoadingIcon';
+import { useAppSelector } from '@/redux/hooks';
 
 const menuVariants = {
     hidden: { x: '100%', opacity: 0 },
@@ -40,12 +41,11 @@ const headerTippyMenu = [
 ];
 const HeaderComponent = () => {
     const router = useRouter();
-    const user = useSelector((state: any) => state.user);
+    const {userProfile} = useAppSelector(state=>state.user)
     const [loading, setLoading] = useState({
         isLoading: false,
         index: -1,
     });
-    console.log('user header', user);
     const dispatch = useDispatch();
     const handleLogOut = async () => {
         await AuthService.logout();
@@ -96,7 +96,7 @@ const HeaderComponent = () => {
                     >
                         Liên hệ
                     </Link>
-                    {user?.email ? ( // Menu tippy
+                    {userProfile?.email ? ( // Menu tippy
                         <Tippy
                             interactive
                             placement="bottom-end"
@@ -111,7 +111,7 @@ const HeaderComponent = () => {
                                         <LoadingComponent />
                                     </Link>
                                     <Link
-                                        href={userDashboardRouter.myDashboard}
+                                        href={userProfileDashboardRouter.myDashboard}
                                         className="text-black px-2 py-2 hover:rounded hover:bg-black/5"
                                     >
                                         <DashboardOutlined className="pr-2" />
@@ -145,15 +145,15 @@ const HeaderComponent = () => {
                             )}
                         >
                             <div className="flex justify-between items-center">
-                                {user?.avatar && (
+                                {userProfile?.avatar && (
                                     <LazyImage
                                         className="rounded-full mr-1 w-8 h-8 overflow-hidden"
-                                        src={user?.avatar}
-                                        alt={user?.name}
+                                        src={userProfile?.avatar}
+                                        alt={userProfile?.name}
                                         placeholder={'...'}
                                     />
                                 )}
-                                <p className="text-lg text-primary">{user?.name}</p>
+                                <p className="text-lg text-primary">{userProfile?.name}</p>
                             </div>
                         </Tippy>
                     ) : (
@@ -194,7 +194,7 @@ const HeaderComponent = () => {
                                 >
                                     Liên hệ
                                 </Link>
-                                {user.email ? (
+                                {userProfile?.email ? (
                                     <>
                                         <Link
                                             className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"

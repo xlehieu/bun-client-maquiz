@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import * as AuthService from '@/services/auth.service';
+import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { LoadingOutlined } from '@ant-design/icons';
 export default function ForgotPasswordPage() {

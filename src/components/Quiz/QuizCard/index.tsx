@@ -21,11 +21,12 @@ import { Popover } from 'antd';
 import dayjs from 'dayjs';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
-import * as UserService from '@/services/user.service';
+import * as UserService from '@/api/user.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { favoriteQuiz } from '@/redux/slices/user.slice';
 import { IQuiz } from '@/interface';
+import { useAppSelector } from '@/redux/hooks';
+import { favoriteQuiz } from '@/redux/slices/user.slice';
 const QuizCard = ({
     name,
     slug,
@@ -41,19 +42,19 @@ const QuizCard = ({
     // nếu onDelete truyền vào là false thì không cho xóa nếu là hàm thì cho xóa
     const router = useRouter();
     const dispatch = useDispatch();
-    const userInfo = useSelector((state: any) => state.user);
+    const {userProfile} = useAppSelector(state=>state.user)
     const favoriteMutation = useMutationHooks((data: { id: string }) => UserService.favoriteQuiz(data));
     const handleFavoriteQuiz = (id: string, slug: string) => {
         if (!id) return;
         favoriteMutation.mutate({ id });
-        dispatch(favoriteQuiz({ slug }));
+        dispatch(favoriteQuiz({slug}));
     };
     useEffect(() => {
         if (favoriteMutation.isSuccess) {
             favoriteMutation.reset();
         }
     }, [favoriteMutation.isSuccess]);
-    isFavorite = userInfo.favoriteQuiz.some((q: IQuiz) => q.slug === slug);
+    isFavorite = userProfile?.favoriteQuiz.some((quiz) => quiz?.slug === slug);
     return (
         <div className="shrink-0 max-w-80 transition-all duration-300 shadow-lg rounded hover:shadow-2xl border-2">
             <div
