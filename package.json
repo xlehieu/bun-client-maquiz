@@ -27,7 +27,7 @@
         "@testing-library/user-event": "^13.5.0",
         "@tippyjs/react": "^4.2.6",
         "@toast-ui/react-editor": "^3.2.3",
-        "antd": "^5.11.3-alpha.0",
+        "antd": "^5.28.1",
         "aos": "^2.3.4",
         "axios": "^1.7.7",
         "classnames": "^2.5.1",

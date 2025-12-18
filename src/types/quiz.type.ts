@@ -36,3 +36,14 @@ export type QuizSection = {
     questions: QuestionType_1_2[];
     isDisabled: boolean;
 };
+
+export type BodyCreateGeneralInformationQuiz = {
+    name: string;
+    description: string;
+    school: string;
+    subject: string[];
+    topic: string[];
+    schoolYear: number;
+    educationLevel: string[];
+    thumb: string;
+};

@@ -2,7 +2,7 @@ import { ApiResponse } from '@/types/api.type';
 import axiosCredentials from '../config/axios.credential';
 import axiosApplicationJson from '../config/axios.default';
 import { IQuerySkipLimit, IQuiz } from '@/interface';
-import { QuizDetailRecord } from '@/types/quiz.type';
+import { BodyCreateGeneralInformationQuiz, QuizDetailRecord } from '@/types/quiz.type';
 
 export const getQuizzes = async (data: IQuerySkipLimit) => {
     const params = new URLSearchParams();
@@ -20,22 +20,8 @@ export const getQuizDetail = async (id: string) => {
     console.log('QUIZ DETAIL', res);
     return res.data.data; // data 1 là của axios còn data sau là của mình viết api trả về
 };
-export const createQuiz = async (data: IQuiz) => {
-    const { name, description, school, subject, topic, schoolYear, educationLevel, thumb } = data;
-
-    const res = await axiosCredentials.post(
-        `/quizzes/create`,
-        JSON.stringify({
-            name,
-            description,
-            school,
-            subject,
-            topic,
-            schoolYear,
-            educationLevel,
-            thumb,
-        }),
-    );
+export const createGeneralInformationQuiz = async (body: BodyCreateGeneralInformationQuiz) => {
+    const res = await axiosCredentials.post(`/quizzes/create`, body);
     return res.data.data;
 };
 export const createQuestion = async (data: any) => {

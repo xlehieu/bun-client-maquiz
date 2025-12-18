@@ -7,13 +7,14 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchExamHistory } from '@/redux/slices/user.slice';
 
 const MyLibrary = () => {
-    const dispatch = useAppDispatch()
-    const {userProfile}=useAppSelector(state=>state.user)
-    const {isFetchingExamHistory,examHistory}=useAppSelector(state=>state.user)
+    const dispatch = useAppDispatch();
+    const { userProfile } = useAppSelector((state) => state.user);
+    const { isFetchingExamHistory, examHistory } = useAppSelector((state) => state.user);
     useEffect(() => {
         document.title = 'My Dashboard';
-        dispatch(fetchExamHistory())
-    },[]);
+        console.log('OKOKOOK');
+        dispatch(fetchExamHistory());
+    }, []);
     return (
         <>
             <section className="pb-5">

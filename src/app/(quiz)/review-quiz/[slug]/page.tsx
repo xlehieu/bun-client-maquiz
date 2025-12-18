@@ -1,7 +1,6 @@
 'use client';
 import QuizPreviewQuestion from '@/components/Quiz/QuizPreviewQuestion';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { fetchQuizPreview } from '@/redux/slices/quizV2.slice';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Spin } from 'antd';
@@ -9,9 +8,10 @@ import { useParams } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import GeneralInformation from './GeneralInformation';
 import LoadingComponent from '@/components/UI/LoadingComponent';
+import { fetchQuizPreview } from '@/redux/slices/takeQuiz';
 const ReviewQuizPage = () => {
     const dispatch = useAppDispatch();
-    const { isFetching, currentQuizDetail } = useAppSelector((state) => state.quizV2);
+    const { isFetching, currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
     const params = useParams();
     const slug = params?.slug as string;
     useEffect(() => {

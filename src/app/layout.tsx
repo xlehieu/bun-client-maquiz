@@ -10,6 +10,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import AppLayout from '@/layouts/AppLayout';
+import { ConfigProvider } from 'antd';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -28,15 +29,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en" title="Maquiz">
             <body>
-                <Toaster position="top-right" richColors />
-                <QueryClientProvider client={queryClient}>
-                    <Provider store={store}>
-                        <PersistGate loading={null} persistor={persistor}>
-                            <AppLayout>{children}</AppLayout>
-                        </PersistGate>
-                    </Provider>
-                    <ReactQueryDevtools initialIsOpen={false} />
-                </QueryClientProvider>
+                <ConfigProvider
+                    theme={{
+                        token: {
+                            colorPrimary: '#3178c6',
+                            colorSuccess: '#52c41a',
+                            colorWarning: '#faad14',
+                            colorError: '#ff4d4f',
+                            borderRadius: 8,
+                        },
+                    }}
+                >
+                    <Toaster position="top-right" richColors />
+                    <QueryClientProvider client={queryClient}>
+                        <Provider store={store}>
+                            <PersistGate loading={null} persistor={persistor}>
+                                <AppLayout>{children}</AppLayout>
+                            </PersistGate>
+                        </Provider>
+                        <ReactQueryDevtools initialIsOpen={false} />
+                    </QueryClientProvider>
+                </ConfigProvider>
             </body>
         </html>
     );

@@ -24,7 +24,7 @@ import TakeOneNNAnswers from '@/components/Quiz/TakeQuiz/TakeOneNNAnswers';
 import TakeMatchQuestion from '@/components/Quiz/TakeQuiz/TakeMatchQuestion';
 import TakeQuizProvider, { ShuffleProvider, TakeQuizContext } from '@/context/TakeQuizContext';
 import { useAppDispatch } from '@/redux/hooks';
-import { fetchQuizPreview } from '@/redux/slices/quizV2.slice';
+import { fetchQuizPreview } from '@/redux/slices/takeQuiz';
 //end
 
 const answerChoiceReducer = (state: any, action: any) => {

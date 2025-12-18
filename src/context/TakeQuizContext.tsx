@@ -4,33 +4,32 @@ import { useParams } from 'next/navigation';
 import { createContext, ReactNode, useEffect, useReducer, useState } from 'react';
 import { toast } from 'sonner';
 import * as QuizService from '@/api/quiz.service';
+import { useAppSelector } from '@/redux/hooks';
 export const TakeQuizContext = createContext<any>({});
 export const TakeMatchingQuestionContext = createContext<any>({});
 const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNode; answerChoiceReducer: any }) => {
     const slug = useParams()?.slug as string;
     //region GET QUIZ DETAIL BY SLUG
-    const queryQuizDetail = useQuery({
-        queryKey: ['QueryQuizDetail', slug],
-        queryFn: () => QuizService.getQuizForExamBySlug(slug),
-    });
+    const { currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
     const [timePass, setTimePass] = useState(2000);
     const [isEnded, setIsEnded] = useState(false);
     const [isTimeout, setIsTimeout] = useState(false);
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answerChoices, dispatchAnswerChoices] = useReducer(answerChoiceReducer, {});
-    const [currentQuestionType, setCurrentQuestionType] = useState('');
+    const [currentQuestionType, setCurrentQuestionType] = useState(0);
     const [countAnswerChoices, setCountAnswerChoices] = useState(0);
     const [countQuestionQuizDetail, setCountQuestionQuizDetail] = useState(0);
     // set cho current question type khi vào bài thi và đếm số câu hỏi trong bài
     useEffect(() => {
-        if (!queryQuizDetail?.data) return;
-        if (queryQuizDetail.data.quiz) {
-            if (queryQuizDetail.data?.quiz[currentQuestionIndex]?.questions[currentQuestionIndex])
+        if (!currentQuizDetail?._id) return;
+        if (currentQuizDetail.quiz) {
+            if (currentQuizDetail?.quiz[currentQuestionIndex]?.questions[currentQuestionIndex])
                 setCurrentQuestionType(
                     queryQuizDetail.data?.quiz[currentQuestionIndex]?.questions[currentQuestionIndex]?.questionType ??
                         1,
                 );
+
             if (Array.isArray(queryQuizDetail.data.quiz)) {
                 setCountQuestionQuizDetail(() => {
                     return queryQuizDetail.data.quiz.reduce((accumulator: any, partDetail: any) => {
@@ -39,7 +38,7 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
                 });
             }
         }
-    }, [queryQuizDetail.data]);
+    }, [currentQuizDetail]);
 
     //Đếm tất cả số câu hỏi trong câu trả lời (answer choices)
     useEffect(() => {
@@ -56,17 +55,10 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
         }
     }, [answerChoices]);
     //
-
-    //Khi get có lỗi
-    useEffect(() => {
-        if (queryQuizDetail.isError) {
-            toast.error('Lỗi');
-        }
-    }, [queryQuizDetail.isError]);
     //Set currentQuestionType khi thay đổi câu hỏi
     useEffect(() => {
-        if (queryQuizDetail.data) {
-            const quiz = queryQuizDetail.data.quiz;
+        if (currentQuizDetail) {
+            const quiz = currentQuizDetail.quiz;
             if (quiz) {
                 if (quiz[currentPartIndex]?.questions[currentQuestionIndex]) {
                     setCurrentQuestionType(quiz[currentPartIndex].questions[currentQuestionIndex].questionType);
