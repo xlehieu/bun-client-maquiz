@@ -1,3 +1,4 @@
+'use client'
 import { questionTypeContent } from '@/common/constants';
 import { shuffleArray } from '@/utils';
 import HTMLReactParser from 'html-react-parser/lib/index';

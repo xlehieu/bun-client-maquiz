@@ -1,3 +1,4 @@
+'use client'
 import { classroomImageFallback } from '@/common/constants';
 import LazyImage from '../LazyImage';
 import Link from 'next/link';

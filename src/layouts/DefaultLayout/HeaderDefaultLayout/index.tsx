@@ -48,7 +48,8 @@ const HeaderComponent = () => {
     });
     const dispatch = useDispatch();
     const handleLogOut = async () => {
-        await AuthService.logout();
+        console.log("HELOO")
+        localStorage.clear()
         dispatch(resetUser());
     };
     const handleClick = async (item: any, index: number) => {
@@ -59,8 +60,7 @@ const HeaderComponent = () => {
         if (!item.type && item.route) {
             router.push(item.route);
         } else {
-            await AuthService.logout();
-            dispatch(resetUser());
+            handleLogOut()
         }
     };
     // useEffect(() => {

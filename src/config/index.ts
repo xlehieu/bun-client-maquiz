@@ -4,13 +4,13 @@ const siteRouter = {
     news: '/tin-tuc',
     profile: '/thong-tin-tai-khoan',
     createQuiz: '/tao-de-thi',
-    notFoundPage: '/*',
     discover: '/kham-pha',
     loginSuccess: '/login-success',
     signIn: '/auth/dang-nhap',
     signUp: '/auth/dang-ky',
     forgotPassword: '/auth/quen-mat-khau',
     resetPassword: '/auth/reset-password',
+    notFoundPage: '/*',
 };
 export const userDashboardRouter = {
     myDashboard: '/my-dashboard',

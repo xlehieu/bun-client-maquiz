@@ -22,7 +22,10 @@ axiosCredentials.interceptors.response.use(
         if (error.response) {
             const status = error.response.status;
             const message = (error.response.data as any)?.message || 'Có lỗi xảy ra';
-
+            if (typeof window === 'undefined') {
+                // Tránh lỗi khi prerender / SSR
+                return Promise.reject(error);
+            }
             // Xử lý chung cho từng mã lỗi
             if (status === 401) {
                 store.dispatch(setAccessToken(null));
@@ -31,6 +34,7 @@ axiosCredentials.interceptors.response.use(
             }
             if (status === 403) {
                 window.location.href = '/page-not-found';
+
                 return;
             }
 

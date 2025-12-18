@@ -1,3 +1,4 @@
+'use client'
 import React, { memo, useState } from 'react';
 import { FadeLoader } from 'react-spinners';
 import { colors } from '@/common/constants';

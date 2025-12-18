@@ -109,8 +109,10 @@ const NewsFeedComponent = () => {
         if (uploadPostMutation.isError) {
             toast.error((uploadPostMutation.error as any).message);
         } else if (uploadPostMutation.isSuccess) {
+            if (typeof window == 'undefined') return;
             toast.success('Thêm thông báo lớp học thành công');
-            window.location.reload();
+
+            router.refresh();
         }
     }, [uploadPostMutation.isError, uploadPostMutation.isSuccess]);
 
@@ -131,7 +133,7 @@ const NewsFeedComponent = () => {
             setIsShowModal(false);
             deletePostMutation.reset();
         } else if (deletePostMutation.isSuccess) {
-            window.location.reload();
+            router.refresh();
         }
     }, [deletePostMutation.isError, deletePostMutation.isSuccess]);
     //region edit classroom

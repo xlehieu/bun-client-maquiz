@@ -55,6 +55,7 @@ export type IQuiz = {
     educationLevel?: string[];
     nameNoAccent?: string;
     isDisabled?: boolean;
+    isUseChatBot?:boolean;
 };
 export type IQuerySkipLimit = {
     skip?: number;

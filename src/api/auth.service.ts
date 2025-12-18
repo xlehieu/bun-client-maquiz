@@ -1,3 +1,4 @@
+'use client'
 import axiosCredentials from '@/config/axios.credential';
 import axiosNoCredential from '@/config/axios.nointerceptor';
 import { ILoginForm } from '@/interface';
@@ -15,7 +16,9 @@ export const callLogin = async (data: ILoginForm) => {
     return res.data;
 };
 export const loginWithGoogle = async () => {
-    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/google`;
+    if (typeof window !== 'undefined') {
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+    }
 };
 export const logout = async () => {
     const res = await axiosCredentials.post(`/auth/log-out`);

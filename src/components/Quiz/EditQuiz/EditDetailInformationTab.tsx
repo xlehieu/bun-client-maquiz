@@ -1,3 +1,4 @@
+'use client'
 import { QuizDetailContext } from '@/context/QuizContext';
 import { useContext, useState } from 'react';
 

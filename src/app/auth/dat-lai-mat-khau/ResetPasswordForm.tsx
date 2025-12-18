@@ -2,14 +2,21 @@
 import React, { Fragment } from 'react';
 import { useEffect, useState } from 'react';
 import useMutationHooks from '@/hooks/useMutationHooks';
+<<<<<<< HEAD
 import * as AuthService from '@/api/auth.service';
 import { useSearchParams } from 'next/navigation';
+=======
+import * as AuthService from '@/services/auth.service';
+import { useRouter, useSearchParams } from 'next/navigation';
+>>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
 import { EyeInvisibleOutlined, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
 import { toast } from 'sonner';
 const ResetPasswordForm = () => {
     useEffect(() => {
         document.title = 'Đặt lại mật khẩu';
     }, []);
+
+    const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams?.get('token');
     const [password, setPassword] = useState('');
@@ -24,7 +31,7 @@ const ResetPasswordForm = () => {
         if (resetPasswordMutation.isSuccess) {
             toast.success('Đổi mật khẩu thành công.');
             setTimeout(() => {
-                location.href = location.origin;
+                router.refresh();
             }, 1500);
         } else if (resetPasswordMutation.isError) {
             toast.error('Đổi mật khẩu thất bại.');

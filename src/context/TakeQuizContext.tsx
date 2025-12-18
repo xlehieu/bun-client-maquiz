@@ -1,3 +1,4 @@
+'use client'
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
@@ -61,9 +62,9 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
             const quiz = currentQuizDetail.quiz;
             if (quiz) {
                 if (quiz[currentPartIndex]?.questions[currentQuestionIndex]) {
-                    setCurrentQuestionType(quiz[currentPartIndex].questions[currentQuestionIndex].questionType);
+                    setCurrentQuestionType(quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionType);
                 }
-                if (currentQuestionIndex === quiz[currentPartIndex].questions.length) {
+                if (currentQuestionIndex === quiz?.[currentPartIndex]?.questions?.length) {
                     if (currentPartIndex === quiz.length - 1) return;
                     setCurrentPartIndex(currentPartIndex + 1);
                     setCurrentQuestionIndex(0);
@@ -76,7 +77,7 @@ const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNo
             const quiz = queryQuizDetail?.data?.quiz;
             if (quiz) {
                 if (quiz[currentPartIndex]?.questions[currentQuestionIndex]) {
-                    setCurrentQuestionType(quiz[currentPartIndex].questions[currentQuestionIndex].questionType);
+                    setCurrentQuestionType(quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionType);
                 }
             }
         }

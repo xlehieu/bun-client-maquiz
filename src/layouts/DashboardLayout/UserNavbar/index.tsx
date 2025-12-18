@@ -10,10 +10,10 @@ import { useAppSelector } from '@/redux/hooks';
 import { persistor } from '@/redux/store';
 export default function UserNavbar() {
     const logoutMutation = useMutationHooks(() => AuthService.logout());
-    const {userProfile} = useAppSelector(state=>state.user) 
+    const { userProfile } = useAppSelector((state) => state.user);
     const handleLogout = () => {
         logoutMutation.mutate();
-        persistor.purge()
+        persistor.purge();
         return window.location.assign('/');
     };
     return (
@@ -25,7 +25,7 @@ export default function UserNavbar() {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => window.location.reload()}
+                        onClick={() => router.push(userDashboardRouter.myDashboard)}
                     >
                         Dashboard
                     </a>
@@ -61,7 +61,11 @@ export default function UserNavbar() {
                     >
                         <div className="flex justify-between items-center hover:cursor-pointer">
                             {userProfile?.avatar && (
-                                <img className="rounded-full mr-1 w-8 h-8" src={userProfile?.avatar} alt={userProfile?.name} />
+                                <img
+                                    className="rounded-full mr-1 w-8 h-8"
+                                    src={userProfile?.avatar}
+                                    alt={userProfile?.name}
+                                />
                             )}
                             <p className="text-lg text-white ">{userProfile?.name}</p>
                         </div>

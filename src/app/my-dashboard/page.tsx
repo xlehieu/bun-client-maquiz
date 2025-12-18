@@ -1,6 +1,6 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import QuizCard from '@/components/Quiz/QuizCard';
 import * as UserService from '@/api/user.service';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -12,9 +12,17 @@ const MyLibrary = () => {
     const { isFetchingExamHistory, examHistory } = useAppSelector((state) => state.user);
     useEffect(() => {
         document.title = 'My Dashboard';
+<<<<<<< HEAD
         console.log('OKOKOOK');
         dispatch(fetchExamHistory());
     }, []);
+=======
+    });
+    console.log(userQuery.data);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    if (!mounted) return null; // ngăn lỗi khi prerender
+>>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
     return (
         <>
             <section className="pb-5">

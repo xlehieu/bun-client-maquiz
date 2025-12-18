@@ -61,16 +61,8 @@ export const deleteQuiz = async (data: IQuiz) => {
 
     return res.data.data;
 };
-export const getDiscoveryQuizzes = async (data: any) => {
-    const { name, page, limit, skip, subject, topic, schoolYear, educationLevel } = data;
-    const params = new URLSearchParams();
-    Object.entries({ name, page, limit, skip, subject, topic, schoolYear, educationLevel }).forEach(([key, value]) => {
-        if (value !== undefined) {
-            params.append(key, String(value));
-        }
-    });
-    const res = await axiosApplicationJson.get(`/quizzes/discovery?${params}`);
-
+export const getDiscoveryQuizzes = async (query: string) => {
+    const res = await axiosApplicationJson.get(`/quizzes/discovery?${query}`);
     return res.data.data;
 };
 export const getQuizzesBySlugs = async (data: any) => {

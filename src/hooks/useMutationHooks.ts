@@ -1,3 +1,4 @@
+'use client'
 import { useMutation } from '@tanstack/react-query';
 
 // Giữ đúng chữ ký: nhận `callback`, return mutation.

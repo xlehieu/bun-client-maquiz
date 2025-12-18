@@ -1,3 +1,4 @@
+'use client'
 import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
 import { useAppSelector } from '@/redux/hooks';
 import HTMLReactParser from 'html-react-parser/lib/index';
@@ -97,16 +98,26 @@ const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }
                 <div className="my-2 font-medium">
                     {/* Hiển thị nội dung câu hỏi */}
                     {HTMLReactParser(
+<<<<<<< HEAD
                         currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].questionContent ||
                             '',
+=======
+                        quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent || '',
+>>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
                     )}
                 </div>
                 <div className="flex flex-col gap-5">
                     {/* Render các câu trả lời và chọn */}
+<<<<<<< HEAD
                     {currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].answers instanceof
                         Array && (
                         <>
                             {currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].answers.map(
+=======
+                    {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers instanceof Array && (
+                        <>
+                            {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
+>>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
                                 (answer: any, index: number) => (
                                     <label
                                         key={index}

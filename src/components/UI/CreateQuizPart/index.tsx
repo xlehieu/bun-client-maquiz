@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import Button from '@/components/UI/Button';
 import { PlusOutlined, CloseSquareOutlined } from '@ant-design/icons';

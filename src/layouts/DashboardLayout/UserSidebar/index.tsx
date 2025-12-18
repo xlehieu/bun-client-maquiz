@@ -2,7 +2,7 @@
 'use client';
 import React, { memo, use, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import NotificationDropdown from '@/components/UI/Dropdowns/NotificationDropdown';
 import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -73,7 +73,8 @@ const sidebarAdmin = {
 const setItem = new Set(items.map((item) => item.key));
 const UserSidebar = () => {
     const router = useRouter();
-    const [path, setPath] = useState(location.pathname);
+    const pathName = usePathname()
+    const [path, setPath] = useState(pathName);
     const user = useSelector((state: any) => state.user);
     if (!setItem.has('3') && user.isAdmin) {
         console.log(setItem);

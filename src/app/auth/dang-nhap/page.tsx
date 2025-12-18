@@ -37,7 +37,7 @@ const SignInPage = () => {
             password: passwordValue,
         });
     };
-    const HandleLoginWithGoogle = (e: React.MouseEvent) => {
+    const HandleLoginWithGoogle = async (e: React.MouseEvent) => {
         e.preventDefault();
         AuthService.loginWithGoogle();
     };
