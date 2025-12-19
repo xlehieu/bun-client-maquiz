@@ -12,17 +12,8 @@ const MyLibrary = () => {
     const { isFetchingExamHistory, examHistory } = useAppSelector((state) => state.user);
     useEffect(() => {
         document.title = 'My Dashboard';
-<<<<<<< HEAD
-        console.log('OKOKOOK');
         dispatch(fetchExamHistory());
     }, []);
-=======
-    });
-    console.log(userQuery.data);
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
-    if (!mounted) return null; // ngăn lỗi khi prerender
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
     return (
         <>
             <section className="pb-5">

@@ -1,19 +1,4 @@
 'use client';
-<<<<<<< HEAD
-=======
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { message } from 'antd';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import HTMLReactParser from 'html-react-parser';
-import * as QuizService from '@/services/quiz.service';
-import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
-import GeneralInformation from './GeneralInformation';
-import { questionTypeContent } from '@/common/constants';
-import LoadingComponent from '@/components/UI/LoadingComponent';
-import { useQuery } from '@tanstack/react-query';
-import { usePathname } from 'next/navigation';
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
 import QuizPreviewQuestion from '@/components/Quiz/QuizPreviewQuestion';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
@@ -29,18 +14,9 @@ const ReviewQuizPage = () => {
     const { isFetching, currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
     const params = useParams();
     const slug = params?.slug as string;
-<<<<<<< HEAD
     useEffect(() => {
         if (slug) dispatch(fetchQuizPreview(slug));
     }, [slug]);
-=======
-
-    const path = usePathname();
-    const queryQuizDetail = useQuery({
-        queryKey: ['QueryQuizPreviewBySlug', slug],
-        queryFn: () => QuizService.getQuizPreviewBySlug(slug),
-    });
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
     const [currentTabIndex, setCurrentTabIndex] = useState(1);
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     useEffect(() => {
