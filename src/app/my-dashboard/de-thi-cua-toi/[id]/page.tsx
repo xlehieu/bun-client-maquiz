@@ -1,5 +1,5 @@
 'use client';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import HTMLReactParser from 'html-react-parser';
 import { useParams } from 'next/navigation';
@@ -7,15 +7,13 @@ import * as QuizService from '@/api/quiz.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { questionTypeContent } from '@/common/constants';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { fetchQuizDetail } from '@/redux/slices/quiz.slice';
 const QuizDetailPage = () => {
     const params = useParams();
     const id = params?.id;
-    const { data } = useQuery({
-        queryKey: ['data', id],
-        queryFn: () => QuizService.getQuizDetail((id as string) || ''),
-        enabled: !!id,
-    });
-
+    const dispatch = useAppDispatch();
+    const { quizDetail } = useAppSelector((state) => state.quiz);
     const [currentKey, setCurrentKey] = useState(1); // key của tabs
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -31,17 +29,22 @@ const QuizDetailPage = () => {
             icon: faQuestionCircle,
         },
     ];
+    useEffect(() => {
+        if (id && !Array.isArray(id)) {
+            dispatch(fetchQuizDetail(id));
+        }
+    }, [id]);
     const handleChangePartIndex = (index: number) => {
         setCurrentPartIndex(index);
-        if (data?.quiz[index]) {
+        if (quizDetail?.quiz[index]) {
             setCurrentPartIndex(index);
             setCurrentQuestionIndex(0);
         }
     };
     const handleChangeQuestionIndex = (index: number) => {
         setCurrentQuestionIndex(index);
-        if (data) {
-            if (data?.quiz?.[currentPartIndex]?.questions?.[index]) {
+        if (quizDetail) {
+            if (quizDetail?.quiz?.[currentPartIndex]?.questions?.[index]) {
                 setCurrentQuestionIndex(index);
             }
         }
@@ -53,25 +56,30 @@ const QuizDetailPage = () => {
                     <tbody>
                         <tr className="h-10">
                             <td className="w-1/3 pl-2 font-semibold text-base">Tên:</td>
-                            <td className="w-1/3 pl-2">{data?.name}</td>
+                            <td className="w-1/3 pl-2">{quizDetail?.name}</td>
                         </tr>
                         <tr className="h-10 bg-gray-100">
                             <td className="w-1/3 pl-2 font-semibold text-base">Môn học:</td>
-                            <td className="w-1/3 pl-2">{data?.subject}</td>
+                            <td className="w-1/3 pl-2">{quizDetail?.subject}</td>
                         </tr>
                         <tr className="h-10">
                             <td className="w-1/3 pl-2 font-semibold text-base">Trường:</td>
-                            <td className="w-1/3 pl-2">{data?.school}</td>
+                            <td className="w-1/3 pl-2">{quizDetail?.school}</td>
                         </tr>
                         <tr className="bg-gray-100">
                             <td className="w-1/3 pl-2 font-semibold text-base">Ảnh:</td>
                             <td className="w-1/3 pl-2 py-2">
-                                <img src={data?.thumb} className="rounded-md" width={180} alt={data?.name} />
+                                <img
+                                    src={quizDetail?.thumb}
+                                    className="rounded-md"
+                                    width={180}
+                                    alt={quizDetail?.name}
+                                />
                             </td>
                         </tr>
                         <tr className="h-10">
                             <td className="w-1/3 pl-2 font-semibold text-base">Mô tả:</td>
-                            <td className="w-1/3 pl-2">{data?.description}</td>
+                            <td className="w-1/3 pl-2">{quizDetail?.description}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -83,13 +91,13 @@ const QuizDetailPage = () => {
                     <div className="bg-white shadow-sm px-3 py-3 border rounded-md w-full">
                         <h5 className="pb-2">Phần thi</h5>
                         <div className="flex flex-wrap gap-2">
-                            {data?.quiz &&
-                                data?.quiz.map((partDetail: any, index: number) => (
+                            {quizDetail?.quiz &&
+                                quizDetail?.quiz.map((partDetail: any, index: number) => (
                                     <button
                                         key={index}
                                         onClick={() => handleChangePartIndex(index)}
                                         className={`${
-                                            partDetail?.partName === data?.quiz[currentPartIndex].partName
+                                            partDetail?.partName === quizDetail?.quiz[currentPartIndex].partName
                                                 ? 'bg-primary border-primary text-white'
                                                 : 'border-gray-400 text-gray-700'
                                         } px-3 py-2 rounded-md border-2 transition-all duration-300 hover:cursor-pointer`}
@@ -100,8 +108,8 @@ const QuizDetailPage = () => {
                         </div>
                     </div>
                     <div className="bg-white shadow-sm px-3 py-3 border rounded-md w-full mt-5 flex flex-wrap gap-5">
-                        {data?.quiz &&
-                            data?.quiz[currentPartIndex]?.questions?.map((question: any, index: number) => (
+                        {quizDetail?.quiz &&
+                            quizDetail?.quiz[currentPartIndex]?.questions?.map((question: any, index: number) => (
                                 <button
                                     key={index}
                                     onClick={() => handleChangeQuestionIndex(index)}
@@ -117,34 +125,38 @@ const QuizDetailPage = () => {
                     </div>
                 </div>
                 <div className="md:flex-1 bg-white px-3 py-3 shadow-md sm:w-full">
-                    {data?.quiz && data?.quiz[currentPartIndex]?.questions?.length > 0 && (
+                    {quizDetail?.quiz && quizDetail?.quiz[currentPartIndex]?.questions?.length > 0 && (
                         <div>
                             <p className="text-base">
                                 <span className="font-medium">Loại câu hỏi:</span>{' '}
                                 {
                                     questionTypeContent?.[
-                                        data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionType
+                                        quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
+                                            ?.questionType
                                     ]
                                 }
                             </p>
-                            {data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent && (
+                            {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
+                                ?.questionContent && (
                                 <div>
                                     <h4 className="mt-3 text-xl font-bold flex">Câu hỏi:</h4>
                                     <div className="mt-1 text-xl">
                                         {HTMLReactParser(
-                                            data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent,
+                                            quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
+                                                ?.questionContent,
                                         )}
                                     </div>
                                 </div>
                             )}
                             <div className="text-base">
-                                {data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
+                                {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
                                     (answer: any, index: number) => (
                                         <div key={index} className="mt-3 flex">
                                             <input
                                                 type={`${
-                                                    data?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
-                                                        ?.questionType == 1
+                                                    quizDetail?.quiz?.[currentPartIndex]?.questions?.[
+                                                        currentQuestionIndex
+                                                    ]?.questionType == 1
                                                         ? 'radio'
                                                         : 'checkbox'
                                                 }`}

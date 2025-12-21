@@ -5,14 +5,12 @@ import userSlice from './slices/user.slice';
 import quizReducer from './slices/quiz.slice';
 import authReducer from './slices/auth.slice';
 import takeQuizReducer from './slices/takeQuiz';
-import createQuizReducer from './slices/createQuiz.slice';
 import questionTypeReducer from './slices/questionType.slice';
 const rootReducer = combineReducers({
     auth: authReducer,
     user: userSlice,
     quiz: quizReducer,
     takeQuiz: takeQuizReducer,
-    createQuiz: createQuizReducer,
     questionType: questionTypeReducer,
 });
 const persistConfig = {

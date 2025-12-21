@@ -1,5 +1,5 @@
 export type CollectionDefault = {
     _id: string;
-    MaMuc: string;
+    MaMuc: number;
     TenMuc: string;
 };

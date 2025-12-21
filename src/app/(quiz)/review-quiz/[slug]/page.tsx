@@ -8,20 +8,23 @@ import { useParams } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import GeneralInformation from './GeneralInformation';
 import LoadingComponent from '@/components/UI/LoadingComponent';
-import { fetchQuizPreview } from '@/redux/slices/takeQuiz';
+import { fetchQuizPreview, shuffleQuiz } from '@/redux/slices/takeQuiz';
 const ReviewQuizPage = () => {
     const dispatch = useAppDispatch();
-    const { isFetching, currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
+    const { isFetching, currentQuizPreviewDetail } = useAppSelector((state) => state.takeQuiz);
     const params = useParams();
     const slug = params?.slug as string;
     useEffect(() => {
         if (slug) dispatch(fetchQuizPreview(slug));
     }, [slug]);
+    useEffect(() => {
+        dispatch(shuffleQuiz(['answer', 'part', 'question']));
+    }, [currentQuizPreviewDetail?._id]);
     const [currentTabIndex, setCurrentTabIndex] = useState(1);
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     useEffect(() => {
-        document.title = currentQuizDetail?.name || 'Maquiz';
-    }, [currentQuizDetail?._id]);
+        document.title = currentQuizPreviewDetail?.name || 'Maquiz';
+    }, [currentQuizPreviewDetail?._id]);
     const tabButtons = [
         {
             key: 1,
@@ -32,10 +35,10 @@ const ReviewQuizPage = () => {
     const tabs: Record<number, ReactNode> = {
         1: (
             <>
-                {currentQuizDetail?.quiz && (
+                {currentQuizPreviewDetail?.quiz && (
                     <>
                         <div className="flex gap-5  pb-4 w-full no-vertical-scroll maquiz-scroll">
-                            {currentQuizDetail?.quiz.map((part: any, index: number) => (
+                            {currentQuizPreviewDetail?.quiz.map((part: any, index: number) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrentPartIndex(index)}
@@ -49,7 +52,10 @@ const ReviewQuizPage = () => {
                                 </button>
                             ))}
                         </div>
-                        <QuizPreviewQuestion quizDetail={currentQuizDetail} currentPartIndex={currentPartIndex} />
+                        <QuizPreviewQuestion
+                            quizDetail={currentQuizPreviewDetail}
+                            currentPartIndex={currentPartIndex}
+                        />
                     </>
                 )}
             </>
@@ -60,7 +66,7 @@ const ReviewQuizPage = () => {
         <div className="w-full">
             {/* <Spin spinning={isFetching}></Spin> */}
             <LoadingComponent isLoading={isFetching}>
-                <GeneralInformation quizDetail={currentQuizDetail} />
+                <GeneralInformation quizDetail={currentQuizPreviewDetail} />
                 <div className="px-2 py-2 mt-5 rounded shadow-md border bg-white">
                     <div className="flex gap-3 flex-wrap">
                         {tabButtons.map((tabButton) => (

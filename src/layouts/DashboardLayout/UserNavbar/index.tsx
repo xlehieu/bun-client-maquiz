@@ -8,7 +8,9 @@ import useMutationHooks from '@/hooks/useMutationHooks';
 import { IUser } from '@/interface';
 import { useAppSelector } from '@/redux/hooks';
 import { persistor } from '@/redux/store';
+import { useRouter } from 'next/navigation';
 export default function UserNavbar() {
+    const router = useRouter();
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const { userProfile } = useAppSelector((state) => state.user);
     const handleLogout = () => {
@@ -19,8 +21,8 @@ export default function UserNavbar() {
     return (
         <>
             {/* Navbar */}
-            <nav className="absolute top-0 right-0 w-full z-10 h-14 bg-primary md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
-                <div className="md:ml-64 w-full mx-auto items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
+            <nav className="w-full z-10 h-14 bg-primary md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
+                <div className="w-full mx-auto items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
                     {/* Brand */}
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"

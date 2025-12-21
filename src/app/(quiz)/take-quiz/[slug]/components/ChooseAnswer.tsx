@@ -8,7 +8,7 @@ import TakeMatchQuestion from '@/components/Quiz/TakeQuiz/TakeMatchQuestion';
 
 const ChooseAnswer = () => {
     const {
-        currentQuizDetail,
+        currentQuizPreviewDetail: currentQuizDetail,
         currentQuestionIndex,
         currentSectionIndex,
         timePassQuestion,

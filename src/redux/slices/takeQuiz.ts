@@ -1,14 +1,16 @@
 import { getQuizPreviewBySlug } from '@/api/quiz.service';
-import { QuizDetailRecord } from '@/types/quiz.type';
+import { MappingMatchQuestion, MatchQuestion, QuestionType_1_2, QuizDetailRecord } from '@/types/quiz.type';
+import { shuffleArray } from '@/utils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // localStorage
 import { toast } from 'sonner';
+type ShuffleType = 'part' | 'question' | 'answer';
 type TakeQuizState = {
     currentQuizId?: string;
     currentSectionIndex: number;
     currentQuestionIndex: number;
-    currentQuizDetail: QuizDetailRecord | null;
+    currentQuizPreviewDetail: QuizDetailRecord | null;
     currentQuestionType?: number;
     isFetching: boolean;
     timePassQuestion: number;
@@ -16,7 +18,7 @@ type TakeQuizState = {
 };
 const initStateTakeQuiz: TakeQuizState = {
     isFetching: false,
-    currentQuizDetail: null,
+    currentQuizPreviewDetail: null,
     currentSectionIndex: 0,
     currentQuestionIndex: 0,
     timePassQuestion: 2000,
@@ -45,6 +47,33 @@ const takeQuizSlice = createSlice({
         setQuestionType: (state, action: PayloadAction<number>) => {
             state.currentQuestionType = action.payload;
         },
+        shuffleQuiz: (state, action: PayloadAction<ShuffleType[]>) => {
+            const checkShuffleAnswer = action.payload.includes('answer');
+            const checkShuffleQuestion = action.payload.includes('question');
+            const checkShufflePart = action.payload.includes('part');
+            if (state.currentQuizPreviewDetail?.quiz) {
+                //part
+                const newPart = state.currentQuizPreviewDetail.quiz.map((part) => {
+                    //rồi shuffle question lên
+                    const newQuestion = part.questions.map((question) => {
+                        const newAnswer = { ...question };
+                        if (checkShuffleAnswer)
+                            if (
+                                (newAnswer.questionType === 1 || newAnswer.questionType === 2) &&
+                                (newAnswer as QuestionType_1_2).answers
+                            ) {
+                                (newAnswer as QuestionType_1_2).answers = shuffleArray(
+                                    (newAnswer as QuestionType_1_2).answers,
+                                );
+                            }
+                        return newAnswer;
+                    });
+                    return checkShuffleQuestion ? shuffleArray(newQuestion) : newQuestion;
+                    // return newPart;
+                });
+                state.currentQuizPreviewDetail.quiz = checkShufflePart ? shuffleArray(newPart) : newPart;
+            }
+        },
     },
     extraReducers(builder) {
         builder
@@ -56,7 +85,50 @@ const takeQuizSlice = createSlice({
             })
             .addCase(fetchQuizPreview.fulfilled, (state, action) => {
                 state.isFetching = false;
-                state.currentQuizDetail = action.payload?.data || null;
+                const quizFetch = action.payload?.data;
+                if (quizFetch) {
+                    state.currentQuizPreviewDetail = {
+                        ...quizFetch,
+
+                        quiz: quizFetch.quiz.map((part) => {
+                            return {
+                                ...part,
+                                questions: part.questions.map((question) => {
+                                    if (question.questionType === 3) {
+                                        const matchQuestion = (question as MatchQuestion).matchQuestions;
+                                        const mappingMatchQuestion: MappingMatchQuestion = {
+                                            optionMatchQuestion_Question: [],
+                                            optionMatchQuestion_Answer: [],
+                                        };
+                                        matchQuestion.forEach((itemMatchQuestion) => {
+                                            const answerId = itemMatchQuestion._id || itemMatchQuestion.answerId;
+                                            mappingMatchQuestion.optionMatchQuestion_Question.push({
+                                                questionContent: itemMatchQuestion.questionContent,
+                                                answerId: answerId,
+                                            });
+                                            mappingMatchQuestion.optionMatchQuestion_Answer.push({
+                                                answer: itemMatchQuestion.answer,
+                                                answerId: answerId,
+                                            });
+                                        });
+                                        return {
+                                            ...question,
+                                            mappingMatchQuestion: {
+                                                optionMatchQuestion_Answer: shuffleArray(
+                                                    mappingMatchQuestion.optionMatchQuestion_Answer,
+                                                ),
+                                                optionMatchQuestion_Question: shuffleArray(
+                                                    mappingMatchQuestion.optionMatchQuestion_Question,
+                                                ),
+                                            },
+                                        };
+                                    }
+                                    return question;
+                                }),
+                            };
+                        }),
+                    };
+                }
             });
     },
 });
@@ -65,6 +137,6 @@ const takeQuizPersistConfig = {
     storage,
     whitelist: ['currentSectionIndex', 'currentQuestionIndex'],
 };
-export const { setCurrentQuestionIndex, setCurrentSectionIndex } = takeQuizSlice.actions;
+export const { setCurrentQuestionIndex, setCurrentSectionIndex, shuffleQuiz } = takeQuizSlice.actions;
 
 export default persistReducer(takeQuizPersistConfig, takeQuizSlice.reducer);

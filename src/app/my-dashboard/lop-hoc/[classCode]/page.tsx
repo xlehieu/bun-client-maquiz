@@ -97,7 +97,7 @@ const NewsFeedComponent = () => {
     const user = useSelector((state: any) => state.user);
     const quizzesQuery = useQuery({
         queryKey: ['queryQuizzes'],
-        queryFn: () => QuizService.getQuizzes({}),
+        queryFn: () => QuizService.getMyQuizzes({}),
     });
     const [selectedQuizzes, setSelectedQuizzes] = useState([]);
     const uploadPostMutation = useMutationHooks((data: any) => PostService.createPost(data));

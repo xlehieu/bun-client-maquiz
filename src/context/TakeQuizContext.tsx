@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import LoadingComponent from '@/components/UI/LoadingComponent';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
@@ -11,7 +11,7 @@ export const TakeMatchingQuestionContext = createContext<any>({});
 const TakeQuizProvider = ({ children, answerChoiceReducer }: { children: ReactNode; answerChoiceReducer: any }) => {
     const slug = useParams()?.slug as string;
     //region GET QUIZ DETAIL BY SLUG
-    const { currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
+    const { currentQuizPreviewDetail: currentQuizDetail } = useAppSelector((state) => state.takeQuiz);
     const [timePass, setTimePass] = useState(2000);
     const [isEnded, setIsEnded] = useState(false);
     const [isTimeout, setIsTimeout] = useState(false);

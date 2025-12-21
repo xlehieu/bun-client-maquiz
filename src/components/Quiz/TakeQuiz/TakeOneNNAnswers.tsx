@@ -20,7 +20,7 @@ const sanitizeHTML = (html: any) => {
     return doc.body.innerHTML;
 };
 const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }) => {
-    const { currentQuizDetail, currentQuestionIndex, currentSectionIndex, currentQuestionType, answerChoices } =
+    const { currentQuizPreviewDetail: currentQuizDetail, currentQuestionIndex, currentSectionIndex, currentQuestionType, answerChoices } =
         useAppSelector((state) => state.takeQuiz);
     const handleChooseAnswer = (chooseIndex: number) => {
         // nếu không có current part index trong answer choice rồi thì xuống thực hiện code phía dưới
