@@ -1,61 +1,26 @@
-<<<<<<< HEAD
-'use client';
-import { Select } from 'antd';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import Lottie from 'lottie-react';
-import congratsAnimation from '@/asset/animations/congratulations-2.json';
-import Aos from 'aos';
-import 'aos/dist/aos.css';
-//component
-import Timer from './Timer';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
-import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
-import LoadingComponent from '@/components/UI/LoadingComponent';
-import siteRouter from '@/config';
-import useMutationHooks from '@/hooks/useMutationHooks';
-import * as QuizHistoryService from '@/api/quizHistory.service';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { toast } from 'sonner';
-import 'react-circular-progressbar/dist/styles.css';
-import ChatBot from '@/components/UI/ChatBot';
-import TakeOneNNAnswers from '@/components/Quiz/TakeQuiz/TakeOneNNAnswers';
-import TakeMatchQuestion from '@/components/Quiz/TakeQuiz/TakeMatchQuestion';
-import TakeQuizProvider, { ShuffleProvider, TakeQuizContext } from '@/context/TakeQuizContext';
-import { useAppDispatch } from '@/redux/hooks';
-import { fetchQuizPreview } from '@/redux/slices/takeQuiz';
-=======
 "use client";
-import { Select } from "antd";
-import React, { Fragment, useContext, useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Lottie from "lottie-react";
 import congratsAnimation from "@/asset/animations/congratulations-2.json";
 import Aos from "aos";
-import "aos/dist/aos.css";
+import Lottie from "lottie-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 //component
-import Timer from "./Timer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import { ANSWER_CHOICE_ACTION, questionTypeContent } from "@/common/constants";
-import LoadingComponent from "@/components/UI/LoadingComponent";
+import TakeMatchQuestion from "@/components/Quiz/TakeQuiz/TakeMatchQuestion";
+import TakeOneNNAnswers from "@/components/Quiz/TakeQuiz/TakeOneNNAnswers";
+import ChatBot from "@/components/UI/ChatBot";
 import siteRouter from "@/config";
-import useMutationHooks from "@/hooks/useMutationHooks";
-import * as QuizHistoryService from "@/services/quizHistory.service";
+import { TakeQuizContext } from "@/context/TakeQuizContext";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchQuizPreview } from "@/redux/slices/takeQuiz";
+import "aos/dist/aos.css";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { toast } from "sonner";
-import "react-circular-progressbar/dist/styles.css";
-import ChatBot from "@/components/UI/ChatBot";
-import TakeOneNNAnswers from "@/components/Quiz/TakeQuiz/TakeOneNNAnswers";
-import TakeMatchQuestion from "@/components/Quiz/TakeQuiz/TakeMatchQuestion";
-import TakeQuizProvider, {
-  ShuffleProvider,
-  TakeQuizContext,
-} from "@/context/TakeQuizContext";
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
+import TakeQuizInfo from "./components/TakeQuizInfo";
+import ChooseAnswer from "./components/ChooseAnswer";
+import TableQuestion from "./components/TableQuestion";
+import { Col, Row } from "antd";
 //end
 
 const answerChoiceReducer = (state: any, action: any) => {
@@ -305,443 +270,247 @@ const calculateScore = (
   }
 };
 
-//region phần bên trái của trang (hiển thị thông tin cơ bản bài thi)
-const TakeQuizInfo = () => {
-  const router = useRouter();
-  const {
-    quizDetail,
-    setIsEnded,
-    setIsTimeout,
-    timePass,
-    setTimePass,
-    currentPartIndex,
-    setCurrentPartIndex,
-    answerChoices,
-  } = useContext(TakeQuizContext);
-  const handleChangePartIndex = (partIndex: any) => {
-    if (partIndex === currentPartIndex) return;
-    setCurrentPartIndex(partIndex);
-  };
-  const handleBack = () => {
-    if (window) {
-      window.location.href = `/review-quiz/${quizDetail?.name}`;
-    }
-  };
-  return (
-    <div className="flex flex-col w-full lg:max-w-72 gap-6">
-      <div className="px-4 py-2 bg-white rounded shadow">
-        <div className="border-b border-gray-300 font-medium py-2">
-          <p className="text-lg">{quizDetail?.name}</p>
-          <p className="font-normal mt-2">
-            <span className="text-2xl text-rose-800 font-bold ml-1">
-              Ôn thi
-            </span>
-          </p>
-        </div>
-        <div className="border-b border-gray-300 py-2">
-          <p>Thời gian làm bài</p>
-          <Timer setIsTimeout={setIsTimeout} />
-        </div>
-        <div className="pt-2">
-          <p className="font-medium pb-1 text-sm">Tự động chuyển câu sau</p>
-          <Select
-            onChange={(e) => {
-              setTimePass(e);
-            }}
-            defaultValue={timePass}
-            className="w-full md:w-1/2 mt-2"
-          >
-            <Select.Option value={1000}>1s</Select.Option>
-            <Select.Option value={2000}>2s</Select.Option>
-            <Select.Option value={3000}>3s</Select.Option>
-            <Select.Option value={4000}>4s</Select.Option>
-          </Select>
-        </div>
-        <div className="flex mt-3 gap-3">
-          <button
-            className="bg-red-500 block rounded-md px-3 py-1  duration-300 hover:opacity-65"
-            onClick={handleBack}
-          >
-            <p className="text-center text-white">Trở về</p>
-          </button>
-          <button
-            className="bg-yellow-500 block rounded-md px-3 py-1 duration-300 hover:opacity-65"
-            onClick={() => setIsEnded(true)}
-          >
-            <p className="text-center text-white">Kết thúc</p>
-          </button>
-        </div>
-      </div>
-      <div className="px-4 py-2 bg-white rounded shadow">
-        <p className="font-medium mb-4">
-          Danh sách phần thi ({quizDetail?.quiz?.length})
-        </p>
-        {quizDetail?.quiz.map((part: any, index: any) => (
-          <button
-            key={index}
-            onClick={() => handleChangePartIndex(index)}
-            className={`w-full px-4 py-2 items-center rounded-sm flex justify-between opacity-95 duration-300 ease-linear ${
-              currentPartIndex === index
-                ? "bg-blue-100 cursor-default"
-                : "cursor-pointer hover:opacity-45 hover:bg-blue-100"
-            }`}
-          >
-            <div className="flex items-center">
-              <div
-                className={`w-7 h-7 flex items-center justify-center flex-wrap rounded-full ${
-                  currentPartIndex === index ? "bg-pink-600" : ""
-                }`}
-              >
-                {currentPartIndex === index && (
-                  <FontAwesomeIcon
-                    className={`text-white text-sm`}
-                    icon={faBookOpen}
-                  />
-                )}
-              </div>
-              <span className="ml-3">{part?.partName}</span>
-            </div>
-            <div className="text-blue-500 font-medium text-right">
-              {index in answerChoices ? (
-                <>{Object.keys(answerChoices[index]).length}</>
-              ) : (
-                0
-              )}
-              /{quizDetail?.quiz[index]?.questions?.length}
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
 // region Choose answers
 // Phần  giữa (chọn đáp án)
 //region chọn đáp án
-const ChooseAnswer = () => {
-  const {
-    quizDetail,
-    currentQuestionIndex,
-    setCurrentQuestionIndex,
-    currentPartIndex,
-    answerChoices,
-    dispatchAnswerChoices,
-    timePass,
-    currentQuestionType,
-  } = useContext(TakeQuizContext);
-  //hàm chuyển câu hỏi (tăng current question index)
-  const NextQuestion = () => {
-    const timeoutId = setTimeout(() => {
-      if (
-        quizDetail &&
-        typeof currentPartIndex === "number" &&
-        typeof currentQuestionIndex === "number"
-      ) {
-        if (quizDetail.quiz) {
-          const quiz = quizDetail.quiz;
-          // kiểm tra xem có phải câu cuối cùng khong
-          if (
-            currentQuestionIndex ===
-              quiz?.[currentPartIndex]?.questions?.length - 1 &&
-            currentPartIndex === quiz.length - 1
-          )
-            return;
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-        }
-      }
-    }, timePass ?? 2000);
-    return () => clearTimeout(timeoutId);
-  };
-  // CHOOSE ANSWER HANDLING
-  //kiểm tra xem câu có question type = 2 đã đúng chưa, so sánh xem đáp án đúng trong quiz detail và answer choice câu hỏi hiện tại có bằng nhau không
-  useEffect(() => {
-    if (currentQuestionType !== 2) return;
-    if (
-      checkQuestionCorrectQuestionType2(
-        quizDetail,
-        answerChoices,
-        currentQuestionType,
-        currentPartIndex,
-        currentQuestionIndex
-      )
-    )
-      NextQuestion();
-    // ngược lại nếu chọn đủ các câu thì next
-    else if (currentPartIndex in answerChoices && quizDetail?.quiz) {
-      if (
-        currentQuestionIndex in answerChoices[currentPartIndex] &&
-        quizDetail?.quiz[currentPartIndex]?.questions
-      ) {
-        if (
-          !Array.isArray(
-            quizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]
-              ?.answers
-          )
-        )
-          return;
-        const lengthAnswersCurrent =
-          quizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]
-            ?.answers?.length;
-        const lengthAnswerChoicesCurrent =
-          answerChoices[currentPartIndex][currentQuestionIndex]?.length;
-        if (lengthAnswersCurrent === lengthAnswerChoicesCurrent) {
-          NextQuestion();
-        }
-      }
-    }
-  }, [answerChoices]);
-  // lặp mảng khi question type = 2 thì lấy ra choose index trong mảng answerChoices của câu hỏi hiện tại,
-  // return về true hoặc false nếu đáp án render ở dưới có index === đáp án được chọn trong answerChoices[currentPartIndex][currentQuestionIndex]
-  // AOS EFFECT
-  useEffect(() => {
-    Aos.init({ duration: 500, easing: "ease-in-out-back" });
-    Aos.refresh();
-  }, [currentPartIndex, currentQuestionIndex]);
-  // END
-  return (
-    <div
-      className="px-2 py-2 flex-1 bg-white rounded shadow"
-      key={currentQuestionIndex}
-      data-aos="zoom-in"
-    >
-      {quizDetail?.quiz[currentPartIndex] && (
-        <>
-          {quizDetail?.quiz?.[currentPartIndex]?.questions instanceof Array && (
-            <>
-              {quizDetail?.quiz?.[currentPartIndex]?.questions?.[
-                currentQuestionIndex
-              ] && (
-                // phần trả lời câu hỏi
-                <Fragment>
-                  {[1, 2].includes(currentQuestionType) && (
-                    <TakeOneNNAnswers
-                      quizDetail={quizDetail}
-                      dispatchAnswerChoices={dispatchAnswerChoices}
-                      answerChoices={answerChoices}
-                      currentPartIndex={currentPartIndex}
-                      currentQuestionIndex={currentQuestionIndex}
-                      currentQuestionType={currentQuestionType}
-                      NextQuestion={NextQuestion}
-                    />
-                  )}
-                  {Number(currentQuestionType) === 3 && (
-                    <TakeMatchQuestion
-                      quizDetail={quizDetail}
-                      dispatchAnswerChoices={dispatchAnswerChoices}
-                      answerChoices={answerChoices}
-                      currentPartIndex={currentPartIndex}
-                      currentQuestionIndex={currentQuestionIndex}
-                      currentQuestionType={currentQuestionType}
-                      NextQuestion={NextQuestion}
-                    />
-                  )}
-                </Fragment>
-              )}
-            </>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
+// const ChooseAnswer = () => {
+//   const {
+//     quizDetail,
+//     currentQuestionIndex,
+//     setCurrentQuestionIndex,
+//     currentPartIndex,
+//     answerChoices,
+//     dispatchAnswerChoices,
+//     timePass,
+//     currentQuestionType,
+//     countQuestionQuizDetail,
+//   } = useContext(TakeQuizContext);
+//   //hàm chuyển câu hỏi (tăng current question index)
+//   const NextQuestion = () => {
+//     const timeoutId = setTimeout(() => {
+//       if (
+//         quizDetail &&
+//         typeof currentPartIndex === "number" &&
+//         typeof currentQuestionIndex === "number"
+//       ) {
+//         if (quizDetail.quiz) {
+//           const quiz = quizDetail.quiz;
+//           // kiểm tra xem có phải câu cuối cùng khong
+//           if (
+//             currentQuestionIndex ===
+//               quiz?.[currentPartIndex]?.questions?.length - 1 &&
+//             currentPartIndex === quiz.length - 1
+//           )
+//             return;
+//           setCurrentQuestionIndex(currentQuestionIndex + 1);
+//         }
+//       }
+//     }, timePass ?? 2000);
+//     return () => clearTimeout(timeoutId);
+//   };
+//   // CHOOSE ANSWER HANDLING
+//   //kiểm tra xem câu có question type = 2 đã đúng chưa, so sánh xem đáp án đúng trong quiz detail và answer choice câu hỏi hiện tại có bằng nhau không
+//   useEffect(() => {
+//     if (currentQuestionType !== 2) return;
+//     if (
+//       checkQuestionCorrectQuestionType2(
+//         quizDetail,
+//         answerChoices,
+//         currentQuestionType,
+//         currentPartIndex,
+//         currentQuestionIndex
+//       )
+//     )
+//       NextQuestion();
+//     // ngược lại nếu chọn đủ các câu thì next
+//     else if (currentPartIndex in answerChoices && quizDetail?.quiz) {
+//       if (
+//         currentQuestionIndex in answerChoices[currentPartIndex] &&
+//         quizDetail?.quiz[currentPartIndex]?.questions
+//       ) {
+//         if (
+//           !Array.isArray(
+//             quizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]
+//               ?.answers
+//           )
+//         )
+//           return;
+//         const lengthAnswersCurrent =
+//           quizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]
+//             ?.answers?.length;
+//         const lengthAnswerChoicesCurrent =
+//           answerChoices[currentPartIndex][currentQuestionIndex]?.length;
+//         if (lengthAnswersCurrent === lengthAnswerChoicesCurrent) {
+//           NextQuestion();
+//         }
+//       }
+//     }
+//   }, [answerChoices]);
+//   // lặp mảng khi question type = 2 thì lấy ra choose index trong mảng answerChoices của câu hỏi hiện tại,
+//   // return về true hoặc false nếu đáp án render ở dưới có index === đáp án được chọn trong answerChoices[currentPartIndex][currentQuestionIndex]
+//   // AOS EFFECT
+//   useEffect(() => {
+//     Aos.init({ duration: 500, easing: "ease-in-out-back" });
+//     Aos.refresh();
+//   }, [currentPartIndex, currentQuestionIndex]);
+//   // END
+//   return (
+//     <div
+//       className="px-2 py-2 flex-1 bg-white rounded shadow"
+//       key={currentQuestionIndex}
+//       data-aos="zoom-in"
+//     >
+//       {quizDetail?.quiz[currentPartIndex] && (
+//         <>
+//           {quizDetail?.quiz?.[currentPartIndex]?.questions instanceof Array && (
+//             <>
+//               {quizDetail?.quiz?.[currentPartIndex]?.questions?.[
+//                 currentQuestionIndex
+//               ] && (
+//                 // phần trả lời câu hỏi
+//                 <Fragment>
+//                   {[1, 2].includes(currentQuestionType) && (
+//                     <TakeOneNNAnswers
+//                       autoNextQuestion={NextQuestion}
+//                       //     quizDetail={quizDetail}
+//                       //     dispatchAnswerChoices={dispatchAnswerChoices}
+//                       //     answerChoices={answerChoices}
+//                       //     currentPartIndex={currentPartIndex}
+//                       //     currentQuestionIndex={currentQuestionIndex}
+//                       //     currentQuestionType={currentQuestionType}
+//                       //     NextQuestion={NextQuestion}
+//                     />
+//                   )}
+//                   {Number(currentQuestionType) === 3 && (
+//                     <TakeMatchQuestion
+//                       quizDetail={quizDetail}
+//                       dispatchAnswerChoices={dispatchAnswerChoices}
+//                       answerChoices={answerChoices}
+//                       currentPartIndex={currentPartIndex}
+//                       currentQuestionIndex={currentQuestionIndex}
+//                       currentQuestionType={currentQuestionType}
+//                       NextQuestion={NextQuestion}
+//                     />
+//                   )}
+//                 </Fragment>
+//               )}
+//             </>
+//           )}
+//         </>
+//       )}
+//     </div>
+//   );
+// };
 // region table of question
 //Phàn bên phải chọn câu hỏi
 
-const TableOfQuestion = () => {
-  const {
-    quizDetail,
-    currentPartIndex,
-    answerChoices,
-    currentQuestionIndex,
-    setCurrentQuestionIndex,
-    currentQuestionType,
-  } = useContext(TakeQuizContext);
-  const checkCorrectAnswer = (index: number) => {
-    if (currentPartIndex in answerChoices) {
-      if (
-        index in answerChoices[currentPartIndex] &&
-        quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 1
-      ) {
-        return answerChoices[currentPartIndex][index]?.isCorrect;
-      } else if (
-        index in answerChoices[currentPartIndex] &&
-        quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 2
-      ) {
-        return checkQuestionCorrectQuestionType2(
-          quizDetail,
-          answerChoices,
-          2,
-          currentPartIndex,
-          index
-        );
-      } else if (
-        index in answerChoices[currentPartIndex] &&
-        quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 3
-      ) {
-        if (
-          answerChoices[currentPartIndex][index].every(
-            (itemQuestionAnswer: any) =>
-              itemQuestionAnswer.question == itemQuestionAnswer.answer
-          )
-        ) {
-          return true;
-        }
-        return false;
-      }
-    }
-    return null;
-  };
-  return (
-    <div className="px-2 py-2 bg-white rounded shadow lg:max-w-80 lg:min-w-72 w-full">
-      <div className="mb-2 flex flex-row justify-between">
-        <p>Mục lục câu hỏi</p>
-        <p className="text-sm">{questionTypeContent[currentQuestionType]}</p>
-      </div>
-      <div className="flex flex-wrap gap-3">
-        {quizDetail?.quiz[currentPartIndex]?.questions.map(
-          (question: any, index: number) => (
-            <button
-              key={index}
-              onClick={() => setCurrentQuestionIndex(index)}
-              className={`${
-                currentQuestionIndex === index
-                  ? "border-primary !bg-primary text-white"
-                  : "border-gray-300"
-              } border-2 rounded-lg min-w-10 h-10 font-medium ${
-                checkCorrectAnswer(index) === true &&
-                "bg-green-700 border-green-700 text-white"
-              } ${
-                checkCorrectAnswer(index) === false &&
-                "bg-red-600 border-red-600 text-white"
-              } 
-                        `}
-            >
-              {Number(index + 1)}
-            </button>
-          )
-        )}
-      </div>
-    </div>
-  );
-};
+// const TableOfQuestion = () => {
+//   const {
+//     quizDetail,
+//     currentPartIndex,
+//     answerChoices,
+//     currentQuestionIndex,
+//     setCurrentQuestionIndex,
+//     currentQuestionType,
+//   } = useContext(TakeQuizContext);
+//   const checkCorrectAnswer = (index: number) => {
+//     if (currentPartIndex in answerChoices) {
+//       if (
+//         index in answerChoices[currentPartIndex] &&
+//         quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 1
+//       ) {
+//         return answerChoices[currentPartIndex][index]?.isCorrect;
+//       } else if (
+//         index in answerChoices[currentPartIndex] &&
+//         quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 2
+//       ) {
+//         return checkQuestionCorrectQuestionType2(
+//           quizDetail,
+//           answerChoices,
+//           2,
+//           currentPartIndex,
+//           index
+//         );
+//       } else if (
+//         index in answerChoices[currentPartIndex] &&
+//         quizDetail?.quiz[currentPartIndex]?.questions[index].questionType === 3
+//       ) {
+//         if (
+//           answerChoices[currentPartIndex][index].every(
+//             (itemQuestionAnswer: any) =>
+//               itemQuestionAnswer.question == itemQuestionAnswer.answer
+//           )
+//         ) {
+//           return true;
+//         }
+//         return false;
+//       }
+//     }
+//     return null;
+//   };
+//   return (
+//     <div className="px-2 py-2 bg-white rounded shadow lg:max-w-80 lg:min-w-72 w-full">
+//       <div className="mb-2 flex flex-row justify-between">
+//         <p>Mục lục câu hỏi</p>
+//         <p className="text-sm">{questionTypeContent[currentQuestionType]}</p>
+//       </div>
+//       <div className="flex flex-wrap gap-3">
+//         {quizDetail?.quiz[currentPartIndex]?.questions.map(
+//           (question: any, index: number) => (
+//             <button
+//               key={index}
+//               onClick={() => setCurrentQuestionIndex(index)}
+//               className={`${
+//                 currentQuestionIndex === index
+//                   ? "border-primary !bg-primary text-white"
+//                   : "border-gray-300"
+//               } border-2 rounded-lg min-w-10 h-10 font-medium ${
+//                 checkCorrectAnswer(index) === true &&
+//                 "bg-green-700 border-green-700 text-white"
+//               } ${
+//                 checkCorrectAnswer(index) === false &&
+//                 "bg-red-600 border-red-600 text-white"
+//               }
+//                         `}
+//             >
+//               {Number(index + 1)}
+//             </button>
+//           )
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
 const TakeQuizPageMain = () => {
-<<<<<<< HEAD
-    const dispatch = useAppDispatch();
-    const { quizDetail, answerChoices, isEnded, isTimeout, countQuestionQuizDetail } = useContext(TakeQuizContext);
-    console.log(answerChoices);
-    const slug = useParams()?.slug as string;
-    useEffect(() => {
-        dispatch(fetchQuizPreview(slug));
-    }, []);
-    const [score, setScore] = useState(0);
-    const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
-    const handleSaveTakeQuizHistory = useMutationHooks((data: any) => QuizHistoryService.saveQuizHistory(data));
-    useEffect(() => {
-        if (!answerChoices || !quizDetail) return;
-        if (isTimeout) {
-            toast.warning('Bạn đã hết giờ làm bài');
-        }
-        if (isEnded || isTimeout) {
-            const score = calculateScore(answerChoices, countQuestionQuizDetail, quizDetail) || 0;
-            setScore(Number(score));
-            handleSaveTakeQuizHistory.mutate({
-                quizId: quizDetail._id,
-                score: score,
-                answerChoices,
-            });
-        }
-        if (answerChoices) {
-            const count = countCorrectAnswerChoices(answerChoices, quizDetail) || 0;
-            setAnswerCorrectCount(count);
-        }
-    }, [isEnded, isTimeout]);
-    useEffect(() => {
-        if (handleSaveTakeQuizHistory.isSuccess) {
-            handleSaveTakeQuizHistory.reset();
-        }
-    }, [handleSaveTakeQuizHistory.isSuccess]);
-    return (
-        <React.Fragment>
-            <div className="w-full h-full flex justify-center items-center">
-                {!handleSaveTakeQuizHistory.isPending ? (
-                    <>
-                        {!isEnded ? (
-                            <div className="flex w-full flex-col-reverse lg:flex-row gap-3 lg:items-start">
-                                {quizDetail?.quiz && (
-                                    <>
-                                        <TakeQuizInfo />
-                                        <ChooseAnswer />
-                                        <TableOfQuestion />
-                                    </>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="inset-0 w-full min-h-96 mx-5 my-5 md:mx-10 md:my-10">
-                                <div className="text-black w-full bg-white shadow rounded px-5 py-5 flex flex-col items-center justify-center">
-                                    <div className="w-full flex flex-row gap-3">
-                                        <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                                            <h5 className="">Điểm của bạn là:</h5>
-                                            <div className="w-1/2 mt-3">
-                                                <CircularProgressbar
-                                                    styles={buildStyles({
-                                                        textSize: '39px',
-                                                        pathColor:
-                                                            score < 5 ? '#ff0000' : score < 7 ? '#ffff00' : '#00ff00',
-                                                        textColor: '#333',
-                                                        trailColor: '#eee',
-                                                    })}
-                                                    value={score}
-                                                    maxValue={10}
-                                                    text={`${score}`}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                                            <h5>Số câu đúng</h5>
-                                            <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
-                                                <LinearProgressBar
-                                                    answerCorrectCount={answerCorrectCount}
-                                                    max={countQuestionQuizDetail}
-                                                />
-                                                <h5 className="text-[#333]">
-                                                    <span className="font-bold">{answerCorrectCount}</span>/
-                                                    <span className="text-green-500 font-bold">
-                                                        {countQuestionQuizDetail}
-                                                    </span>
-                                                </h5>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <Link
-                                        href={siteRouter.discover}
-                                        className="bg-primary text-3xl px-3 py-3 mt-6 md:px-2 md:py-2 md:mt-10   z-20 text-white font-bold md:text-lg rounded-md"
-                                    >
-                                        OK
-                                    </Link>
-                                </div>
-                                <Lottie
-                                    className="w-full md:w-2/3 absolute bottom-60 md:-bottom-24 z-10"
-                                    animationData={congratsAnimation}
-                                />
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <LoadingComponent />
-=======
+  const dispatch = useAppDispatch();
+  //   const {
+  //     quizDetail,
+  //     answerChoices,
+  //     isEnded,
+  //     isTimeout,
+  //     countQuestionQuizDetail,
+  //   } = useContext(TakeQuizContext);
   const {
-    quizDetail,
     answerChoices,
+    currentQuizPreviewDetail: quizDetail,
     isEnded,
+    isFetching,
+    currentPartIndex,
+    currentQuestionIndex,
+    currentQuestionType,
     isTimeout,
     countQuestionQuizDetail,
-  } = useContext(TakeQuizContext);
+  } = useAppSelector((state) => state.takeQuiz);
+  console.log(answerChoices);
+  const slug = useParams()?.slug as string;
+  useEffect(() => {
+    dispatch(fetchQuizPreview(slug));
+  }, []);
   const [score, setScore] = useState(0);
   const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
-  const handleSaveTakeQuizHistory = useMutationHooks((data: any) =>
-    QuizHistoryService.saveQuizHistory(data)
-  );
+  //   const handleSaveTakeQuizHistory = useMutationHooks((data: any) =>
+  //     QuizHistoryService.saveQuizHistory(data)
+  //   );
   useEffect(() => {
     if (!answerChoices || !quizDetail) return;
     if (isTimeout) {
@@ -751,101 +520,90 @@ const TakeQuizPageMain = () => {
       const score =
         calculateScore(answerChoices, countQuestionQuizDetail, quizDetail) || 0;
       setScore(Number(score));
-      handleSaveTakeQuizHistory.mutate({
-        quizId: quizDetail._id,
-        score: score,
-        answerChoices,
-      });
+      // handleSaveTakeQuizHistory.mutate({
+      //   quizId: quizDetail._id,
+      //   score: score,
+      //   answerChoices,
+      // });
     }
     if (answerChoices) {
       const count = countCorrectAnswerChoices(answerChoices, quizDetail) || 0;
       setAnswerCorrectCount(count);
     }
   }, [isEnded, isTimeout]);
-  useEffect(() => {
-    if (handleSaveTakeQuizHistory.isSuccess) {
-      handleSaveTakeQuizHistory.reset();
-    }
-  }, [handleSaveTakeQuizHistory.isSuccess]);
   return (
     <React.Fragment>
       <div className="w-full h-full flex justify-center items-center">
-        {!handleSaveTakeQuizHistory.isPending ? (
-          <>
-            {!isEnded ? (
-              <div className="flex w-full flex-col-reverse lg:flex-row gap-3 lg:items-start">
-                {quizDetail?.quiz && (
-                  <>
-                    <TakeQuizInfo />
-                    <ChooseAnswer />
-                    <TableOfQuestion />
-                  </>
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
-                )}
-              </div>
-            ) : (
-              <div className="inset-0 w-full min-h-96 mx-5 my-5 md:mx-10 md:my-10">
-                <div className="text-black w-full bg-white shadow rounded px-5 py-5 flex flex-col items-center justify-center">
-                  <div className="w-full flex flex-row gap-3">
-                    <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                      <h5 className="">Điểm của bạn là:</h5>
-                      <div className="w-1/2 mt-3">
-                        <CircularProgressbar
-                          styles={buildStyles({
-                            textSize: "39px",
-                            pathColor:
-                              score < 5
-                                ? "#ff0000"
-                                : score < 7
-                                ? "#ffff00"
-                                : "#00ff00",
-                            textColor: "#333",
-                            trailColor: "#eee",
-                          })}
-                          value={score}
-                          maxValue={10}
-                          text={`${score}`}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                      <h5>Số câu đúng</h5>
-                      <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
-                        <LinearProgressBar
-                          answerCorrectCount={answerCorrectCount}
-                          max={countQuestionQuizDetail}
-                        />
-                        <h5 className="text-[#333]">
-                          <span className="font-bold">
-                            {answerCorrectCount}
-                          </span>
-                          /
-                          <span className="text-green-500 font-bold">
-                            {countQuestionQuizDetail}
-                          </span>
-                        </h5>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      if (window) window.location.href = siteRouter.discover;
-                    }}
-                    className="bg-primary text-3xl px-3 py-3 mt-6 md:px-2 md:py-2 md:mt-10   z-20 text-white font-bold md:text-lg rounded-md"
-                  >
-                    OK
-                  </button>
-                </div>
-                <Lottie
-                  className="w-full md:w-2/3 absolute bottom-60 md:-bottom-24 z-10"
-                  animationData={congratsAnimation}
-                />
-              </div>
+        {!isEnded ? (
+          <section className="flex flex-1 w-full sm:flex-col-reverse gap-3">
+            {quizDetail && (
+              <Row gutter={[19, 12]}>
+                <Col xs={24} md={5}>
+                  <TakeQuizInfo />
+                </Col>
+                <Col xs={24} md={13}>
+                  <ChooseAnswer />
+                </Col>
+                <Col xs={24} md={6}>
+                  <TableQuestion />
+                </Col>
+              </Row>
             )}
-          </>
+          </section>
         ) : (
-          <LoadingComponent />
+          <div className="inset-0 w-full min-h-96 mx-5 my-5 md:mx-10 md:my-10">
+            <div className="text-black w-full bg-white shadow rounded px-5 py-5 flex flex-col items-center justify-center">
+              <div className="w-full flex flex-row gap-3">
+                <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
+                  <h5 className="">Điểm của bạn là:</h5>
+                  <div className="w-1/2 mt-3">
+                    <CircularProgressbar
+                      styles={buildStyles({
+                        textSize: "39px",
+                        pathColor:
+                          score < 5
+                            ? "#ff0000"
+                            : score < 7
+                            ? "#ffff00"
+                            : "#00ff00",
+                        textColor: "#333",
+                        trailColor: "#eee",
+                      })}
+                      value={score}
+                      maxValue={10}
+                      text={`${score}`}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
+                  <h5>Số câu đúng</h5>
+                  <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
+                    <LinearProgressBar
+                      answerCorrectCount={answerCorrectCount}
+                      max={countQuestionQuizDetail}
+                    />
+                    <h5 className="text-[#333]">
+                      <span className="font-bold">{answerCorrectCount}</span>/
+                      <span className="text-green-500 font-bold">
+                        {countQuestionQuizDetail}
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href={siteRouter.discover}
+                className="bg-primary text-3xl px-3 py-3 mt-6 md:px-2 md:py-2 md:mt-10   z-20 text-white font-bold md:text-lg rounded-md"
+              >
+                OK
+              </Link>
+            </div>
+            <Lottie
+              className="w-full md:w-2/3 absolute bottom-60 md:-bottom-24 z-10"
+              animationData={congratsAnimation}
+            />
+          </div>
         )}
       </div>
       {quizDetail?.isUseChatBot && <ChatBot />}
@@ -931,13 +689,13 @@ const reducerMatchingQuestion = (state: any, action: any) => {
   return choices;
 };
 
-const TakeQuizPage = () => {
-  return (
-    <TakeQuizProvider answerChoiceReducer={answerChoiceReducer}>
-      <ShuffleProvider reducerMatchingQuestion={reducerMatchingQuestion}>
-        <TakeQuizPageMain />
-      </ShuffleProvider>
-    </TakeQuizProvider>
-  );
-};
-export default TakeQuizPage;
+// const TakeQuizPage = () => {
+//   return (
+//     <TakeQuizProvider answerChoiceReducer={answerChoiceReducer}>
+//       <ShuffleProvider reducerMatchingQuestion={reducerMatchingQuestion}>
+//         <TakeQuizPageMain />
+//       </ShuffleProvider>
+//     </TakeQuizProvider>
+//   );
+// };
+export default TakeQuizPageMain;

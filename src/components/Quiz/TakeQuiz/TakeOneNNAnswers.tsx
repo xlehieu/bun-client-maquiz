@@ -1,180 +1,203 @@
-'use client'
-import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
-import { useAppSelector } from '@/redux/hooks';
-import HTMLReactParser from 'html-react-parser/lib/index';
-import React from 'react';
+"use client";
+import { ANSWER_CHOICE_ACTION, questionTypeContent } from "@/common/constants";
+import { useAppSelector } from "@/redux/hooks";
+import { QuestionType_1_2 } from "@/types/quiz.type";
+import { Radio } from "antd";
+import HTMLReactParser from "html-react-parser/lib/index";
+import React from "react";
 
 // Phần  giữa (chọn đáp án)
 const sanitizeHTML = (html: any) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const elements = doc.body.querySelectorAll('p,span');
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const elements = doc.body.querySelectorAll("p,span");
 
-    elements.forEach((el: any) => {
-        if (el.style && el.style.backgroundColor) {
-            el.style.backgroundColor = ''; // Loại bỏ background-color
-            el.style.color = ''; // Loại bỏ color
-        }
-    });
+  elements.forEach((el: any) => {
+    if (el.style && el.style.backgroundColor) {
+      el.style.backgroundColor = ""; // Loại bỏ background-color
+      el.style.color = ""; // Loại bỏ color
+    }
+  });
 
-    return doc.body.innerHTML;
+  return doc.body.innerHTML;
 };
-const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }) => {
-    const { currentQuizPreviewDetail: currentQuizDetail, currentQuestionIndex, currentSectionIndex, currentQuestionType, answerChoices } =
-        useAppSelector((state) => state.takeQuiz);
-    const handleChooseAnswer = (chooseIndex: number) => {
-        // nếu không có current part index trong answer choice rồi thì xuống thực hiện code phía dưới
-        // nếu có thì check xem có curent question index trong answer choice chưa nếu có thì return vì đã trả lời rồi thì không được làm lại nữa
-        if (currentQuestionType == 1 && answerChoices[currentSectionIndex])
-            if (currentQuestionIndex in answerChoices[currentSectionIndex]) return;
-        if (currentQuestionType == 1) {
-            dispatchAnswerChoices({
-                type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_1,
-                payload: {
-                    currentSectionIndex,
-                    currentQuestionIndex,
-                    chooseIndex: chooseIndex,
-                    isCorrect:
-                        currentQuizDetail?.quiz[currentSectionIndex]?.questions[currentQuestionIndex]?.answers[
-                            chooseIndex
-                        ]?.isCorrect,
-                },
-            });
-            autoNextQuestion();
-        } else if (currentQuestionType == 2) {
-            dispatchAnswerChoices({
-                type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_2,
-                payload: {
-                    currentSectionIndex,
-                    currentQuestionIndex,
-                    chooseIndex: chooseIndex,
-                    isCorrect:
-                        currentQuizDetail?.quiz[currentSectionIndex]?.questions[currentQuestionIndex]?.answers[
-                            chooseIndex
-                        ]?.isCorrect,
-                },
-            });
-        }
-    };
-    const handleGetChooseIndexAnswer = (indexInRenderAnswer: number) => {
-        if (currentQuestionType === 1 && currentSectionIndex in answerChoices) {
-            if (currentQuestionIndex in answerChoices[currentSectionIndex]) {
-                if (answerChoices[currentSectionIndex][currentQuestionIndex].chooseIndex === indexInRenderAnswer)
-                    return true;
-            }
-        }
-        if (currentQuestionType === 2 && currentSectionIndex in answerChoices) {
-            const choices = answerChoices[currentSectionIndex][currentQuestionIndex];
-            if (Array.isArray(choices)) {
-                // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
-                const foundChoice = choices.find((choice) => choice.chooseIndex == indexInRenderAnswer);
-                return foundChoice ? true : false;
-            }
-        }
-        return false;
-    };
-    const handleGetIsCorrectAnswer = (indexInRenderAnswer: number) => {
-        if (currentQuestionType == 2 && currentSectionIndex in answerChoices) {
-            const choices = answerChoices[currentSectionIndex][currentQuestionIndex];
-            if (Array.isArray(choices)) {
-                // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
-                const foundChoice = choices.find((choice) => choice.chooseIndex === indexInRenderAnswer);
-                return foundChoice ? foundChoice.isCorrect : null;
-            }
-        }
-        return null;
-    };
+const TakeOneNNAnswers = ({
+  autoNextQuestion,
+}: {
+  autoNextQuestion: () => void;
+}) => {
+  const {
+    currentQuizPreviewDetail: currentQuizDetail,
+    currentQuestionIndex,
+    currentPartIndex: currentSectionIndex,
+    currentQuestionType,
+    answerChoices,
+  } = useAppSelector((state) => state.takeQuiz);
+  //     const handleChooseAnswer = (chooseIndex: number) => {
+  //         // nếu không có current part index trong answer choice rồi thì xuống thực hiện code phía dưới
+  //         // nếu có thì check xem có curent question index trong answer choice chưa nếu có thì return vì đã trả lời rồi thì không được làm lại nữa
+  //         if (currentQuestionType == 1 && answerChoices[currentSectionIndex])
+  //             if (currentQuestionIndex in answerChoices[currentSectionIndex]) return;
+  //         if (currentQuestionType == 1) {
+  //             dispatchAnswerChoices({
+  //                 type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_1,
+  //                 payload: {
+  //                     currentSectionIndex,
+  //                     currentQuestionIndex,
+  //                     chooseIndex: chooseIndex,
+  //                     isCorrect:
+  //                         currentQuizDetail?.quiz[currentSectionIndex]?.questions[currentQuestionIndex]?.answers[
+  //                             chooseIndex
+  //                         ]?.isCorrect,
+  //                 },
+  //             });
+  //             autoNextQuestion();
+  //         } else if (currentQuestionType == 2) {
+  //             dispatchAnswerChoices({
+  //                 type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_2,
+  //                 payload: {
+  //                     currentSectionIndex,
+  //                     currentQuestionIndex,
+  //                     chooseIndex: chooseIndex,
+  //                     isCorrect:
+  //                         currentQuizDetail?.quiz[currentSectionIndex]?.questions[currentQuestionIndex]?.answers[
+  //                             chooseIndex
+  //                         ]?.isCorrect,
+  //                 },
+  //             });
+  //         }
+  //     };
+  const handleGetChooseIndexAnswer = (indexInRenderAnswer: number) => {
+    if (
+      currentQuestionType === 1 &&
+      currentSectionIndex in (answerChoices || {})
+    ) {
+      if (currentQuestionIndex in answerChoices[currentSectionIndex]) {
+        if (
+          answerChoices[currentSectionIndex][currentQuestionIndex]
+            .chooseIndex === indexInRenderAnswer
+        )
+          return true;
+      }
+    }
+    if (currentQuestionType === 2 && currentSectionIndex in answerChoices) {
+      const choices = answerChoices[currentSectionIndex][currentQuestionIndex];
+      if (Array.isArray(choices)) {
+        // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
+        const foundChoice = choices.find(
+          (choice) => choice.chooseIndex == indexInRenderAnswer
+        );
+        return foundChoice ? true : false;
+      }
+    }
+    return false;
+  };
+  const handleGetIsCorrectAnswer = (indexInRenderAnswer: number) => {
+    if (currentQuestionType == 2 && currentSectionIndex in answerChoices) {
+      const choices = answerChoices[currentSectionIndex][currentQuestionIndex];
+      if (Array.isArray(choices)) {
+        // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
+        const foundChoice = choices.find(
+          (choice) => choice.chooseIndex === indexInRenderAnswer
+        );
+        return foundChoice ? foundChoice.isCorrect : null;
+      }
+    }
+    return null;
+  };
 
-    return (
-        <div>
-            <>
-                <div className="flex justify-between items-center">
-                    <p>Câu {currentQuestionIndex + 1}</p>
-                    <p className="text-sm text-gray-500">
-                        {/*lấy kiểu câu hỏi - Một đáp án or nhiều đáp án*/}
-                        {questionTypeContent?.[currentQuestionType]}
-                    </p>
-                </div>
-                <div className="my-2 font-medium">
-                    {/* Hiển thị nội dung câu hỏi */}
-                    {HTMLReactParser(
-<<<<<<< HEAD
-                        currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].questionContent ||
-                            '',
-=======
-                        quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.questionContent || '',
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
-                    )}
-                </div>
-                <div className="flex flex-col gap-5">
-                    {/* Render các câu trả lời và chọn */}
-<<<<<<< HEAD
-                    {currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].answers instanceof
-                        Array && (
-                        <>
-                            {currentQuizDetail?.quiz[currentSectionIndex].questions[currentQuestionIndex].answers.map(
-=======
-                    {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers instanceof Array && (
-                        <>
-                            {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
->>>>>>> bceb0fcdd663ce52a321aa0984bce5e25540178d
-                                (answer: any, index: number) => (
-                                    <label
-                                        key={index}
-                                        className="flex items-center select-none space-x-2 cursor-pointer"
-                                    >
-                                        {/* Kiểm tra xem kiểu câu hỏi hiện tại là gì (hàm set ở trên provider)*/}
-                                        <input
-                                            type={currentQuestionType == 1 ? 'radio' : 'checkbox'}
-                                            onChange={() => handleChooseAnswer(index)}
-                                            checked={handleGetChooseIndexAnswer(index)}
-                                            className="w-5 h-5"
-                                        />
-                                        {/* Đây là render bằng mảng nên để tránh việc chưa trả lời mà đáp án đã tích thì phải đủ điều kiện
-                                                                chỉ số phần thi hiện tại ở trong answerChoice(provider) và có thằng đáp án hiện tại sau khi chọn
-                                                                tiếp theo thêm điều kiện đáp án đúng của câu hỏi
-        
-                                                                Khi trả lời sai thì tất render màu đỏ bằng cách chỉ số câu trả lời khi render và chỉ số câu trả lời đã lưu trong anserchoice phải bằng nhau
-                                                                thứ 2 trong answerChoice isCorrect phải bằng false
-                                                                */}
-                                        <div
-                                            className={
-                                                currentQuestionType == 1
-                                                    ? `${
-                                                          currentSectionIndex in answerChoices &&
-                                                          answerChoices[currentSectionIndex][currentQuestionIndex] &&
-                                                          answer.isCorrect &&
-                                                          '!bg-green-700 text-white'
-                                                      } ${
-                                                          currentSectionIndex in answerChoices &&
-                                                          answerChoices[currentSectionIndex][currentQuestionIndex]
-                                                              ?.isCorrect === false &&
-                                                          answerChoices[currentSectionIndex][currentQuestionIndex]
-                                                              ?.chooseIndex === index &&
-                                                          '!bg-red-600 !text-white'
-                                                      } px-2`
-                                                    : `${
-                                                          handleGetIsCorrectAnswer(index) === true &&
-                                                          '!bg-green-700 !text-white'
-                                                      }
-                                                                              ${
-                                                                                  handleGetIsCorrectAnswer(index) ===
-                                                                                      false && '!bg-red-600 !text-white'
-                                                                              }
-                                                                              `
-                                            }
-                                        >
-                                            {HTMLReactParser(sanitizeHTML(answer.content))}
-                                        </div>
-                                    </label>
-                                ),
-                            )}
-                        </>
-                    )}
-                </div>
-            </>
+  return (
+    <div>
+      <>
+        <div className="flex justify-between items-center">
+          <p>Câu {currentQuestionIndex + 1}</p>
+          <p className="text-sm text-gray-500">
+            {/*lấy kiểu câu hỏi - Một đáp án or nhiều đáp án*/}
+            {questionTypeContent?.[currentQuestionType || 1]}
+          </p>
         </div>
-    );
+        <div className="my-2 font-medium">
+          {/* Hiển thị nội dung câu hỏi */}
+          {HTMLReactParser(
+            (
+              currentQuizDetail?.quiz[currentSectionIndex].questions[
+                currentQuestionIndex
+              ] as QuestionType_1_2
+            ).questionContent || ""
+          )}
+        </div>
+        <div className="flex flex-col gap-5">
+          {/* Render các câu trả lời và chọn */}
+          {(
+            currentQuizDetail?.quiz[currentSectionIndex].questions[
+              currentQuestionIndex
+            ] as any
+          ).answers instanceof Array && (
+            <>
+              {(
+                currentQuizDetail?.quiz[currentSectionIndex].questions[
+                  currentQuestionIndex
+                ] as any
+              ).answers.map((answer: any, index: number) => (
+                <label
+                  key={index}
+                  className="flex items-center select-none space-x-2 cursor-pointer"
+                >
+                  {/* Kiểm tra xem kiểu câu hỏi hiện tại là gì (hàm set ở trên provider)*/}
+                  <Radio
+                    //   type={currentQuestionType == 1 ? "radio" : "checkbox"}
+                    //   onChange={() => handleChooseAnswer(index)}
+                    checked={handleGetChooseIndexAnswer(index)}
+                    className="w-5 h-5"
+                  />
+                  {/* Đây là render bằng mảng nên để tránh việc chưa trả lời mà đáp án đã tích thì phải đủ điều kiện
+                  chỉ số phần thi hiện tại ở trong answerChoice(provider) và có thằng đáp án hiện tại sau khi chọn
+                  tiếp theo thêm điều kiện đáp án đúng của câu hỏi
+        
+                  Khi trả lời sai thì tất render màu đỏ bằng cách chỉ số câu trả lời khi render và chỉ số câu trả lời đã lưu trong anserchoice phải bằng nhau
+                  thứ 2 trong answerChoice isCorrect phải bằng false
+                  */}
+                  <div
+                    className={
+                      currentQuestionType == 1
+                        ? `${
+                            currentSectionIndex in answerChoices &&
+                            answerChoices[currentSectionIndex][
+                              currentQuestionIndex
+                            ] &&
+                            answer.isCorrect &&
+                            "!bg-green-700 text-white"
+                          } ${
+                            currentSectionIndex in answerChoices &&
+                            answerChoices[currentSectionIndex][
+                              currentQuestionIndex
+                            ]?.isCorrect === false &&
+                            answerChoices[currentSectionIndex][
+                              currentQuestionIndex
+                            ]?.chooseIndex === index &&
+                            "!bg-red-600 !text-white"
+                          } px-2`
+                        : `${
+                            handleGetIsCorrectAnswer(index) === true &&
+                            "!bg-green-700 !text-white"
+                          }
+                        ${
+                          handleGetIsCorrectAnswer(index) === false &&
+                          "!bg-red-600 !text-white"
+                        }
+                        `
+                    }
+                  >
+                    {HTMLReactParser(sanitizeHTML(answer.content))}
+                  </div>
+                </label>
+              ))}
+            </>
+          )}
+        </div>
+      </>
+    </div>
+  );
 };
 
 export default TakeOneNNAnswers;

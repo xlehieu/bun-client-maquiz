@@ -1,18 +1,19 @@
-'use client'
-import React, { ReactNode } from 'react';
-import Link from 'next/link';
-import MaquizLogo from '@/components/UI/MaquizLogo';
-import siteRouter from '@/config';
-import UserInfoHeader from './UserInfoHeader';
+"use client";
+import React, { ReactNode } from "react";
+import Link from "next/link";
+import MaquizLogo from "@/components/UI/MaquizLogo";
+import siteRouter from "@/config";
+import UserInfoHeader from "./components/UserInfoHeader";
+import UserDropdown from "@/components/UI/Dropdowns/UserDropdown";
 const SubLayout = ({ children }: { children: ReactNode }) => {
-    return (
-        <div className="bg-[#fcfcfc] select-none min-h-svh">
-            <header className="w-full bg-white md:h-20 md:shadow-md">
-                <div className="container px-0 md:px-5 mx-0 md:mx-auto hidden md:flex justify-between items-center h-full">
-                    <Link href={siteRouter.home} className="w-40 h-full">
-                        <MaquizLogo className={'w-full h-full object-contain'} />
-                    </Link>
-                    {/* <div className="hidden md:flex space-x-7 justify-between items-center">
+  return (
+    <div className="bg-[#fcfcfc] select-none min-h-svh">
+      <header className="w-full bg-white md:h-20 md:shadow-md">
+        <div className="container px-0 md:px-5 mx-0 md:mx-auto hidden md:flex justify-between items-center h-full">
+          <Link href={siteRouter.home} className="w-40 h-full">
+            <MaquizLogo className={"w-full h-full object-contain"} />
+          </Link>
+          {/* <div className="hidden md:flex space-x-7 justify-between items-center">
                         <button onClick={toggleExpand}>
                             <FontAwesomeIcon icon={faExpand} className="text-primary" />
                         </button>
@@ -62,14 +63,14 @@ const SubLayout = ({ children }: { children: ReactNode }) => {
                             </Link>
                         )}
                     </div> */}
-                    <UserInfoHeader />
-                </div>
-            </header>
-            <div className="w-full">
-                <div className="mx-auto px-2 md:px-5 mt-5">{children}</div>
-            </div>
+          <UserDropdown />
         </div>
-    );
+      </header>
+      <div className="w-full">
+        <div className="mx-auto px-2 md:px-5 mt-5">{children}</div>
+      </div>
+    </div>
+  );
 };
 
 export default SubLayout;
