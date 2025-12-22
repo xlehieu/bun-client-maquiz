@@ -1,7 +1,7 @@
-'use client'
+'use client';
 import React from 'react';
 import { ClockLoader, MoonLoader } from 'react-spinners';
-import { colors } from '@/common/constants';
+import { reactjxColors } from '@/common/constants';
 const LoadingIcon = ({
     width = 32,
     height = 32,
@@ -13,7 +13,7 @@ const LoadingIcon = ({
 }) => {
     return (
         <div className={`w-[${width}] h-[${height}] ${className}`}>
-            <MoonLoader color={colors.primary} size={width} />
+            <MoonLoader color={reactjxColors.primary} size={width} />
         </div>
     );
 };

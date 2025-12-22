@@ -102,7 +102,7 @@ export const imageQuizThumbDefault = [
     'https://firebasestorage.googleapis.com/v0/b/mah-auth.appspot.com/o/assets%2Fimages%2FquizThumbnail3.jpg?alt=media&token=b14bf3aa-5cd8-4dba-a96e-f0af272bae92',
 ];
 export const classroomImageFallback = `https://iteach.net/wp-content/uploads/new-teacher-classroom-setup.jpg`;
-export const colors = {
+export const reactjxColors = {
     // primary: '#0d99a6',
     primary: '#3178C6',
 };
@@ -131,84 +131,83 @@ export const ANSWER_CHOICE_ACTION = {
 };
 export const SUBJECTS = [
     // Môn phổ thông
-    "Toán học",
-    "Ngữ văn",
-    "Tiếng Anh",
-    "Vật lý",
-    "Hóa học",
-    "Sinh học",
-    "Lịch sử",
-    "Địa lý",
-    "Giáo dục công dân",
-    "Tin học cơ bản",
-    "Âm nhạc",
-    "Mỹ thuật",
-    "Thể dục",
-    "Công nghệ",
-    "Ngoại ngữ khác (Pháp, Nhật, Đức…)",
-  
+    'Toán học',
+    'Ngữ văn',
+    'Tiếng Anh',
+    'Vật lý',
+    'Hóa học',
+    'Sinh học',
+    'Lịch sử',
+    'Địa lý',
+    'Giáo dục công dân',
+    'Tin học cơ bản',
+    'Âm nhạc',
+    'Mỹ thuật',
+    'Thể dục',
+    'Công nghệ',
+    'Ngoại ngữ khác (Pháp, Nhật, Đức…)',
+
     // Môn trung học phổ thông nâng cao / bổ sung
-    "Toán cao cấp (Đại số, Giải tích, Hình học)",
-    "Vật lý nâng cao",
-    "Hóa học nâng cao",
-    "Sinh học nâng cao",
-    "Tin học nâng cao / lập trình",
-    "Kinh tế học cơ bản",
-    "Tâm lý học cơ bản",
-    "Triết học cơ bản",
-  
+    'Toán cao cấp (Đại số, Giải tích, Hình học)',
+    'Vật lý nâng cao',
+    'Hóa học nâng cao',
+    'Sinh học nâng cao',
+    'Tin học nâng cao / lập trình',
+    'Kinh tế học cơ bản',
+    'Tâm lý học cơ bản',
+    'Triết học cơ bản',
+
     // Môn đại học / chuyên ngành
     // Khoa học tự nhiên
-    "Toán cao cấp",
-    "Vật lý lý thuyết",
-    "Hóa phân tích",
-    "Sinh học phân tử",
-    "Khoa học môi trường",
-  
+    'Toán cao cấp',
+    'Vật lý lý thuyết',
+    'Hóa phân tích',
+    'Sinh học phân tử',
+    'Khoa học môi trường',
+
     // Khoa học máy tính & công nghệ thông tin
-    "Lập trình (Python, Java, C++)",
-    "Cấu trúc dữ liệu & Thuật toán",
-    "Hệ điều hành",
-    "Cơ sở dữ liệu",
-    "Trí tuệ nhân tạo",
-    "Mạng máy tính",
-    "An ninh mạng",
-  
+    'Lập trình (Python, Java, C++)',
+    'Cấu trúc dữ liệu & Thuật toán',
+    'Hệ điều hành',
+    'Cơ sở dữ liệu',
+    'Trí tuệ nhân tạo',
+    'Mạng máy tính',
+    'An ninh mạng',
+
     // Kinh tế & Quản trị
-    "Kinh tế vi mô / vĩ mô",
-    "Quản trị học",
-    "Marketing",
-    "Tài chính – Ngân hàng",
-    "Kế toán",
-    "Thống kê kinh tế",
-  
+    'Kinh tế vi mô / vĩ mô',
+    'Quản trị học',
+    'Marketing',
+    'Tài chính – Ngân hàng',
+    'Kế toán',
+    'Thống kê kinh tế',
+
     // Khoa học xã hội & nhân văn
-    "Tâm lý học",
-    "Xã hội học",
-    "Triết học nâng cao",
-    "Ngôn ngữ học",
-    "Lịch sử thế giới / Việt Nam",
-    "Quan hệ quốc tế",
-  
+    'Tâm lý học',
+    'Xã hội học',
+    'Triết học nâng cao',
+    'Ngôn ngữ học',
+    'Lịch sử thế giới / Việt Nam',
+    'Quan hệ quốc tế',
+
     // Kỹ thuật & công nghệ
-    "Cơ học kỹ thuật",
-    "Điện – Điện tử",
-    "Cơ điện tử",
-    "Kỹ thuật môi trường",
-    "Xây dựng / Kiến trúc",
-  
+    'Cơ học kỹ thuật',
+    'Điện – Điện tử',
+    'Cơ điện tử',
+    'Kỹ thuật môi trường',
+    'Xây dựng / Kiến trúc',
+
     // Y dược
-    "Giải phẫu học",
-    "Sinh lý học",
-    "Dược lý học",
-    "Khoa học điều dưỡng",
-    "Y học lâm sàng",
-  
+    'Giải phẫu học',
+    'Sinh lý học',
+    'Dược lý học',
+    'Khoa học điều dưỡng',
+    'Y học lâm sàng',
+
     // Nghệ thuật & thiết kế
-    "Mỹ thuật đại cương",
-    "Thiết kế đồ họa",
-    "Âm nhạc nâng cao",
-    "Nhiếp ảnh",
-    "Thiết kế thời trang"
-  ];
-  
+    'Mỹ thuật đại cương',
+    'Thiết kế đồ họa',
+    'Âm nhạc nâng cao',
+    'Nhiếp ảnh',
+    'Thiết kế thời trang',
+];

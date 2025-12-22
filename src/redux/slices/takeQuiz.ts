@@ -1,178 +1,264 @@
-import { getQuizPreviewBySlug } from "@/api/quiz.service";
-import {
-  MappingMatchQuestion,
-  MatchQuestion,
-  QuestionType_1_2,
-  QuizDetailRecord,
-} from "@/types/quiz.type";
-import { shuffleArray } from "@/utils";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // localStorage
-import { toast } from "sonner";
-type ShuffleType = "part" | "question" | "answer";
+import { getQuizPreviewBySlug } from '@/api/quiz.service';
+import { MappingMatchQuestion, MatchQuestion, QuestionType_1_2, QuizDetailRecord } from '@/types/quiz.type';
+import { shuffleArray } from '@/utils';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // localStorage
+import { toast } from 'sonner';
+type ShuffleType = 'part' | 'question' | 'answer';
 type TakeQuizState = {
-  currentQuizId?: string;
-  currentPartIndex: number;
-  currentQuestionIndex: number;
-  currentQuizPreviewDetail: QuizDetailRecord | null;
-  currentQuestionType?: number;
-  isFetching: boolean;
-  timePassQuestion: number;
-  answerChoices?: any;
-  countQuestionQuizDetail: number;
-  isEnded: boolean;
-  isTimeout: boolean;
+    currentQuizId?: string;
+    currentPartIndex: number;
+    currentQuestionIndex: number;
+    currentQuizPreviewDetail: QuizDetailRecord | null;
+    currentQuestionType?: number;
+    isFetching: boolean;
+    timePassQuestion: number;
+    answerChoices?: any;
+    countQuestionQuizDetail: number;
+    isEnded: boolean;
+    isTimeout: boolean;
 };
 const initStateTakeQuiz: TakeQuizState = {
-  isFetching: false,
-  currentQuizPreviewDetail: null,
-  currentPartIndex: 0,
-  currentQuestionIndex: 0,
-  timePassQuestion: 2000,
-  countQuestionQuizDetail: 0,
-  isEnded: false,
-  isTimeout: false,
+    isFetching: false,
+    currentQuizPreviewDetail: null,
+    currentPartIndex: 0,
+    currentQuestionIndex: 0,
+    timePassQuestion: 2000,
+    countQuestionQuizDetail: 0,
+    isEnded: false,
+    isTimeout: false,
+    answerChoices: {},
 };
-export const fetchQuizPreview = createAsyncThunk(
-  "quiz/fetchQuizDetail",
-  async (slug: string) => {
+export const fetchQuizPreview = createAsyncThunk('quiz/fetchQuizDetail', async (slug: string) => {
     try {
-      const response = await getQuizPreviewBySlug(slug);
-      return response.data;
+        const response = await getQuizPreviewBySlug(slug);
+        return response.data;
     } catch (err) {
-      toast.error("Lỗi server, không tìm thấy bài trắc nghiệm!");
+        toast.error('Lỗi server, không tìm thấy bài trắc nghiệm!');
     }
-  }
-);
+});
 const takeQuizSlice = createSlice({
-  name: "takeQuiz",
-  initialState: initStateTakeQuiz,
-  reducers: {
-    setTimePassQuestion: (state, action: PayloadAction<number>) => {
-      state.timePassQuestion = action.payload;
-    },
-    setCurrentPartIndex: (state, action: PayloadAction<number>) => {
-      state.currentPartIndex = action.payload;
-    },
-    setCurrentQuestionIndex: (state, action: PayloadAction<number>) => {
-      state.currentQuestionIndex = action.payload;
-    },
-    setCurrentQuestionType: (state, action: PayloadAction<number>) => {
-      state.currentQuestionType = action.payload;
-    },
-    endTakeQuiz: (state) => {
-      state.isEnded = true;
-    },
-    timeOut: (state) => {
-      state.isTimeout = true;
-    },
-    shuffleQuiz: (state, action: PayloadAction<ShuffleType[]>) => {
-      const checkShuffleAnswer = action.payload.includes("answer");
-      const checkShuffleQuestion = action.payload.includes("question");
-      const checkShufflePart = action.payload.includes("part");
-      if (state.currentQuizPreviewDetail?.quiz) {
-        //part
-        const newPart = state.currentQuizPreviewDetail?.quiz?.map((part) => {
-          //rồi shuffle question lên
-          const newQuestion = part?.questions?.map((question) => {
-            const newAnswer = { ...question };
-            if (checkShuffleAnswer)
-              if (
-                (newAnswer.questionType === 1 ||
-                  newAnswer.questionType === 2) &&
-                (newAnswer as QuestionType_1_2).answers
-              ) {
-                (newAnswer as QuestionType_1_2).answers = shuffleArray(
-                  (newAnswer as QuestionType_1_2).answers
-                );
-              }
-            return newAnswer;
-          });
-          return checkShuffleQuestion ? shuffleArray(newQuestion) : newQuestion;
-          // return newPart;
-        });
-        state.currentQuizPreviewDetail.quiz = checkShufflePart
-          ? shuffleArray(newPart)
-          : newPart;
-      }
-    },
-  },
-  extraReducers(builder) {
-    builder
-      .addCase(fetchQuizPreview.pending, (state) => {
-        state.isFetching = true;
-      })
-      .addCase(fetchQuizPreview.rejected, (state) => {
-        state.isFetching = false;
-      })
-      .addCase(fetchQuizPreview.fulfilled, (state, action) => {
-        state.isFetching = false;
-        const quizFetch = action.payload?.data;
-        if (quizFetch) {
-          let countQuestion = 0;
-          state.currentQuizPreviewDetail = {
-            ...quizFetch,
-            quiz: quizFetch?.quiz?.map((part) => {
-              return {
-                ...part,
-                questions: part?.questions?.map((question) => {
-                  if (question.questionType === 3) {
-                    const matchQuestion = (question as MatchQuestion)
-                      .matchQuestions;
-                    const mappingMatchQuestion: MappingMatchQuestion = {
-                      optionMatchQuestion_Question: [],
-                      optionMatchQuestion_Answer: [],
-                    };
-                    matchQuestion.forEach((itemMatchQuestion) => {
-                      const answerId =
-                        itemMatchQuestion._id || itemMatchQuestion.answerId;
-                      mappingMatchQuestion.optionMatchQuestion_Question.push({
-                        questionContent: itemMatchQuestion.questionContent,
-                        answerId: answerId,
-                      });
-                      mappingMatchQuestion.optionMatchQuestion_Answer.push({
-                        answer: itemMatchQuestion.answer,
-                        answerId: answerId,
-                      });
+    name: 'takeQuiz',
+    initialState: initStateTakeQuiz,
+    reducers: {
+        setTimePassQuestion: (state, action: PayloadAction<number>) => {
+            state.timePassQuestion = action.payload;
+        },
+        setCurrentPartIndex: (state, action: PayloadAction<number>) => {
+            state.currentPartIndex = action.payload;
+        },
+        setCurrentQuestionIndex: (state, action: PayloadAction<number>) => {
+            state.currentQuestionIndex = action.payload;
+        },
+        setCurrentQuestionType: (state, action: PayloadAction<number>) => {
+            state.currentQuestionType = action.payload;
+        },
+        endTakeQuiz: (state) => {
+            state.isEnded = true;
+        },
+        timeOut: (state) => {
+            state.isTimeout = true;
+        },
+        shuffleQuiz: (state, action: PayloadAction<ShuffleType[]>) => {
+            const checkShuffleAnswer = action.payload.includes('answer');
+            const checkShuffleQuestion = action.payload.includes('question');
+            const checkShufflePart = action.payload.includes('part');
+            if (state.currentQuizPreviewDetail?.quiz) {
+                //part
+                const newPart = state.currentQuizPreviewDetail?.quiz?.map((part) => {
+                    //rồi shuffle question lên
+                    const newQuestion = part?.questions?.map((question) => {
+                        const newAnswer = { ...question };
+                        if (checkShuffleAnswer)
+                            if (
+                                (newAnswer.questionType === 1 || newAnswer.questionType === 2) &&
+                                (newAnswer as QuestionType_1_2).answers
+                            ) {
+                                (newAnswer as QuestionType_1_2).answers = shuffleArray(
+                                    (newAnswer as QuestionType_1_2).answers,
+                                );
+                            }
+                        return newAnswer;
                     });
-                    return {
-                      ...question,
-                      mappingMatchQuestion: {
-                        optionMatchQuestion_Answer: shuffleArray(
-                          mappingMatchQuestion.optionMatchQuestion_Answer
-                        ),
-                        optionMatchQuestion_Question: shuffleArray(
-                          mappingMatchQuestion.optionMatchQuestion_Question
-                        ),
-                      },
+                    return checkShuffleQuestion ? shuffleArray(newQuestion) : newQuestion;
+                    // return newPart;
+                });
+                state.currentQuizPreviewDetail.quiz = checkShufflePart ? shuffleArray(newPart) : newPart;
+            }
+        },
+        chooseQuestionType1: (
+            state,
+            action: PayloadAction<{
+                currentPartIndex: number;
+                currentQuestionIndex: number;
+                chooseIndex: number;
+                isCorrect: boolean;
+            }>,
+        ) => {
+            state.answerChoices = {
+                ...(state.answerChoices || {}),
+                [action.payload.currentPartIndex]: {
+                    ...(state?.answerChoices?.[action.payload?.currentPartIndex] || {}),
+                    [action.payload.currentQuestionIndex]: {
+                        chooseIndex: action.payload.chooseIndex,
+                        isCorrect: action.payload.isCorrect,
+                    },
+                },
+            };
+        },
+        chooseQuestionType2: (
+            state,
+            action: PayloadAction<{
+                currentPartIndex: number;
+                currentQuestionIndex: number;
+                chooseIndex: number;
+                isCorrect: boolean;
+            }>,
+        ) => {
+            const { currentPartIndex, currentQuestionIndex, chooseIndex, isCorrect } = action.payload;
+            if (
+                currentPartIndex !== undefined &&
+                currentQuestionIndex !== undefined &&
+                chooseIndex !== undefined &&
+                isCorrect !== undefined
+            ) {
+                const choices = { ...state.answerChoices };
+                // khi choices[currentPartIndex] là undefined thì phải set là một đối tượng không thì
+                // kiểm tra choices[currentPartIndex][currentQuestionIndex] sẽ là đang truy cập đến thuộc tính của undefined nên lỗi
+                // và đang là kiểm tra questionType = 1 nên sẽ kiểm tra là mảng
+                if (!choices.hasOwnProperty(currentPartIndex)) choices[currentPartIndex] = {};
+                if (Array.isArray(choices[currentPartIndex][currentQuestionIndex])) {
+                    // nếu câu hỏi vừa chọn có trong answer choice rồi thì return
+                    if (
+                        choices[currentPartIndex][currentQuestionIndex].some(
+                            (choice) => choice.chooseIndex === chooseIndex,
+                        )
+                    ) {
+                        return state;
+                    }
+                    choices[currentPartIndex] = {
+                        ...choices[currentPartIndex],
+                        [currentQuestionIndex]: [
+                            ...choices[currentPartIndex][currentQuestionIndex],
+                            {
+                                chooseIndex: chooseIndex,
+                                isCorrect: isCorrect,
+                            },
+                        ],
                     };
-                  }
-                  countQuestion += part.questions.length;
+                } else {
+                    choices[currentPartIndex] = {
+                        ...choices[currentPartIndex],
+                        [currentQuestionIndex]: [
+                            {
+                                chooseIndex: chooseIndex,
+                                isCorrect: isCorrect,
+                            },
+                        ],
+                    };
+                }
+                state.answerChoices = { ...choices };
+            }
+        },
+        chooseQuestionType3: (
+            state,
+            action: PayloadAction<{
+                currentPartIndex: number;
+                currentQuestionIndex: number;
+                // matchQuestion:
+            }>,
+        ) => {
+            // const { currentPartIndex, currentQuestionIndex, matchQuestion } = action.payload;
+            // const choices = { ...state.answerChoices };
+            // if (!choices[currentPartIndex]) {
+            //     choices[currentPartIndex] = {};
+            // }
+            // if (Array.isArray(matchQuestion)) {
+            //     choices[currentPartIndex] = {
+            //         ...(choices?.[currentPartIndex] || {}),
+            //         [currentQuestionIndex]: [...(matchQuestion || [])],
+            //     };
+            // }
+            // state.answerChoices = {...choices};
+        },
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(fetchQuizPreview.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchQuizPreview.rejected, (state) => {
+                state.isFetching = false;
+            })
+            .addCase(fetchQuizPreview.fulfilled, (state, action) => {
+                state.isFetching = false;
+                const quizFetch = action.payload?.data;
+                if (quizFetch) {
+                    let countQuestion = 0;
+                    state.currentQuizPreviewDetail = {
+                        ...quizFetch,
+                        quiz: quizFetch?.quiz?.map((part) => {
+                            return {
+                                ...part,
+                                questions: part?.questions?.map((question) => {
+                                    if (question.questionType === 3) {
+                                        const matchQuestion = (question as MatchQuestion).matchQuestions;
+                                        const mappingMatchQuestion: MappingMatchQuestion = {
+                                            optionMatchQuestion_Question: [],
+                                            optionMatchQuestion_Answer: [],
+                                        };
+                                        matchQuestion.forEach((itemMatchQuestion) => {
+                                            const answerId = itemMatchQuestion._id || itemMatchQuestion.answerId;
+                                            mappingMatchQuestion.optionMatchQuestion_Question.push({
+                                                questionContent: itemMatchQuestion.questionContent,
+                                                answerId: answerId,
+                                            });
+                                            mappingMatchQuestion.optionMatchQuestion_Answer.push({
+                                                answer: itemMatchQuestion.answer,
+                                                answerId: answerId,
+                                            });
+                                        });
+                                        return {
+                                            ...question,
+                                            mappingMatchQuestion: {
+                                                optionMatchQuestion_Answer: shuffleArray(
+                                                    mappingMatchQuestion.optionMatchQuestion_Answer,
+                                                ),
+                                                optionMatchQuestion_Question: shuffleArray(
+                                                    mappingMatchQuestion.optionMatchQuestion_Question,
+                                                ),
+                                            },
+                                        };
+                                    }
+                                    countQuestion += part.questions.length;
 
-                  return question;
-                }),
-              };
-            }),
-          };
-          state.countQuestionQuizDetail = countQuestion;
-        }
-      });
-  },
+                                    return question;
+                                }),
+                            };
+                        }),
+                    };
+                    state.countQuestionQuizDetail = countQuestion;
+                }
+            });
+    },
 });
 const takeQuizPersistConfig = {
-  key: "takeQuiz",
-  storage,
-  whitelist: ["currentSectionIndex", "currentQuestionIndex"],
+    key: 'takeQuiz',
+    storage,
+    whitelist: ['currentSectionIndex', 'currentQuestionIndex'],
 };
 export const {
-  setTimePassQuestion,
-  setCurrentQuestionIndex,
-  setCurrentPartIndex,
-  shuffleQuiz,
-  endTakeQuiz,
-  setCurrentQuestionType,
-  timeOut,
+    setTimePassQuestion,
+    setCurrentQuestionIndex,
+    setCurrentPartIndex,
+    shuffleQuiz,
+    endTakeQuiz,
+    setCurrentQuestionType,
+    timeOut,
+    chooseQuestionType1,
+    chooseQuestionType2,
+    chooseQuestionType3,
 } = takeQuizSlice.actions;
 
 export default persistReducer(takeQuizPersistConfig, takeQuizSlice.reducer);
