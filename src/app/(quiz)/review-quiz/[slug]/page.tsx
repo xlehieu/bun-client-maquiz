@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import GeneralInformation from './GeneralInformation';
 import LoadingComponent from '@/components/UI/LoadingComponent';
-import { fetchQuizPreview, shuffleQuiz } from '@/redux/slices/takeQuiz';
+import { fetchQuizPreview, shuffleQuiz } from '@/redux/slices/takeQuiz.slice';
 const ReviewQuizPage = () => {
     const dispatch = useAppDispatch();
     const { isFetching, currentQuizPreviewDetail } = useAppSelector((state) => state.takeQuiz);

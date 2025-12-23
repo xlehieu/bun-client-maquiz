@@ -6,12 +6,14 @@ import { shuffleArray } from '@/utils';
 import { Button, Modal } from 'antd';
 import { TakeMatchingQuestionContext } from '@/context/TakeQuizContext';
 import { ANSWER_CHOICE_ACTION, reactjxColors } from '@/common/constants';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { MatchQuestion } from '@/types/quiz.type';
+import { chooseQuestionType3 } from '@/redux/slices/takeQuiz.slice';
+import { AnswerChoiceType3 } from '@/types/shared.type';
 type XArrowType = {
-    start: string;
+    question: string;
     match: string;
-    end: string;
+    answer?: string;
 };
 export default function TakeMatchQuestion() {
     const {
@@ -20,22 +22,27 @@ export default function TakeMatchQuestion() {
         currentQuestionIndex,
         answerChoices,
     } = useAppSelector((state) => state.takeQuiz);
+    const dispatch = useAppDispatch();
     // const { shuffleMatchQuestion, setShuffleMatchQuestion, answerMatchingQuestion, dispatchAnswerMatchingQuestion } =
     //     useContext(TakeMatchingQuestionContext);
     const refQuestion = useRef<any[]>([]);
     const [elementCurrentMouseDown, setElementCurrentMouseDown] = useState('');
     const [xArrows, setXArrows] = useState<XArrowType[]>([]);
     const [dragging, setDragging] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [isDisabled, setIsDisabled] = useState(false);
     const mouseRef = useRef<HTMLDivElement>(null);
     // di chuyển div ẩn theo chuột
     const containerRef = useRef<HTMLDivElement>(null);
     const [left, setLeft] = useState(0);
     const [top, setTop] = useState(0);
     useEffect(() => {
+        const matchQuestion = [
+            ...((answerChoices?.[currentPartIndex]?.[currentQuestionIndex] as AnswerChoiceType3[]) || []),
+        ];
+        setIsDisabled(currentQuestionIndex in (answerChoices?.[currentPartIndex] || {}) ? true : false);
         const timeout = setTimeout(() => {
-            setLoading(false);
-        }, 500);
+            setXArrows(Array.isArray(matchQuestion) ? matchQuestion : []);
+        }, 600);
         return () => clearTimeout(timeout);
     }, [answerChoices]);
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, match: string) => {
@@ -43,49 +50,41 @@ export default function TakeMatchQuestion() {
         setDragging(true);
         const startId = e.currentTarget.id;
         if (startId) setElementCurrentMouseDown(startId);
-        setXArrows((prevValue: any[]) => {
+        setXArrows((prevValue) => {
             const newValue = [...(prevValue || [])];
             // tìm index trong mảng và chỉnh sửa index đó {idx và indexElement hoàn toàn khác nhau}
             const idxArr = newValue?.findIndex((item) => item?.match === match);
             if (idxArr === -1) {
                 newValue.push({
-                    start: startId,
+                    question: startId,
                     match,
                 });
             } else {
                 newValue[idxArr] = {
-                    start: startId,
+                    question: startId,
                     match,
                 };
             }
             return newValue?.filter(Boolean);
         });
-        // setCurrentQuestion(match);
-        // dispatchAnswerMatchingQuestion({
-        //     payload: {
-        //         currentPartIndex,
-        //         currentQuestionIndex,
-        //         question: match,
-        //     },
-        // });
     };
     const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>, match: any) => {
-        const endId = e.currentTarget.id;
+        const targetAnswerId = e.currentTarget.id;
         // nếu nhả chuột vào ô hiện tại thì return, xóa luôn current element
 
-        if (elementCurrentMouseDown === endId) {
+        if (elementCurrentMouseDown === targetAnswerId) {
             setElementCurrentMouseDown('');
             return;
         }
         //lấy id của current => gán vào thằng nhả ra là ok
-        setXArrows((prevValue: any[]) => {
+        setXArrows((prevValue) => {
             const newValue = [...prevValue];
             // start cũng đang là element current luôn => tìm ông nào bắt đầu bằng startId và gán thêm end => phần tử hiện tại vừa mouse up
-            const idxArr = newValue?.findIndex((item) => item?.start === elementCurrentMouseDown);
+            const idxArr = newValue?.findIndex((item) => item?.question === elementCurrentMouseDown);
             if (newValue && newValue.length > 0 && newValue?.[idxArr]) {
                 newValue[idxArr] = {
                     ...newValue[idxArr],
-                    end: endId,
+                    answer: targetAnswerId,
                 };
             }
             return newValue?.filter(Boolean);
@@ -131,6 +130,13 @@ export default function TakeMatchQuestion() {
         //         matchQuestion,
         //     },
         // });
+        dispatch(
+            chooseQuestionType3({
+                currentPartIndex,
+                currentQuestionIndex,
+                matchQuestion: xArrows,
+            }),
+        );
         setOpenModal(false);
     };
     const [openModal, setOpenModal] = useState(false);
@@ -177,20 +183,19 @@ export default function TakeMatchQuestion() {
                     </div>
                 </div>
                 <Fragment key={top + left + Math.random()}>
-                    {!loading &&
-                        xArrows?.map((el, index) => (
-                            <Fragment key={index}>
-                                {el?.start && el?.end && (
-                                    <Xarrow
-                                        color={reactjxColors.primary}
-                                        headSize={3}
-                                        strokeWidth={3}
-                                        start={el.start}
-                                        end={el.end}
-                                    />
-                                )}
-                            </Fragment>
-                        ))}
+                    {xArrows?.map((el, index) => (
+                        <Fragment key={index}>
+                            {el?.question && el?.answer && (
+                                <Xarrow
+                                    color={reactjxColors.primary}
+                                    headSize={3}
+                                    strokeWidth={3}
+                                    start={el.question}
+                                    end={el.answer}
+                                />
+                            )}
+                        </Fragment>
+                    ))}
                 </Fragment>
                 {/* div ẩn bám theo chuột */}
                 <div
@@ -219,7 +224,7 @@ export default function TakeMatchQuestion() {
                     )}
                 </Fragment>
                 <div className="flex flex-1 justify-end">
-                    <Button className="mt-4" onClick={handleOpenModal}>
+                    <Button className="mt-4" disabled={isDisabled} onClick={handleOpenModal}>
                         Xác nhận
                     </Button>
                 </div>

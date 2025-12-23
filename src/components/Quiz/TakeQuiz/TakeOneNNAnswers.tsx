@@ -2,8 +2,10 @@
 import QuizDetail from '@/app/admin/quizzes-management/QuizDetail';
 import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { chooseQuestionType1, chooseQuestionType2 } from '@/redux/slices/takeQuiz';
+import { chooseQuestionType1, chooseQuestionType2 } from '@/redux/slices/takeQuiz.slice';
 import { QuestionType_1_2 } from '@/types/quiz.type';
+import { AnswerChoiceType1_2 } from '@/types/shared.type';
+import { getClassNameQuestion } from '@/utils';
 import { Checkbox, Radio } from 'antd';
 import HTMLReactParser from 'html-react-parser/lib/index';
 import React from 'react';
@@ -23,7 +25,7 @@ const sanitizeHTML = (html: any) => {
 
     return doc.body.innerHTML;
 };
-const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }) => {
+const TakeOneNNAnswers = () => {
     const {
         currentQuizPreviewDetail: currentQuizDetail,
         currentQuestionIndex,
@@ -31,45 +33,14 @@ const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }
         currentQuestionType,
         answerChoices,
     } = useAppSelector((state) => state.takeQuiz);
-    // const handleChooseAnswer = (chooseIndex: number) => {
-    //     // nếu không có current part index trong answer choice rồi thì xuống thực hiện code phía dưới
-    //     // nếu có thì check xem có curent question index trong answer choice chưa nếu có thì return vì đã trả lời rồi thì không được làm lại nữa
-    //     if (currentQuestionType == 1 && answerChoices[currentPartIndex])
-    //         if (currentQuestionIndex in answerChoices[currentPartIndex]) return;
-    //     if (currentQuestionType == 1) {
-    //         dispatchAnswerChoices({
-    //             type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_1,
-    //             payload: {
-    //                 currentPartIndex,
-    //                 currentQuestionIndex,
-    //                 chooseIndex: chooseIndex,
-    //                 isCorrect:
-    //                     currentQuizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]?.answers[
-    //                         chooseIndex
-    //                     ]?.isCorrect,
-    //             },
-    //         });
-    //         autoNextQuestion();
-    //     } else if (currentQuestionType == 2) {
-    //         dispatchAnswerChoices({
-    //             type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_2,
-    //             payload: {
-    //                 currentPartIndex,
-    //                 currentQuestionIndex,
-    //                 chooseIndex: chooseIndex,
-    //                 isCorrect:
-    //                     currentQuizDetail?.quiz[currentPartIndex]?.questions[currentQuestionIndex]?.answers[
-    //                         chooseIndex
-    //                     ]?.isCorrect,
-    //             },
-    //         });
-    //     }
-    // };
     const dispatch = useAppDispatch();
     const handleGetChooseIndexAnswer = (indexInRenderAnswer: number) => {
         if (currentQuestionType === 1 && currentPartIndex in (answerChoices || {})) {
             if (currentQuestionIndex in answerChoices[currentPartIndex]) {
-                if (answerChoices[currentPartIndex][currentQuestionIndex].chooseIndex === indexInRenderAnswer)
+                if (
+                    (answerChoices[currentPartIndex][currentQuestionIndex] as AnswerChoiceType1_2).chooseIndex ===
+                    indexInRenderAnswer
+                )
                     return true;
             }
         }
@@ -77,7 +48,9 @@ const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }
             const choices = answerChoices[currentPartIndex][currentQuestionIndex];
             if (Array.isArray(choices)) {
                 // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
-                const foundChoice = choices.find((choice) => choice.chooseIndex == indexInRenderAnswer);
+                const foundChoice = choices.find(
+                    (choice) => (choice as AnswerChoiceType1_2).chooseIndex == indexInRenderAnswer,
+                );
                 return foundChoice ? true : false;
             }
         }
@@ -88,8 +61,10 @@ const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }
             const choices = answerChoices[currentPartIndex][currentQuestionIndex];
             if (Array.isArray(choices)) {
                 // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
-                const foundChoice = choices.find((choice) => choice.chooseIndex === indexInRenderAnswer);
-                return foundChoice ? foundChoice.isCorrect : null;
+                const foundChoice = choices.find(
+                    (choice) => (choice as AnswerChoiceType1_2).chooseIndex === indexInRenderAnswer,
+                );
+                return foundChoice ? (foundChoice as AnswerChoiceType1_2).isCorrect : null;
             }
         }
         return null;
@@ -170,25 +145,14 @@ const TakeOneNNAnswers = ({ autoNextQuestion }: { autoNextQuestion: () => void }
                                     thứ 2 trong answerChoice isCorrect phải bằng false
                                     */}
                             <div
-                                className={
-                                    currentQuestionType == 1
-                                        ? `${
-                                              currentPartIndex in answerChoices &&
-                                              answerChoices[currentPartIndex][currentQuestionIndex] &&
-                                              answer.isCorrect &&
-                                              '!bg-green-700 text-white'
-                                          } ${
-                                              currentPartIndex in answerChoices &&
-                                              answerChoices[currentPartIndex][currentQuestionIndex]?.isCorrect ===
-                                                  false &&
-                                              answerChoices[currentPartIndex][currentQuestionIndex]?.chooseIndex ===
-                                                  index &&
-                                              '!bg-red-600 !text-white'
-                                          } px-2`
-                                        : `${handleGetIsCorrectAnswer(index) === true && '!bg-green-700 !text-white'}
-                        ${handleGetIsCorrectAnswer(index) === false && '!bg-red-600 !text-white'}
-                        `
-                                }
+                                className={getClassNameQuestion({
+                                    answerChoices: answerChoices,
+                                    currentPartIndex,
+                                    currentQuestionIndex,
+                                    isCorrectAnswerRender: answer.isCorrect,
+                                    questionType: currentQuestionType,
+                                    indexAnswer: index,
+                                })}
                             >
                                 {HTMLReactParser(sanitizeHTML(answer.content))}
                             </div>

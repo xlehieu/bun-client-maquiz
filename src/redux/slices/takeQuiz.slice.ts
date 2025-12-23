@@ -1,5 +1,6 @@
 import { getQuizPreviewBySlug } from '@/api/quiz.service';
 import { MappingMatchQuestion, MatchQuestion, QuestionType_1_2, QuizDetailRecord } from '@/types/quiz.type';
+import { AnswerChoices, AnswerChoiceType1_2 } from '@/types/shared.type';
 import { shuffleArray } from '@/utils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
@@ -14,7 +15,7 @@ type TakeQuizState = {
     currentQuestionType?: number;
     isFetching: boolean;
     timePassQuestion: number;
-    answerChoices?: any;
+    answerChoices: AnswerChoices;
     countQuestionQuizDetail: number;
     isEnded: boolean;
     isTimeout: boolean;
@@ -131,22 +132,21 @@ const takeQuizSlice = createSlice({
                 if (Array.isArray(choices[currentPartIndex][currentQuestionIndex])) {
                     // nếu câu hỏi vừa chọn có trong answer choice rồi thì return
                     if (
-                        choices[currentPartIndex][currentQuestionIndex].some(
-                            (choice) => choice.chooseIndex === chooseIndex,
+                        !choices[currentPartIndex][currentQuestionIndex].some(
+                            (choice) => (choice as AnswerChoiceType1_2).chooseIndex === chooseIndex,
                         )
                     ) {
-                        return state;
+                        (choices as any)[currentPartIndex] = {
+                            ...choices[currentPartIndex],
+                            [currentQuestionIndex]: [
+                                ...choices[currentPartIndex][currentQuestionIndex],
+                                {
+                                    chooseIndex: chooseIndex,
+                                    isCorrect: isCorrect,
+                                },
+                            ],
+                        };
                     }
-                    choices[currentPartIndex] = {
-                        ...choices[currentPartIndex],
-                        [currentQuestionIndex]: [
-                            ...choices[currentPartIndex][currentQuestionIndex],
-                            {
-                                chooseIndex: chooseIndex,
-                                isCorrect: isCorrect,
-                            },
-                        ],
-                    };
                 } else {
                     choices[currentPartIndex] = {
                         ...choices[currentPartIndex],
@@ -166,21 +166,24 @@ const takeQuizSlice = createSlice({
             action: PayloadAction<{
                 currentPartIndex: number;
                 currentQuestionIndex: number;
-                // matchQuestion:
+                matchQuestion: any;
             }>,
         ) => {
-            // const { currentPartIndex, currentQuestionIndex, matchQuestion } = action.payload;
-            // const choices = { ...state.answerChoices };
-            // if (!choices[currentPartIndex]) {
-            //     choices[currentPartIndex] = {};
-            // }
-            // if (Array.isArray(matchQuestion)) {
-            //     choices[currentPartIndex] = {
-            //         ...(choices?.[currentPartIndex] || {}),
-            //         [currentQuestionIndex]: [...(matchQuestion || [])],
-            //     };
-            // }
-            // state.answerChoices = {...choices};
+            const { currentPartIndex, currentQuestionIndex, matchQuestion } = action.payload;
+            const choices = { ...state.answerChoices };
+            if (!choices[currentPartIndex]) {
+                choices[currentPartIndex] = {};
+            }
+            if (Array.isArray(matchQuestion)) {
+                choices[currentPartIndex] = {
+                    ...(choices?.[currentPartIndex] || {}),
+                    [currentQuestionIndex]: [...(matchQuestion || [])],
+                };
+            }
+            state.answerChoices = { ...choices };
+        },
+        resetTakeQuiz: () => {
+            return { ...initStateTakeQuiz };
         },
     },
     extraReducers(builder) {
@@ -199,6 +202,7 @@ const takeQuizSlice = createSlice({
                     state.currentQuizPreviewDetail = {
                         ...quizFetch,
                         quiz: quizFetch?.quiz?.map((part) => {
+                            countQuestion += part.questions.length;
                             return {
                                 ...part,
                                 questions: part?.questions?.map((question) => {
@@ -231,7 +235,6 @@ const takeQuizSlice = createSlice({
                                             },
                                         };
                                     }
-                                    countQuestion += part.questions.length;
 
                                     return question;
                                 }),
@@ -259,6 +262,7 @@ export const {
     chooseQuestionType1,
     chooseQuestionType2,
     chooseQuestionType3,
+    resetTakeQuiz,
 } = takeQuizSlice.actions;
 
 export default persistReducer(takeQuizPersistConfig, takeQuizSlice.reducer);

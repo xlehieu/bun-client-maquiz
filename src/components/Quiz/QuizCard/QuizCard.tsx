@@ -3,6 +3,7 @@ import { reactjxColors } from '@/common/constants';
 import LazyImage from '@/components/UI/LazyImage';
 import {
     faBookOpenReader,
+    faCalendar,
     faChartSimple,
     faCircleQuestion,
     faEdit,
@@ -70,17 +71,13 @@ const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
                         onClick={() => router.push(`${quizRouter.reviewQuiz}/${quizDetail?.slug}`)}
                         className="w-full h-52 flex justify-center content-center hover:cursor-pointer"
                     >
-                        <LazyImage
-                            src={quizDetail?.thumb}
-                            alt={quizDetail?.name}
-                            placeholder={<ScaleLoader color={reactjxColors.primary} />}
-                        />
+                        <LazyImage src={quizDetail?.thumb} alt={quizDetail?.name} />
                     </div>
                     <div className="px-2 py-3">
                         <p className="font-bold text-base line-clamp-2">{quizDetail?.name}</p>
                         {quizDetail?.createdAt && (
                             <div className="flex items-center gap-1">
-                                <FontAwesomeIcon className="text-orange-900" icon={faCircleQuestion} />
+                                <FontAwesomeIcon className="text-orange-900" icon={faCalendar} />
                                 <p className="text-gray-700">{dayjs(quizDetail?.createdAt).format('DD/MM/YYYY')}</p>
                             </div>
                         )}

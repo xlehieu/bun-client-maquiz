@@ -2,15 +2,15 @@
 import congratsAnimation from '@/asset/animations/congratulations-2.json';
 import Lottie from 'lottie-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 //component
 import { ANSWER_CHOICE_ACTION } from '@/common/constants';
 import ChatBot from '@/components/UI/ChatBot';
 import siteRouter from '@/config';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { fetchQuizPreview } from '@/redux/slices/takeQuiz';
-import { Col, Row } from 'antd';
+import { fetchQuizPreview, resetTakeQuiz } from '@/redux/slices/takeQuiz.slice';
+import { Button, Col, Row } from 'antd';
 import 'aos/dist/aos.css';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { toast } from 'sonner';
@@ -232,6 +232,7 @@ const calculateScore = (answerChoices: any, countQuestionQuizDetail: any, quizDe
     }
 };
 const TakeQuizPageMain = () => {
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const {
         answerChoices,
@@ -245,6 +246,7 @@ const TakeQuizPageMain = () => {
         countQuestionQuizDetail,
     } = useAppSelector((state) => state.takeQuiz);
     console.log(answerChoices);
+    console.log('countQuestionQuizDetail', countQuestionQuizDetail);
     const slug = useParams()?.slug as string;
     useEffect(() => {
         dispatch(fetchQuizPreview(slug));
@@ -293,51 +295,63 @@ const TakeQuizPageMain = () => {
                         )}
                     </section>
                 ) : (
-                    <div className="inset-0 w-full min-h-96 mx-5 my-5 md:mx-10 md:my-10">
+                    <div className="inset-0 relative w-full mx-5 my-5 md:mx-10 md:my-10">
                         <div className="text-black w-full bg-white shadow rounded px-5 py-5 flex flex-col items-center justify-center">
-                            <div className="w-full flex flex-row gap-3">
-                                <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                                    <h5 className="">Điểm của bạn là:</h5>
-                                    <div className="w-1/2 mt-3">
-                                        <CircularProgressbar
-                                            styles={buildStyles({
-                                                textSize: '39px',
-                                                pathColor: score < 5 ? '#ff0000' : score < 7 ? '#ffff00' : '#00ff00',
-                                                textColor: '#333',
-                                                trailColor: '#eee',
-                                            })}
-                                            value={score}
-                                            maxValue={10}
-                                            text={`${score}`}
-                                        />
+                            <Row className="w-full" gutter={[12, 12]}>
+                                <Col xs={24} md={8}>
+                                    <div className="flex flex-col rounded-lg shadow-md border px-3 py-3 items-center h-full">
+                                        <h5 className="">Điểm của bạn là:</h5>
+                                        <div className="w-full md:w-1/2 mt-3">
+                                            <CircularProgressbar
+                                                styles={buildStyles({
+                                                    textSize: '39px',
+                                                    pathColor:
+                                                        score < 5 ? '#ff0000' : score < 7 ? '#ffff00' : '#00ff00',
+                                                    textColor: '#333',
+                                                    trailColor: '#eee',
+                                                })}
+                                                className="text-center"
+                                                value={score}
+                                                maxValue={10}
+                                                text={`${score}`}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex flex-col w-1/3 rounded-lg shadow-md border px-3 py-3 items-center">
-                                    <h5>Số câu đúng</h5>
-                                    <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
-                                        <LinearProgressBar
-                                            answerCorrectCount={answerCorrectCount}
-                                            max={countQuestionQuizDetail}
-                                        />
-                                        <h5 className="text-[#333]">
-                                            <span className="font-bold">{answerCorrectCount}</span>/
-                                            <span className="text-green-500 font-bold">{countQuestionQuizDetail}</span>
-                                        </h5>
+                                </Col>
+                                <Col xs={24} md={8}>
+                                    <div className="flex flex-col rounded-lg shadow-md border px-3 py-3 items-center h-full">
+                                        <h5>Số câu đúng</h5>
+                                        <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
+                                            <LinearProgressBar
+                                                answerCorrectCount={answerCorrectCount}
+                                                max={countQuestionQuizDetail}
+                                            />
+                                            <h5 className="text-[#333]">
+                                                <span className="font-bold">{answerCorrectCount}</span>/
+                                                <span className="text-green-500 font-bold">
+                                                    {countQuestionQuizDetail}
+                                                </span>
+                                            </h5>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </Col>
+                            </Row>
 
-                            <Link
-                                href={siteRouter.discover}
-                                className="bg-primary text-3xl px-3 py-3 mt-6 md:px-2 md:py-2 md:mt-10   z-20 text-white font-bold md:text-lg rounded-md"
+                            <Button
+                                onClick={() => {
+                                    dispatch(resetTakeQuiz());
+                                    router.replace(siteRouter.discover);
+                                }}
+                                type="primary"
+                                className="z-[99999] mt-5"
+                                // className="bg-primary text-3xl px-3 py-3 mt-6 md:px-2 md:py-2 md:mt-10   z-20 text-white font-bold md:text-lg rounded-md"
                             >
                                 OK
-                            </Link>
+                            </Button>
                         </div>
-                        <Lottie
-                            className="w-full md:w-2/3 absolute bottom-60 md:-bottom-24 z-10"
-                            animationData={congratsAnimation}
-                        />
+                        <div className="w-full md:w-full absolute md:-bottom-64 z-10">
+                            <Lottie className="w-full" animationData={congratsAnimation} />
+                        </div>
                     </div>
                 )}
             </div>

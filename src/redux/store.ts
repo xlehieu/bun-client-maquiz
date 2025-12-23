@@ -4,7 +4,7 @@ import storage from 'redux-persist/lib/storage'; // localStorage
 import userSlice from './slices/user.slice';
 import quizReducer from './slices/quiz.slice';
 import authReducer from './slices/auth.slice';
-import takeQuizReducer from './slices/takeQuiz';
+import takeQuizReducer from './slices/takeQuiz.slice';
 import questionTypeReducer from './slices/questionType.slice';
 const rootReducer = combineReducers({
     auth: authReducer,
