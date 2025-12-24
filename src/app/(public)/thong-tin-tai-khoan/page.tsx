@@ -9,8 +9,10 @@ import { toast } from 'sonner';
 import { Button, Col, Form, Input, Row } from 'antd';
 import { BodyUpdateUser } from '@/types/user.type';
 import { useAppSelector } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
 const ProfileUser = () => {
     const [form] = Form.useForm();
+    const router = useRouter();
     const { userProfile } = useAppSelector((state) => state.user);
     const updateUserMutation = useMutationHooks((data: BodyUpdateUser) => UserService.updateUser(data));
     const onFinishForm = async (formValue: BodyUpdateUser) => {

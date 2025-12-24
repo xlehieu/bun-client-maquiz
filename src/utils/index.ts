@@ -1,5 +1,5 @@
-import { QuestionType_1_2, QuizPart } from '@/types/quiz.type';
-import { AnswerChoices, AnswerChoiceType1_2 } from '@/types/shared.type';
+import { QuestionType_1_2, QuizDetailRecord, QuizPart } from '@/types/quiz.type';
+import { AnswerChoices, AnswerChoiceType1_2, AnswerChoiceType3 } from '@/types/shared.type';
 
 export const isJsonString = (data: any) => {
     try {
@@ -73,10 +73,11 @@ export const getClassNameQuestion = ({
     isCorrectAnswerRender,
     indexAnswer,
 }: GetClassNameQuestionType) => {
+    console.log(answerChoices?.[currentPartIndex]?.[currentQuestionIndex]);
     if (questionType == 1) {
         if (
             currentPartIndex in answerChoices &&
-            answerChoices?.[currentPartIndex]?.[currentQuestionIndex] &&
+            (answerChoices?.[currentPartIndex]?.[currentQuestionIndex] as AnswerChoiceType1_2)?.isCorrect &&
             isCorrectAnswerRender
         )
             return classNameCorrect;
@@ -91,7 +92,7 @@ export const getClassNameQuestion = ({
     } else if (questionType == 2 && currentPartIndex in answerChoices) {
         const choices = answerChoices[currentPartIndex][currentQuestionIndex];
         if (Array.isArray(choices)) {
-            // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
+            // tìm xem trong answer choice có questionIndex render không? nếu có thì return về isCorrect của nó
             const foundChoice = choices.find((choice) => (choice as AnswerChoiceType1_2).chooseIndex === indexAnswer);
             const check = foundChoice ? (foundChoice as AnswerChoiceType1_2).isCorrect : null;
             if (check === true) return classNameCorrect;
@@ -99,4 +100,84 @@ export const getClassNameQuestion = ({
         }
     }
 };
-export const getClassNameItemTableQuestion = () => {};
+export const checkQuestionCorrectQuestionType2 = (
+    currentQuizDetail: QuizDetailRecord | null,
+    answerChoices: any,
+    currentQuestionType: number,
+    currentSectionIndex: number,
+    currentQuestionIndex: number,
+) => {
+    if (
+        typeof currentQuizDetail === 'undefined' &&
+        typeof answerChoices === 'undefined' &&
+        typeof currentQuestionType === 'undefined' &&
+        typeof currentSectionIndex === 'undefined' &&
+        typeof currentQuestionIndex === 'undefined'
+    )
+        return;
+    if (currentQuizDetail?.quiz && currentQuestionType === 2 && currentSectionIndex in answerChoices) {
+        if (currentQuestionIndex in answerChoices[currentSectionIndex]) {
+            const quiz = currentQuizDetail.quiz;
+            if (quiz[currentSectionIndex].questions[currentQuestionIndex]) {
+                const answers = (quiz[currentSectionIndex].questions[currentQuestionIndex] as QuestionType_1_2).answers; // quiz detail
+                const choices = answerChoices[currentSectionIndex][currentQuestionIndex]; //answer choices
+                if (Array.isArray(answers) && Array.isArray(choices)) {
+                    let countAnswerCorrectInQuizDetail = 0;
+                    answers.forEach((answer) => {
+                        if (answer.isCorrect) return countAnswerCorrectInQuizDetail++;
+                    }, 0);
+                    let countAnswerCorrectInAnswerChoices = 0;
+                    choices.forEach((choice) => {
+                        if (choice.isCorrect) return countAnswerCorrectInAnswerChoices++;
+                    }, 0);
+                    const everyCorrect = choices.every((choice) => choice.isCorrect === true);
+                    if (countAnswerCorrectInQuizDetail === countAnswerCorrectInAnswerChoices && everyCorrect) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
+    }
+    return null;
+};
+export const checkCorrectAnswer = ({
+    questionIndex,
+    partIndex,
+    answerChoices,
+    quizDetail,
+}: {
+    questionIndex: number;
+    partIndex: number;
+    answerChoices: AnswerChoices;
+    quizDetail: QuizDetailRecord;
+}) => {
+    if (partIndex in (answerChoices || {})) {
+        if (
+            questionIndex in answerChoices[partIndex] &&
+            quizDetail?.quiz[partIndex]?.questions[questionIndex].questionType === 1
+        ) {
+            return (answerChoices[partIndex][questionIndex] as AnswerChoiceType1_2)?.isCorrect;
+        } else if (
+            questionIndex in answerChoices[partIndex] &&
+            quizDetail?.quiz[partIndex]?.questions[questionIndex].questionType === 2
+        ) {
+            return checkQuestionCorrectQuestionType2(quizDetail, answerChoices, 2, partIndex, questionIndex);
+        } else if (
+            questionIndex in answerChoices[partIndex] &&
+            quizDetail?.quiz[partIndex]?.questions[questionIndex].questionType === 3
+        ) {
+            if (
+                (answerChoices?.[partIndex]?.[questionIndex] as AnswerChoiceType3[])?.every?.(
+                    (itemQuestionAnswer) =>
+                        itemQuestionAnswer?.question?.replace?.('question', '') ===
+                        itemQuestionAnswer?.answer?.replace?.('answer', ''),
+                )
+            ) {
+                return true;
+            }
+            return false;
+        }
+    }
+    return null;
+};

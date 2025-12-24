@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import LoadingComponent from '@/components/UI/LoadingComponent';
-import * as UserManagementService from '@/services/admin/usermanagement.service';
+import * as UserManagementService from '@/api/admin/usermanagement.service';
 import { useParams, useRouter } from 'next/navigation';
 const UserDetail = () => {
     const { id } = useParams();

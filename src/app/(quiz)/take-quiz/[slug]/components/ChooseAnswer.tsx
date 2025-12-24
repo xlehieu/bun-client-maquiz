@@ -3,10 +3,10 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCurrentPartIndex, setCurrentQuestionIndex } from '@/redux/slices/takeQuiz.slice';
 import Aos from 'aos';
 import React, { Fragment, useEffect } from 'react';
-import { checkQuestionCorrectQuestionType2 } from '../constants';
 import TakeOneNNAnswers from '@/components/Quiz/TakeQuiz/TakeOneNNAnswers';
 import TakeMatchQuestion from '@/components/Quiz/TakeQuiz/TakeMatchQuestion';
 import { QuestionType_1_2 } from '@/types/quiz.type';
+import { checkQuestionCorrectQuestionType2 } from '@/utils';
 
 const ChooseAnswer = () => {
     const {

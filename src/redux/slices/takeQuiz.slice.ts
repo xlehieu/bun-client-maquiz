@@ -242,6 +242,9 @@ const takeQuizSlice = createSlice({
                         }),
                     };
                     state.countQuestionQuizDetail = countQuestion;
+                    if (state?.currentQuizPreviewDetail?.quiz?.length > 0)
+                        state.currentQuestionType =
+                            state?.currentQuizPreviewDetail?.quiz[0]?.questions?.[0]?.questionType;
                 }
             });
     },

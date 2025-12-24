@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import React, { useEffect, useReducer, useState } from 'react';
 import { PAGE_SIZE } from '@/common/constants';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as ClassroomManagementService from '@/services/admin/classroommanagement.service';
+import * as ClassroomManagementService from '@/api/admin/classroommanagement.service';
 import { toast } from 'sonner';
 const active_type = {
     CHANGE_DISABLED: 'CHANGE_DISABLED',
@@ -84,7 +84,7 @@ const ClassroomManagement = () => {
                 id,
             },
         });
-        toast.success('Cập nhật trạng thái thành công')
+        toast.success('Cập nhật trạng thái thành công');
     };
     useEffect(() => {
         console.log(classroomList);

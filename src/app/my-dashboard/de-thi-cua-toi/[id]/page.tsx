@@ -92,7 +92,7 @@ const QuizDetailPage = () => {
                         <h5 className="pb-2">Phần thi</h5>
                         <div className="flex flex-wrap gap-2">
                             {quizDetail?.quiz &&
-                                quizDetail?.quiz.map((partDetail: any, index: number) => (
+                                quizDetail?.quiz.map((partDetail, index: number) => (
                                     <button
                                         key={index}
                                         onClick={() => handleChangePartIndex(index)}
@@ -125,7 +125,7 @@ const QuizDetailPage = () => {
                     </div>
                 </div>
                 <div className="md:flex-1 bg-white px-3 py-3 shadow-md sm:w-full">
-                    {quizDetail?.quiz && quizDetail?.quiz[currentPartIndex]?.questions?.length > 0 && (
+                    {quizDetail?.quiz && quizDetail?.quiz?.[currentPartIndex]?.questions?.length > 0 && (
                         <div>
                             <p className="text-base">
                                 <span className="font-medium">Loại câu hỏi:</span>{' '}
@@ -136,39 +136,41 @@ const QuizDetailPage = () => {
                                     ]
                                 }
                             </p>
-                            {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
+                            {(quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex] as any)
                                 ?.questionContent && (
                                 <div>
                                     <h4 className="mt-3 text-xl font-bold flex">Câu hỏi:</h4>
                                     <div className="mt-1 text-xl">
                                         {HTMLReactParser(
-                                            quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
-                                                ?.questionContent,
+                                            (
+                                                quizDetail?.quiz?.[currentPartIndex]?.questions?.[
+                                                    currentQuestionIndex
+                                                ] as any
+                                            )?.questionContent,
                                         )}
                                     </div>
                                 </div>
                             )}
                             <div className="text-base">
-                                {quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers.map(
-                                    (answer: any, index: number) => (
-                                        <div key={index} className="mt-3 flex">
-                                            <input
-                                                type={`${
-                                                    quizDetail?.quiz?.[currentPartIndex]?.questions?.[
-                                                        currentQuestionIndex
-                                                    ]?.questionType == 1
-                                                        ? 'radio'
-                                                        : 'checkbox'
-                                                }`}
-                                                checked={answer.isCorrect}
-                                                onChange={() => {}}
-                                            />
-                                            <label className="ml-3 text-gray-700 font-normal">
-                                                {HTMLReactParser(answer.content)}
-                                            </label>
-                                        </div>
-                                    ),
-                                )}
+                                {(
+                                    quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex] as any
+                                )?.answers.map((answer: any, index: number) => (
+                                    <div key={index} className="mt-3 flex">
+                                        <input
+                                            type={`${
+                                                quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]
+                                                    ?.questionType == 1
+                                                    ? 'radio'
+                                                    : 'checkbox'
+                                            }`}
+                                            checked={answer.isCorrect}
+                                            onChange={() => {}}
+                                        />
+                                        <label className="ml-3 text-gray-700 font-normal">
+                                            {HTMLReactParser(answer.content)}
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}

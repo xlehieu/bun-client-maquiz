@@ -1,15 +1,13 @@
 'use client';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Xarrow from 'react-xarrows';
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 
-import { shuffleArray } from '@/utils';
-import { Button, Modal } from 'antd';
-import { TakeMatchingQuestionContext } from '@/context/TakeQuizContext';
-import { ANSWER_CHOICE_ACTION, reactjxColors } from '@/common/constants';
+import { reactjxColors } from '@/common/constants';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { MatchQuestion } from '@/types/quiz.type';
 import { chooseQuestionType3 } from '@/redux/slices/takeQuiz.slice';
+import { MatchQuestion } from '@/types/quiz.type';
 import { AnswerChoiceType3 } from '@/types/shared.type';
+import { Button, Modal } from 'antd';
 type XArrowType = {
     question: string;
     match: string;

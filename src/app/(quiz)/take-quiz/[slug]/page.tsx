@@ -17,218 +17,66 @@ import { toast } from 'sonner';
 import ChooseAnswer from './components/ChooseAnswer';
 import TableQuestion from './components/TableQuestion';
 import TakeQuizInfo from './components/TakeQuizInfo';
-//end
-
-const answerChoiceReducer = (state: any, action: any) => {
-    switch (action.type) {
-        case ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_1: {
-            return {
-                ...state,
-                [action.payload.currentPartIndex]: {
-                    ...state[action.payload.currentPartIndex],
-                    [action.payload.currentQuestionIndex]: {
-                        chooseIndex: action.payload.chooseIndex,
-                        isCorrect: action.payload.isCorrect,
-                    },
-                },
-            };
-        }
-        case ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_2: {
-            const { currentPartIndex, currentQuestionIndex, chooseIndex, isCorrect } = action.payload;
-            if (
-                currentPartIndex !== undefined &&
-                currentQuestionIndex !== undefined &&
-                chooseIndex !== undefined &&
-                isCorrect !== undefined
-            ) {
-                const choices = { ...state };
-                // khi choices[currentPartIndex] là undefined thì phải set là một đối tượng không thì
-                // kiểm tra choices[currentPartIndex][currentQuestionIndex] sẽ là đang truy cập đến thuộc tính của undefined nên lỗi
-                // và đang là kiểm tra questionType = 1 nên sẽ kiểm tra là mảng
-                if (!choices.hasOwnProperty(currentPartIndex)) choices[currentPartIndex] = {};
-                if (Array.isArray(choices[currentPartIndex][currentQuestionIndex])) {
-                    // nếu câu hỏi vừa chọn có trong answer choice rồi thì return
-                    if (
-                        choices[currentPartIndex][currentQuestionIndex].some(
-                            (choice) => choice.chooseIndex === chooseIndex,
-                        )
-                    ) {
-                        return state;
-                    }
-                    choices[currentPartIndex] = {
-                        ...choices[currentPartIndex],
-                        [currentQuestionIndex]: [
-                            ...choices[currentPartIndex][currentQuestionIndex],
-                            {
-                                chooseIndex: chooseIndex,
-                                isCorrect: isCorrect,
-                            },
-                        ],
-                    };
-                } else {
-                    choices[currentPartIndex] = {
-                        ...choices[currentPartIndex],
-                        [currentQuestionIndex]: [
-                            {
-                                chooseIndex: chooseIndex,
-                                isCorrect: isCorrect,
-                            },
-                        ],
-                    };
-                }
-                return choices;
-            }
-            return state;
-        }
-        case ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_3: {
-            //matchInfo sẽ có kiểu {answer,question}// sẽ có thêm current question
-            const { currentPartIndex, currentQuestionIndex, matchQuestion } = action.payload;
-            const choices = { ...state };
-            if (!choices[currentPartIndex]) {
-                choices[currentPartIndex] = {};
-            }
-            if (Array.isArray(matchQuestion)) {
-                choices[currentPartIndex] = {
-                    ...(choices?.[currentPartIndex] || {}),
-                    [currentQuestionIndex]: [...(matchQuestion || [])],
-                };
-            }
-            return choices;
-        }
-        default:
-            return state;
-    }
-};
-const checkQuestionCorrectQuestionType2 = (
-    quizDetail: any,
-    answerChoices: any,
-    currentQuestionType: any,
-    currentPartIndex: any,
-    currentQuestionIndex: any,
+import { AnswerChoices, AnswerChoiceType1_2, AnswerChoiceType3 } from '@/types/shared.type';
+import { QuestionType_1_2, QuizDetailRecord } from '@/types/quiz.type';
+import useMutationHooks from '@/hooks/useMutationHooks';
+import { saveQuizHistory } from '@/api/quizHistory.service';
+// Loại 1 chỉ cần có 1 đáp án đúng
+// Loại length đáp án đúng = length and all dung đáp án đúng trong quiz
+// Tát cả bằng nhau question và answer
+const calculateScore = (
+    answerChoices: AnswerChoices,
+    countQuestionQuizDetail: number,
+    quizDetail: QuizDetailRecord,
 ) => {
-    if (
-        typeof quizDetail === 'undefined' &&
-        typeof answerChoices === 'undefined' &&
-        typeof currentQuestionType === 'undefined' &&
-        typeof currentPartIndex === 'undefined' &&
-        typeof currentQuestionIndex === 'undefined'
-    )
-        return;
-    if (quizDetail.quiz && currentQuestionType === 2 && currentPartIndex in answerChoices) {
-        if (currentQuestionIndex in answerChoices[currentPartIndex]) {
-            const quiz = quizDetail.quiz;
-            if (quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]) {
-                const answers = quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex]?.answers; // quiz detail
-                const choices = answerChoices[currentPartIndex][currentQuestionIndex]; //answer choices
-                if (Array.isArray(answers) && Array.isArray(choices)) {
-                    let countAnswerCorrectInQuizDetail = 0;
-                    answers.forEach((answer) => {
-                        if (answer.isCorrect) return countAnswerCorrectInQuizDetail++;
-                    }, 0);
-                    let countAnswerCorrectInAnswerChoices = 0;
-                    choices.forEach((choice) => {
-                        if (choice.isCorrect) return countAnswerCorrectInAnswerChoices++;
-                    }, 0);
-                    const everyCorrect = choices.every((choice) => choice.isCorrect === true);
-                    if (countAnswerCorrectInQuizDetail === countAnswerCorrectInAnswerChoices && everyCorrect) {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        }
-    }
-    return null;
-};
-// đếm số câu đúng trong 1 câu hỏi
-const countCorrectAnswerQuizDetail = (question: any) => {
-    if (!(question?.answers?.length > 0)) return 0;
-    let count = 0;
-    question.answers.forEach((answer: any) => {
-        if (answer?.isCorrect) count++;
-    });
-    return count;
-};
-// đếm đáp án đúng trong câu trả lời
-const countCorrectAnswerChoices = (answerChoices: any, quizDetail: any) => {
-    let count = 0;
-    console.log(answerChoices, quizDetail);
-    //lặp qua từng phần
-    Object.entries(answerChoices).forEach(([keyOfPart, valueOfPart]) => {
-        if (typeof valueOfPart === 'object') {
-            // đang tính theo question
-            Object.entries(valueOfPart as any).forEach(([keyOfQuestion, valueOfQuestion]: any) => {
-                // nếu là loại 1
-                if (
-                    typeof valueOfQuestion === 'object' &&
-                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 1
-                ) {
-                    if (valueOfQuestion?.isCorrect) {
-                        console.log('OK 1');
-                        count++;
-                    }
-                } else if (
-                    Array.isArray(valueOfQuestion) &&
-                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 2
-                ) {
-                    //đếm xem đã chọn đủ số đáp án đúng chưa => check bằng length của đáp án được chọn so với số câu dúng của question đó
-                    // => không quan tâm đến question answer có đúng hay không đã
-                    if (
-                        countCorrectAnswerQuizDetail(quizDetail.quiz[keyOfPart].questions[keyOfQuestion]) ===
-                        valueOfQuestion.length
-                    ) {
-                        if (valueOfQuestion.every((answer) => answer.isCorrect === true)) {
-                            console.log('OK 2');
-
-                            count++;
-                        }
-                    }
-                } else if (
-                    Array.isArray(valueOfQuestion) &&
-                    quizDetail.quiz[keyOfPart]?.questions[keyOfQuestion]?.questionType === 3
-                ) {
-                    // nếu tất cả giống nhau thì trả lời đúng
-                    if (
-                        valueOfQuestion.every(
-                            (itemQuestionAnswer) => itemQuestionAnswer.question == itemQuestionAnswer.answer,
-                        )
-                    ) {
-                        console.log('OK 3');
-                        count++;
-                    }
-                }
-            });
-        }
-    });
-    return count;
-};
-const calculateScore = (answerChoices: any, countQuestionQuizDetail: any, quizDetail: any) => {
-    if (typeof answerChoices === 'object' && typeof quizDetail === 'object' && quizDetail?.quiz?.length > 0) {
+    const quiz = [...(quizDetail?.quiz || [])];
+    if (typeof answerChoices === 'object' && quiz?.length > 0) {
         let countCorrectAnswer = 0;
         //vào part
-        Object.entries(answerChoices).forEach(([keyPart, value]: any) => {
+        Object.entries(answerChoices).forEach(([keyPart, value]) => {
             // entries trả về mảng, mảng đó lại chứa các mảng [key,value]
             if (typeof value === 'object') {
                 //vào question và lấy được giá trị bằng value
-                Object.entries(value).forEach(([keyQuestion, valueQuestion]: any) => {
+                Object.entries(value).forEach(([keyQuestion, valueQuestion]) => {
                     if (
-                        Array.isArray(valueQuestion) &&
-                        countCorrectAnswerQuizDetail(quizDetail.quiz[keyPart].questions[keyQuestion]) ===
-                            valueQuestion.length
+                        quiz?.[Number(keyPart)]?.questions?.[Number(keyQuestion)]?.questionType === 1 &&
+                        typeof valueQuestion === 'object' &&
+                        (valueQuestion as AnswerChoiceType1_2).isCorrect
                     ) {
-                        if (valueQuestion.every((answer) => answer.isCorrect === true)) {
+                        countCorrectAnswer++;
+                    } else if (
+                        Array.isArray(valueQuestion) &&
+                        quiz?.[Number(keyPart)]?.questions?.[Number(keyQuestion)]?.questionType === 2
+                    ) {
+                        const _answer = valueQuestion as AnswerChoiceType1_2[];
+                        if (
+                            (
+                                quiz?.[Number(keyPart)]?.questions?.[Number(keyQuestion)] as QuestionType_1_2
+                            ).answers?.filter((answer) => answer.isCorrect).length ===
+                                _answer.filter((__answer) => __answer.isCorrect).length &&
+                            _answer.every((__answer) => __answer.isCorrect)
+                        ) {
                             countCorrectAnswer++;
                         }
-                    }
-                    if (typeof valueQuestion === 'object') {
-                        if (valueQuestion?.isCorrect) {
+                    } else if (
+                        Array.isArray(valueQuestion) &&
+                        quiz?.[Number(keyPart)]?.questions?.[Number(keyQuestion)]?.questionType === 3
+                    ) {
+                        const _answer: AnswerChoiceType3[] = (valueQuestion as AnswerChoiceType3[]).map((item) => {
+                            return {
+                                match: item.match,
+                                question: item.question.replace('question', ''),
+                                answer: item?.answer?.replace?.('answer', '') || '',
+                            };
+                        });
+                        if (_answer.every((__answer) => __answer?.answer === __answer.question)) {
                             countCorrectAnswer++;
                         }
                     }
                 });
             }
         });
-        return Number(((countCorrectAnswer / countQuestionQuizDetail) * 10).toFixed(2));
+        return { score: Number(((countCorrectAnswer / countQuestionQuizDetail) * 10).toFixed(2)), countCorrectAnswer };
     }
 };
 const TakeQuizPageMain = () => {
@@ -238,41 +86,32 @@ const TakeQuizPageMain = () => {
         answerChoices,
         currentQuizPreviewDetail: quizDetail,
         isEnded,
-        isFetching,
-        currentPartIndex,
-        currentQuestionIndex,
-        currentQuestionType,
         isTimeout,
         countQuestionQuizDetail,
     } = useAppSelector((state) => state.takeQuiz);
     console.log(answerChoices);
-    console.log('countQuestionQuizDetail', countQuestionQuizDetail);
     const slug = useParams()?.slug as string;
     useEffect(() => {
         dispatch(fetchQuizPreview(slug));
     }, []);
     const [score, setScore] = useState(0);
     const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
-    //   const handleSaveTakeQuizHistory = useMutationHooks((data: any) =>
-    //     QuizHistoryService.saveQuizHistory(data)
-    //   );
+    const handleSaveTakeQuizHistory = useMutationHooks((data: any) => saveQuizHistory(data));
     useEffect(() => {
         if (!answerChoices || !quizDetail) return;
         if (isTimeout) {
             toast.warning('Bạn đã hết giờ làm bài');
         }
         if (isEnded || isTimeout) {
-            const score = calculateScore(answerChoices, countQuestionQuizDetail, quizDetail) || 0;
-            setScore(Number(score));
-            // handleSaveTakeQuizHistory.mutate({
-            //   quizId: quizDetail._id,
-            //   score: score,
-            //   answerChoices,
-            // });
-        }
-        if (answerChoices) {
-            const count = countCorrectAnswerChoices(answerChoices, quizDetail) || 0;
-            setAnswerCorrectCount(count);
+            const dataScore = calculateScore(answerChoices, countQuestionQuizDetail, quizDetail);
+            setScore(Number(dataScore?.score || 0));
+            setAnswerCorrectCount(Number(dataScore?.countCorrectAnswer || 0));
+            handleSaveTakeQuizHistory.mutate({
+                quizId: quizDetail._id,
+                score: dataScore?.score,
+                answerChoices,
+                quizShuffle: [...quizDetail.quiz],
+            });
         }
     }, [isEnded, isTimeout]);
     return (
@@ -300,8 +139,8 @@ const TakeQuizPageMain = () => {
                             <Row className="w-full" gutter={[12, 12]}>
                                 <Col xs={24} md={8}>
                                     <div className="flex flex-col rounded-lg shadow-md border px-3 py-3 items-center h-full">
-                                        <h5 className="">Điểm của bạn là:</h5>
-                                        <div className="w-full md:w-1/2 mt-3">
+                                        <h5 className="text-[20px]">Điểm của bạn là:</h5>
+                                        <div className="w-full md:w-1/2 mt-3 relative">
                                             <CircularProgressbar
                                                 styles={buildStyles({
                                                     textSize: '39px',
@@ -310,25 +149,28 @@ const TakeQuizPageMain = () => {
                                                     textColor: '#333',
                                                     trailColor: '#eee',
                                                 })}
-                                                className="text-center"
+                                                // className="flex justify-between items-center"
                                                 value={score}
                                                 maxValue={10}
-                                                text={`${score}`}
+                                                // text={`${score}`}
                                             />
+                                            <div className="absolute top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2">
+                                                <p className="text-[39px] text-primary-bold font-semibold">{score}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </Col>
                                 <Col xs={24} md={8}>
                                     <div className="flex flex-col rounded-lg shadow-md border px-3 py-3 items-center h-full">
-                                        <h5>Số câu đúng</h5>
+                                        <h5 className="text-[20px]">Số câu đúng</h5>
                                         <div className="mt-3 w-full flex flex-col items-center justify-center flex-1 gap-3">
                                             <LinearProgressBar
                                                 answerCorrectCount={answerCorrectCount}
                                                 max={countQuestionQuizDetail}
                                             />
                                             <h5 className="text-[#333]">
-                                                <span className="font-bold">{answerCorrectCount}</span>/
-                                                <span className="text-green-500 font-bold">
+                                                <span className="font-bold text-[20px]">{answerCorrectCount}</span>/
+                                                <span className="text-primary text-[20px] font-bold">
                                                     {countQuestionQuizDetail}
                                                 </span>
                                             </h5>

@@ -1,6 +1,5 @@
 'use client';
-import QuizDetail from '@/app/admin/quizzes-management/QuizDetail';
-import { ANSWER_CHOICE_ACTION, questionTypeContent } from '@/common/constants';
+import { questionTypeContent } from '@/common/constants';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { chooseQuestionType1, chooseQuestionType2 } from '@/redux/slices/takeQuiz.slice';
 import { QuestionType_1_2 } from '@/types/quiz.type';
@@ -8,7 +7,6 @@ import { AnswerChoiceType1_2 } from '@/types/shared.type';
 import { getClassNameQuestion } from '@/utils';
 import { Checkbox, Radio } from 'antd';
 import HTMLReactParser from 'html-react-parser/lib/index';
-import React from 'react';
 
 // Phần  giữa (chọn đáp án)
 const sanitizeHTML = (html: any) => {
@@ -55,19 +53,6 @@ const TakeOneNNAnswers = () => {
             }
         }
         return false;
-    };
-    const handleGetIsCorrectAnswer = (indexInRenderAnswer: number) => {
-        if (currentQuestionType == 2 && currentPartIndex in answerChoices) {
-            const choices = answerChoices[currentPartIndex][currentQuestionIndex];
-            if (Array.isArray(choices)) {
-                // tìm xem trong answer choice có index render không? nếu có thì return về isCorrect của nó
-                const foundChoice = choices.find(
-                    (choice) => (choice as AnswerChoiceType1_2).chooseIndex === indexInRenderAnswer,
-                );
-                return foundChoice ? (foundChoice as AnswerChoiceType1_2).isCorrect : null;
-            }
-        }
-        return null;
     };
     const handleChooseAnswerQuestion1 = (chooseIndex: number, isCorrect: boolean) => {
         if (answerChoices?.[currentPartIndex]?.[currentQuestionIndex]) return;
@@ -146,7 +131,7 @@ const TakeOneNNAnswers = () => {
                                     */}
                             <div
                                 className={getClassNameQuestion({
-                                    answerChoices: answerChoices,
+                                    answerChoices,
                                     currentPartIndex,
                                     currentQuestionIndex,
                                     isCorrectAnswerRender: answer.isCorrect,

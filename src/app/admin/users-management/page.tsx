@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { adminRouter } from '@/config';
 import { PAGE_SIZE } from '@/common/constants';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as UserManagementService from '@/services/admin/usermanagement.service';
+import * as UserManagementService from '@/api/admin/usermanagement.service';
 const active_type = {
     CHANGE_ACTIVE: 'CHANGE_ACTIVE',
     SET_USER_LIST: 'SET_USER_LIST',

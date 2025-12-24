@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import React, { useEffect, useReducer, useState } from 'react';
 import { PAGE_SIZE } from '@/common/constants';
 import useMutationHooks from '@/hooks/useMutationHooks';
-import * as QuizManagementService from '@/services/admin/quizmanagement.service';
+import * as QuizManagementService from '@/api/admin/quizmanagement.service';
 const active_type = {
     CHANGE_DISABLED: 'CHANGE_DISABLED',
     SET_QUIZZES_LIST: 'SET_USER_LIST',
