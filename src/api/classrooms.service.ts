@@ -1,7 +1,9 @@
-import { ICreateClassroom, IGetAndEnrollClassroomDetail, IUpdateInfoClassroom } from '@/interface';
+import { IGetAndEnrollClassroomDetail, IUpdateInfoClassroom } from '@/interface';
 import axiosCredentials from '@/config/axios.credential';
+import { ApiResponse } from '@/types/api.type';
+import { BodyCreateClassroom, ClassroomDetailRecord } from '@/types/classroom.type';
 
-export const createClassroom = async (data: ICreateClassroom) => {
+export const createClassroom = async (data: BodyCreateClassroom) => {
     const { classroomName, subjectName } = data;
     if (!classroomName?.trim() || !subjectName?.trim()) {
         throw new Error('Tên lớp học và tên môn học không thể bỏ trống');
@@ -16,28 +18,23 @@ export const createClassroom = async (data: ICreateClassroom) => {
     return response.data?.data;
 };
 export const getUserClassrooms = async () => {
-    const response = await axiosCredentials.get('/classrooms/mine');
+    const response = await axiosCredentials.get<
+        ApiResponse<{
+            enrolledClassrooms: ClassroomDetailRecord[];
+            myClassrooms: ClassroomDetailRecord[];
+        }>
+    >('/classrooms/mine');
     return response.data?.data;
 };
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-export const getClassroomDetail = async (data: IGetAndEnrollClassroomDetail) => {
-    const { classCode } = data;
-    if (!classCode) return null;
-    const params = new URLSearchParams();
-    Object.entries({ classCode }).forEach(([key, value]) => {
-        if (value !== undefined) {
-            params.append(key, String(value));
-        }
-    });
-    if (!classCode?.trim()) throw new Error('Lỗi');
-    const res = await axiosCredentials.get(`/classrooms/detail?${params}`);
-
+export const getClassroomDetail = async (classCode: string) => {
+    const res = await axiosCredentials.get<ApiResponse<ClassroomDetailRecord>>(`/classrooms/detail/${classCode}`);
     return res.data.data;
 };
 export const enrollInClassroom = async (data: IGetAndEnrollClassroomDetail) => {
     const { classCode } = data;
     if (!classCode?.trim()) throw new Error('Vui lòng nhập mã lớp');
-    const res = await axiosCredentials.patch('/classrooms/enroll', JSON.stringify({ classCode }));
+    const res = await axiosCredentials.patch('/classrooms/enroll', { classCode });
 
     return res.data.data;
 };

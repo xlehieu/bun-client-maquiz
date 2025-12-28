@@ -17,9 +17,6 @@ const ReviewQuizPage = () => {
     useEffect(() => {
         if (slug) dispatch(fetchQuizPreview(slug));
     }, [slug]);
-    useEffect(() => {
-        dispatch(shuffleQuiz(['answer', 'part', 'question']));
-    }, [currentQuizPreviewDetail?._id]);
     const [currentTabIndex, setCurrentTabIndex] = useState(1);
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     useEffect(() => {

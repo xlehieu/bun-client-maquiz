@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 //component
 import { ANSWER_CHOICE_ACTION } from '@/common/constants';
 import ChatBot from '@/components/UI/ChatBot';
-import siteRouter from '@/config';
+import MAIN_ROUTE from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchQuizPreview, resetTakeQuiz } from '@/redux/slices/takeQuiz.slice';
 import { Button, Col, Row } from 'antd';
@@ -89,11 +89,11 @@ const TakeQuizPageMain = () => {
         isTimeout,
         countQuestionQuizDetail,
     } = useAppSelector((state) => state.takeQuiz);
-    console.log(answerChoices);
+    console.log('quizDetailquizDetailquizDetail', quizDetail);
     const slug = useParams()?.slug as string;
-    useEffect(() => {
-        dispatch(fetchQuizPreview(slug));
-    }, []);
+    // useEffect(() => {
+    //     dispatch(fetchQuizPreview(slug));
+    // }, []);
     const [score, setScore] = useState(0);
     const [answerCorrectCount, setAnswerCorrectCount] = useState(0);
     const handleSaveTakeQuizHistory = useMutationHooks((data: any) => saveQuizHistory(data));
@@ -182,7 +182,7 @@ const TakeQuizPageMain = () => {
                             <Button
                                 onClick={() => {
                                     dispatch(resetTakeQuiz());
-                                    router.replace(siteRouter.discover);
+                                    router.replace(MAIN_ROUTE.DISCOVER_QUIZ);
                                 }}
                                 type="primary"
                                 className="z-[99999] mt-5"

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
-import siteRouter, { userDashboardRouter } from '@/config';
+import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
 import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useRouter } from 'next/navigation';
@@ -52,12 +52,12 @@ export default function AdminNavbar({ user }: any) {
                             <div className="flex flex-col items-center bg-white rounded-md shadow">
                                 <Link
                                     className="text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
-                                    href={siteRouter.profile}
+                                    href={MAIN_ROUTE.PROFILE}
                                 >
                                     Thông tin tài khoản
                                 </Link>
                                 <Link
-                                    href={userDashboardRouter.myDashboard}
+                                    href={userDashboardRouter.MY_DASHBOARD}
                                     className="bg-white text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
                                 >
                                     Dashboard

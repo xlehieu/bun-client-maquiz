@@ -1,5 +1,5 @@
-'use client'
-import siteRouter from '@/config';
+'use client';
+import MAIN_ROUTE from '@/config/routes';
 import Link from 'next/link';
 
 export default function FooterAdmin() {
@@ -33,7 +33,7 @@ export default function FooterAdmin() {
                                 </li>
                                 <li>
                                     <Link
-                                        href={siteRouter.contact}
+                                        href={MAIN_ROUTE.CONTACT}
                                         className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
                                     >
                                         Về chúng tôi
@@ -41,7 +41,7 @@ export default function FooterAdmin() {
                                 </li>
                                 <li>
                                     <Link
-                                        href={siteRouter.news}
+                                        href={MAIN_ROUTE.NEWS}
                                         className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
                                     >
                                         Tin tức

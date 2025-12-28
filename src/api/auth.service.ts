@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import axiosCredentials from '@/config/axios.credential';
 import axiosNoCredential from '@/config/axios.nointerceptor';
 import { ILoginForm } from '@/interface';
@@ -38,4 +38,8 @@ export const resetPassword = async (data: any) => {
         newPassword,
     });
     return res.data;
+};
+export const register = async (data: any) => {
+    const res = await axiosNoCredential.post(`/auth/sign-up`, data);
+    return res?.data?.data;
 };

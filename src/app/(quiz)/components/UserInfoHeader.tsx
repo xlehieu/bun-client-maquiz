@@ -1,5 +1,5 @@
 'use client';
-import siteRouter, { userDashboardRouter } from '@/config';
+import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
 import { faExpand } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DashboardOutlined, IdcardOutlined, LogoutOutlined } from '@ant-design/icons';
@@ -13,7 +13,7 @@ import { useAppSelector } from '@/redux/hooks';
 export default function UserInfoHeader() {
     const router = useRouter();
     const [isExpand, setIsExpand] = useState(false);
-    const {userProfile} = useAppSelector(state=>state.user)
+    const { userProfile } = useAppSelector((state) => state.user);
     const handleToggle = () => {
         if (!isExpand) {
             // document.documentElement.requestFullscreen?.() documentElement dùng để chuyển tất c ả các phần tử trong trang sang chế độ toàn màn hình
@@ -61,12 +61,12 @@ export default function UserInfoHeader() {
                         <div className="flex flex-col items-center bg-white rounded-md shadow">
                             <Link
                                 className="text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
-                                href={siteRouter.profile}
+                                href={MAIN_ROUTE.PROFILE}
                             >
                                 Thông tin tài khoản
                             </Link>
                             <Link
-                                href={userDashboardRouter.myDashboard}
+                                href={userDashboardRouter.MY_DASHBOARD}
                                 className="bg-white text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
                             >
                                 Dashboard
@@ -76,14 +76,18 @@ export default function UserInfoHeader() {
                 >
                     <div className="flex justify-between items-center hover:cursor-pointer">
                         {userProfile?.avatar && (
-                            <img className="rounded-full mr-1 w-10 h-10" src={userProfile?.avatar} alt={userProfile?.name} />
+                            <img
+                                className="rounded-full mr-1 w-10 h-10"
+                                src={userProfile?.avatar}
+                                alt={userProfile?.name}
+                            />
                         )}
                     </div>
                 </Tippy>
             ) : (
                 <Link
                     className="w-24 flex items-center justify-center text-primary text-lg duration-300 hover:text-secondary"
-                    href={siteRouter.signIn}
+                    href={MAIN_ROUTE.LOGIN}
                 >
                     Đăng nhập
                 </Link>

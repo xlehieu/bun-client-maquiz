@@ -8,10 +8,12 @@ import useMutationHooks from '@/hooks/useMutationHooks';
 import * as UserService from '@/api/user.service';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { register } from '@/api/auth.service';
+import MAIN_ROUTE from '@/config/routes';
 
 const SignUpPage = () => {
     const router = useRouter();
-    const mutationRegister = useMutationHooks((data: any) => UserService.register(data));
+    const mutationRegister = useMutationHooks((data: any) => register(data));
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
@@ -35,7 +37,7 @@ const SignUpPage = () => {
     useEffect(() => {
         if (mutationRegister.isSuccess) {
             toast.success('Đăng ký thành công');
-            router.push('/dang-nhap');
+            router.push(MAIN_ROUTE.LOGIN);
         } else if (mutationRegister.isError) {
             toast.error((mutationRegister.error as any).message);
         }
@@ -62,7 +64,7 @@ const SignUpPage = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                 />
-                <div className="flex px-3 py-2 border border-gray-500 box-border w-full  outline-primary">
+                <div className="flex px-3 py-2 border border-gray-500 box-border w-full focus-within:outline-primary">
                     <input
                         id="input-password"
                         className="outline-none mr-2 flex-1"
@@ -79,7 +81,7 @@ const SignUpPage = () => {
                         <EyeInvisibleOutlined onClick={() => setIsShowPassword(!isShowPassword)} />
                     )}
                 </div>
-                <div className="flex px-3 py-2 border border-gray-500 box-border w-full  outline-primary">
+                <div className="flex px-3 py-2 border border-gray-500 box-border w-full  focus-within:outline-primary">
                     <input
                         id="input-confirm-password"
                         className="outline-none mr-2 flex-1"

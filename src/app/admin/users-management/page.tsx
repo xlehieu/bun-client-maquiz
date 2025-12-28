@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { toast } from 'sonner';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { adminRouter } from '@/config';
+import { adminRouter } from '@/config/routes';
 import { PAGE_SIZE } from '@/common/constants';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import * as UserManagementService from '@/api/admin/usermanagement.service';
@@ -83,7 +83,7 @@ const UserManagement = () => {
     };
     const handleClickUser = (userId: string) => {
         if (!userId) return;
-        router.push(`${adminRouter.userDetail}/${userId}`);
+        router.push(`${adminRouter.USER_DETAIL}/${userId}`);
     };
     return (
         <>

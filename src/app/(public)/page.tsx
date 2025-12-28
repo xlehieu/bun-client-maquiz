@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import Aos from 'aos';
 import 'aos/dist/aos.css';
-import siteRouter, { userDashboardRouter } from '@/config';
+import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
 import searchIcon from '@/asset/image/search.png';
 import knowledgeIcon from '@/asset/image/knowledge.png';
 import quizIcon from '@/asset/image/qna.png';
@@ -45,7 +45,7 @@ export default function HomePage() {
                     <div className="grid grid-cols-2 w-full">
                         <div className="flex justify-center">
                             <button
-                                onClick={() => router.push(siteRouter.discover)}
+                                onClick={() => router.push(MAIN_ROUTE.DISCOVER_QUIZ)}
                                 className="bg-primary relative -rotate-3 text-white px-10 py-3 border border-black rounded-full text-lg hover:bg-primary-bold transition hover:scale-105 hover:shadow-xl duration-150"
                             >
                                 Khám phá ngay
@@ -62,7 +62,7 @@ export default function HomePage() {
                     <div className="grid grid-cols-2 w-full">
                         <div className="flex justify-center">
                             <button
-                                onClick={() => router.push(siteRouter.createQuiz)}
+                                onClick={() => router.push(MAIN_ROUTE.CREATE_QUIZ)}
                                 className="bg-primary relative rotate-6 text-white px-10 py-3 border border-black rounded-full text-lg hover:bg-primary-bold transition hover:scale-105 hover:shadow-xl duration-150"
                             >
                                 Tạo đề thi
@@ -71,7 +71,7 @@ export default function HomePage() {
                         </div>
                         <div className="flex justify-center">
                             <button
-                                onClick={() => router.push(userDashboardRouter.classroom)}
+                                onClick={() => router.push(userDashboardRouter.CLASSROOM)}
                                 className="bg-primary -rotate-1 text-white px-10 py-3  border border-black  rounded-full text-lg hover:bg-primary-bold transition hover:scale-105 hover:shadow-xl duration-150"
                             >
                                 Lớp học
@@ -82,7 +82,7 @@ export default function HomePage() {
                     <div className="grid grid-cols-2 w-full">
                         <div className="flex justify-center">
                             <button
-                                onClick={() => router.push(siteRouter.news)}
+                                onClick={() => router.push(MAIN_ROUTE.NEWS)}
                                 className="bg-primary rotate-1 relative text-white px-10 py-3 border border-black rounded-full text-lg hover:bg-primary-bold transition hover:scale-105 hover:shadow-xl duration-150"
                             >
                                 Xem tin

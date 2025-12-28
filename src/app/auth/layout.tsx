@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import BlurBackground from '@/components/UI/BlurBackground';
-import siteRouter from '@/config';
+import MAIN_ROUTE from '@/config/routes';
 import { motion, AnimatePresence } from 'framer-motion';
 import MaquizLogo from '@/components/UI/MaquizLogo';
 
@@ -28,7 +28,7 @@ function SignInUpLayout({ children, title }: any) {
             <div className="border-b-2">
                 <header className="container mx-auto w-full flex items-center justify-between bg-white px-5 py-4">
                     <div className="block">
-                        <Link href={siteRouter.home}>
+                        <Link href={MAIN_ROUTE.HOME}>
                             <MaquizLogo className="w-2/4" alt="logo" />
                         </Link>
                     </div>
@@ -53,7 +53,7 @@ function SignInUpLayout({ children, title }: any) {
                                     className="absolute z-30 py-10 h-full bg-white shadow-lg min-w-72 max-w-full right-0 top-0 flex flex-col text-3xl space-y-5 items-start"
                                 >
                                     <Link
-                                        href={siteRouter.home}
+                                        href={MAIN_ROUTE.HOME}
                                         className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
                                     >
                                         Trang chủ

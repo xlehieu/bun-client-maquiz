@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import siteRouter from '@/config';
+import MAIN_ROUTE from '@/config/routes';
 
 const Footer = () => {
     return (
@@ -22,7 +22,7 @@ const Footer = () => {
                         <h4 className="text-2xl font-bold mb-4">Liên kết nhanh</h4>
                         <ul className="space-y-2">
                             <li>
-                                <Link href={siteRouter.home} className="text-white hover:text-link">
+                                <Link href={MAIN_ROUTE.HOME} className="text-white hover:text-link">
                                     Trang chủ
                                 </Link>
                             </li>
@@ -32,7 +32,7 @@ const Footer = () => {
                                 </Link>
                             </li> */}
                             <li>
-                                <Link href={siteRouter.contact} className="text-white hover:text-link">
+                                <Link href={MAIN_ROUTE.CONTACT} className="text-white hover:text-link">
                                     Liên hệ
                                 </Link>
                             </li>

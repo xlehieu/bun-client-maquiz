@@ -73,7 +73,6 @@ export const getClassNameQuestion = ({
     isCorrectAnswerRender,
     indexAnswer,
 }: GetClassNameQuestionType) => {
-    console.log(answerChoices?.[currentPartIndex]?.[currentQuestionIndex]);
     if (questionType == 1) {
         if (
             currentPartIndex in answerChoices &&
@@ -181,3 +180,7 @@ export const checkCorrectAnswer = ({
     }
     return null;
 };
+export function hasValidTextInHTML(html: string) {
+    const strippedText = html.replace(/<\/?p>/g, '').trim(); // Xóa thẻ <p> nhưng giữ nội dung
+    return strippedText.length > 0;
+}

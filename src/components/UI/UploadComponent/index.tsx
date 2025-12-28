@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useRef, useState, memo, useEffect } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { message } from 'antd';
@@ -30,35 +30,36 @@ const UploadComponent = ({ value, onChange, className, ...props }: any) => {
     const handleChange = (event: any) => {
         if (!beforeUpload(event)) return;
         setLoading(true);
+        console.log('event', event);
         getBase64(event.target.files[0], (base64: any) => {
             setLoading(false);
             onChange(base64); // tra base64 từ event load của reader
         });
     };
-    const handleClickOpenInputFile = () => {
+    const handleClickOpenInputFile = (e: any) => {
+        e.preventDefault();
         inputRef?.current?.click();
     };
     const UploadButton = () => {
         const [mounted, setMounted] = useState(false);
-                useEffect(() => setMounted(true), []);
-                if (!mounted) return null; // ngăn lỗi khi prerender
-        return(
-
+        useEffect(() => setMounted(true), []);
+        if (!mounted) return null; // ngăn lỗi khi prerender
+        return (
             <button className="w-full hover:cursor-pointer" type="button" onClick={handleClickOpenInputFile}>
-            {loading ? <LoadingOutlined /> : <FontAwesomeIcon className="text-[#333]" icon={faImage} />}
-            <div
-                style={{
-                    marginTop: 8,
-                }}
+                {loading ? <LoadingOutlined /> : <FontAwesomeIcon className="text-[#333]" icon={faImage} />}
+                <div
+                    style={{
+                        marginTop: 8,
+                    }}
                 >
-                <span className="font-semibold">Tải liên</span>
-            </div>
-        </button>
-)
-}
-const [mounted, setMounted] = useState(false);
-            useEffect(() => setMounted(true), []);
-            if (!mounted) return null; // ngăn lỗi khi prerender
+                    <span className="font-semibold">Tải liên</span>
+                </div>
+            </button>
+        );
+    };
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    if (!mounted) return null; // ngăn lỗi khi prerender
     return (
         <div className={`${className} hover:cursor-pointer`} {...props}>
             <input
@@ -67,6 +68,7 @@ const [mounted, setMounted] = useState(false);
                 ref={inputRef}
                 onChange={handleChange}
                 accept="image/jpeg, image/png"
+                hidden
             />
             <div
                 className={`border-2 border-dashed h-44 w-full ${
@@ -74,7 +76,7 @@ const [mounted, setMounted] = useState(false);
                 } border-primary flex rounded-md justify-center content-center hover:cursor-pointer`}
             >
                 {value ? (
-                    <button className="w-full h-full" onClick={() => handleClickOpenInputFile()}>
+                    <button className="w-full h-full" onClick={(e) => handleClickOpenInputFile(e)}>
                         {/* <img
                             src={imageUrl}
                             className="rounded-md cursor-pointer w-full object-cover h-full"

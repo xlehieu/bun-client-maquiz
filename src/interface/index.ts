@@ -1,7 +1,3 @@
-export interface ICreateClassroom {
-    classroomName: string;
-    subjectName: string;
-}
 export interface IUpdateInfoClassroom {
     classCode: string;
     name: string;
@@ -55,7 +51,7 @@ export type IQuiz = {
     educationLevel?: string[];
     nameNoAccent?: string;
     isDisabled?: boolean;
-    isUseChatBot?:boolean;
+    isUseChatBot?: boolean;
 };
 export type IQuerySkipLimit = {
     skip?: number;

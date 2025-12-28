@@ -17,7 +17,7 @@ import { ScaleLoader } from 'react-spinners';
 // import { Link, useNavigate } from 'react-router-dom';
 import * as UserService from '@/api/user.service';
 import * as QuizService from '@/api/quiz.service';
-import { quizRouter, userDashboardRouter } from '@/config';
+import { quizRouter, userDashboardRouter } from '@/config/routes';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { favoriteQuiz } from '@/redux/slices/user.slice';
@@ -33,8 +33,9 @@ import { fetchMyListQuiz } from '@/redux/slices/quiz.slice';
 type QuizCardProps = {
     quizDetail: QuizDetailRecord;
     allowEdit?: boolean;
+    showButton?: boolean;
 };
-const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
+const QuizCard = ({ quizDetail, allowEdit = false, showButton = true }: QuizCardProps) => {
     // nếu onDelete truyền vào là false thì không cho xóa nếu là hàm thì cho xóa
     const router = useRouter();
     const dispatch = useAppDispatch();
@@ -68,7 +69,7 @@ const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
             {quizDetail && (
                 <div className="shrink-0 max-w-80 transition-all duration-300 shadow-lg rounded hover:shadow-2xl border-2">
                     <div
-                        onClick={() => router.push(`${quizRouter.reviewQuiz}/${quizDetail?.slug}`)}
+                        // onClick={() => router.push(`${quizRouter.REVIEW_QUIZ}/${quizDetail?.slug}`)}
                         className="w-full h-52 flex justify-center content-center hover:cursor-pointer"
                     >
                         <LazyImage src={quizDetail?.thumb} alt={quizDetail?.name} />
@@ -110,7 +111,7 @@ const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
                                         >
                                             <button
                                                 onClick={() =>
-                                                    router.push(`${userDashboardRouter.myQuiz}/${quizDetail?._id}`)
+                                                    router.push(`${userDashboardRouter.MYQUIZ}/${quizDetail?._id}`)
                                                 }
                                             >
                                                 <FontAwesomeIcon icon={faEye} className="pr-1 text-[#f27735]" />
@@ -124,7 +125,7 @@ const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
                                             <button
                                                 onClick={() =>
                                                     router.push(
-                                                        `${userDashboardRouter.myQuiz}/chinh-sua/${quizDetail?._id}`,
+                                                        `${userDashboardRouter.MYQUIZ}/chinh-sua/${quizDetail?._id}`,
                                                     )
                                                 }
                                             >
@@ -154,24 +155,26 @@ const QuizCard = ({ quizDetail, allowEdit = false }: QuizCardProps) => {
                             </div>
                         </div>
                     )}
-                    <div className="px-3 py-3 border-t-2 flex justify-between">
-                        <Link
-                            href={`${quizRouter.reviewQuiz}/${quizDetail?.slug}`}
-                            className="inline-block rounded border hover:text-white hover:opacity-80 ease-linear transition-all duration-200 text-white bg-gradient-to-r from-primary to-[#1e998c] px-2 py-2"
-                        >
-                            <FontAwesomeIcon icon={faPlayCircle} className="pr-1" />
-                            Vào ôn thi
-                        </Link>
-                        <button
-                            onClick={() => handleFavoriteQuiz(quizDetail?._id, quizDetail?.slug)}
-                            className="hover:cursor-pointer"
-                        >
-                            <FontAwesomeIcon
-                                className="text-red-500 text-2xl"
-                                icon={isFavorite ? faHeartSolid : faHeartRegular}
-                            />
-                        </button>
-                    </div>
+                    {showButton && (
+                        <div className="px-3 py-3 border-t-2 flex justify-between">
+                            <Link
+                                href={`${quizRouter.REVIEW_QUIZ}/${quizDetail?.slug}`}
+                                className="inline-block rounded border hover:text-white hover:opacity-80 ease-linear transition-all duration-200 text-white bg-gradient-to-r from-primary to-[#1e998c] px-2 py-2"
+                            >
+                                <FontAwesomeIcon icon={faPlayCircle} className="pr-1" />
+                                Vào ôn thi
+                            </Link>
+                            <button
+                                onClick={() => handleFavoriteQuiz(quizDetail?._id, quizDetail?.slug)}
+                                className="hover:cursor-pointer"
+                            >
+                                <FontAwesomeIcon
+                                    className="text-red-500 text-2xl"
+                                    icon={isFavorite ? faHeartSolid : faHeartRegular}
+                                />
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </Fragment>

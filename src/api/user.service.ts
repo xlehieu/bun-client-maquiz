@@ -9,10 +9,7 @@ import { ExamHistoryRecord, UserDetail } from '@/types/user.type';
 export const getUserDetail = async () => {
     return axiosCredentials.get<ApiResponse<UserDetail>>(`/users/detail`);
 };
-export const register = async (data: any) => {
-    const res = await axiosNoInterceptor.post(`/users/sign-up`, JSON.stringify(data));
-    return res?.data?.data;
-};
+
 export const refreshToken = async () => {
     const res = await axios.post(`/users/refresh-token`, { withCredentials: true });
     return res;
@@ -44,6 +41,6 @@ export const getQuizzesAccessHistory = async (data: any) => {
     const res = await axiosCredentials.get(`/users/quizz-access-history?${params}`);
     return res?.data.data;
 };
-export const getExamHistory = async ()=>{
-    return axiosCredentials.get<ApiResponse<ExamHistoryRecord[]>>(`/users/exam-history`)
-}
+export const getExamHistory = async () => {
+    return axiosCredentials.get<ApiResponse<ExamHistoryRecord[]>>(`/users/exam-history`);
+};

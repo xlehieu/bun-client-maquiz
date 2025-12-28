@@ -6,7 +6,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // localStorage
 import { toast } from 'sonner';
-type ShuffleType = 'part' | 'question' | 'answer';
+export type ShuffleType = 'part' | 'question' | 'answer';
 type TakeQuizState = {
     currentQuizId?: string;
     currentPartIndex: number;
@@ -67,25 +67,34 @@ const takeQuizSlice = createSlice({
             const checkShufflePart = action.payload.includes('part');
             if (state.currentQuizPreviewDetail?.quiz) {
                 //part
-                const newPart = state.currentQuizPreviewDetail?.quiz?.map((part) => {
-                    //rồi shuffle question lên
-                    const newQuestion = part?.questions?.map((question) => {
-                        const newAnswer = { ...question };
-                        if (checkShuffleAnswer)
-                            if (
-                                (newAnswer.questionType === 1 || newAnswer.questionType === 2) &&
-                                (newAnswer as QuestionType_1_2).answers
-                            ) {
-                                (newAnswer as QuestionType_1_2).answers = shuffleArray(
-                                    (newAnswer as QuestionType_1_2).answers,
-                                );
-                            }
-                        return newAnswer;
+                //các phần thi nằm trong này
+                const newQuiz = state.currentQuizPreviewDetail?.quiz?.map((part) => {
+                    // const partDetail = { ...part };
+                    const newDataPart = part.questions?.map((question) => {
+                        // const newAnswer = { ...question };
+                        // // if (checkShuffleAnswer)
+                        // //     if (
+                        // //         (newAnswer.questionType === 1 || newAnswer.questionType === 2) &&
+                        // //         (newAnswer as QuestionType_1_2).answers
+                        // //     ) {
+                        // //         (newAnswer as QuestionType_1_2).answers = shuffleArray(
+                        // //             (newAnswer as QuestionType_1_2).answers,
+                        // //         );
+                        // //     }
+                        return {
+                            ...question,
+                            answers: checkShuffleAnswer
+                                ? shuffleArray((question as QuestionType_1_2).answers)
+                                : (question as QuestionType_1_2).answers,
+                        };
                     });
-                    return checkShuffleQuestion ? shuffleArray(newQuestion) : newQuestion;
+                    return {
+                        ...part,
+                        questions: checkShuffleQuestion ? shuffleArray(newDataPart) : newDataPart,
+                    };
                     // return newPart;
                 });
-                state.currentQuizPreviewDetail.quiz = checkShufflePart ? shuffleArray(newPart) : newPart;
+                state.currentQuizPreviewDetail.quiz = checkShufflePart ? shuffleArray(newQuiz) : newQuiz;
             }
         },
         chooseQuestionType1: (

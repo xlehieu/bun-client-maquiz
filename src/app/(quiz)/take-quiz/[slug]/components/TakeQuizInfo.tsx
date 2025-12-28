@@ -18,6 +18,7 @@ const TakeQuizInfo = () => {
         currentQuestionType,
         answerChoices,
         isEnded,
+        timePassQuestion,
         currentQuizPreviewDetail: quizDetail,
     } = useAppSelector((state) => state.takeQuiz);
     const handleChangePartIndex = (partIndex: any) => {
@@ -50,6 +51,7 @@ const TakeQuizInfo = () => {
                         }}
                         defaultValue={1000}
                         className="w-full md:w-1/2 mt-2"
+                        value={timePassQuestion}
                     >
                         <Select.Option value={1000}>1s</Select.Option>
                         <Select.Option value={2000}>2s</Select.Option>

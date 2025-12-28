@@ -16,7 +16,7 @@ import {
     faPeopleRoof,
 } from '@fortawesome/free-solid-svg-icons';
 import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter, userDashboardRouter } from '@/config';
+import { adminRouter, userDashboardRouter } from '@/config/routes';
 import BlurBackground from '@/components/UI/BlurBackground';
 import { useSelector } from 'react-redux';
 
@@ -28,13 +28,13 @@ const items = [
                 key: '1.1',
                 label: 'Thư viện của tôi',
                 icon: faHouse,
-                to: userDashboardRouter.myDashboard,
+                to: userDashboardRouter.MY_DASHBOARD,
             },
             {
                 key: '1.2',
                 label: 'Truy cập gần đây',
                 icon: faClockRotateLeft,
-                to: userDashboardRouter.historyAccess,
+                to: userDashboardRouter.HISTORY_ACCESS,
             },
         ],
         key: '1',
@@ -47,13 +47,13 @@ const items = [
                 key: '2.1',
                 label: 'Đề thi',
                 icon: faBookOpen,
-                to: userDashboardRouter.myQuiz,
+                to: userDashboardRouter.MYQUIZ,
             },
             {
                 key: '2.2',
                 label: 'Lớp học',
                 icon: faChalkboardUser,
-                to: userDashboardRouter.classroom,
+                to: userDashboardRouter.CLASSROOM,
             },
         ],
     },
@@ -66,7 +66,7 @@ const sidebarAdmin = {
             key: '2.1',
             label: 'Admin dashboard',
             icon: faPeopleRoof,
-            to: adminRouter.userList,
+            to: adminRouter.USER_LIST,
         },
     ],
 };

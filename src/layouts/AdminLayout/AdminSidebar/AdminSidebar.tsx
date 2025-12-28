@@ -1,5 +1,5 @@
 /*eslint-disable*/
-'use client'
+'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import NotificationDropdown from '@/components/UI/Dropdowns/NotificationDropdown';
@@ -7,7 +7,7 @@ import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faFaceSmile, faChalkboardTeacher, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter } from '@/config';
+import { adminRouter } from '@/config/routes';
 import BlurBackground from '@/components/UI/BlurBackground';
 import { useRouter } from 'next/navigation';
 const items = [
@@ -18,19 +18,19 @@ const items = [
                 key: '1.1',
                 label: 'Danh sách user',
                 icon: faFaceSmile,
-                to: adminRouter.userList,
+                to: adminRouter.USER_LIST,
             },
             {
                 key: '1.2',
                 label: 'Danh sách lớp học',
                 icon: faChalkboardTeacher,
-                to: adminRouter.classroomList,
+                to: adminRouter.CLASSROOM_LIST,
             },
             {
                 key: '1.3',
                 label: 'Danh sách đề thi',
                 icon: faBookOpen,
-                to: adminRouter.quizList,
+                to: adminRouter.QUIZ_LIST,
             },
         ],
     },

@@ -15,7 +15,7 @@ import { Button, Form, Input, Modal, Select, Tabs } from 'antd';
 
 import CreateMatchQuestion from '@/components/Quiz/Questions/CreateMatchQuestion';
 import OneNNAnswer from '@/components/Quiz/Questions/OneNNAnswer';
-import { userDashboardRouter } from '@/config';
+import { userDashboardRouter } from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { BodyUpsertQuestionQuiz } from '@/types/quiz.type';
 import { useRouter } from 'next/navigation';
@@ -271,7 +271,7 @@ const ImportQuestions = () => {
             toast.error('Import câu hỏi thất bại');
         }
         if (countdown === 0) {
-            router.push(userDashboardRouter.editMyQuizNoParam + currentCreateQuizId);
+            router.push(userDashboardRouter.EDIT_MY_QUIZ_NO_PARAMS + currentCreateQuizId);
         }
     }, [importDataMutation.isSuccess, importDataMutation.isError, countdown]);
     useEffect(() => {}, []);

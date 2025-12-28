@@ -1,10 +1,23 @@
-'use client'
+'use client';
 import { classroomImageFallback } from '@/common/constants';
-import LazyImage from '../LazyImage';
 import Link from 'next/link';
-import { userDashboardRouter } from '@/config';
+import { userDashboardRouter } from '@/config/routes';
+import LazyImage from '@/components/UI/LazyImage';
+import { Button } from 'antd';
+import { ClassroomDetailRecord } from '@/types/classroom.type';
+import { useAppDispatch } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
+import { setClassroomDetail } from '@/redux/slices/classrooms.slice';
 
-const ClassroomCard = ({ classroom, isMyClassroom = false }: any) => {
+const ClassroomCard = ({
+    classroom,
+    isMyClassroom = false,
+}: {
+    classroom: ClassroomDetailRecord;
+    isMyClassroom?: boolean;
+}) => {
+    // const dispatch = useAppDispatch();
+    const router = useRouter();
     return (
         <div className="w-full bg-white transition-all block duration-300 border-2 border-gray-200 rounded-lg overflow-hidden pb-3 hover:drop-shadow-lg relative h-56">
             {classroom?.thumb ? (
@@ -29,12 +42,16 @@ const ClassroomCard = ({ classroom, isMyClassroom = false }: any) => {
                     />
                 )}
                 {classroom?.name && (
-                    <Link
-                        href={`${userDashboardRouter.classroom}/${classroom?.classCode}`}
+                    <Button
+                        type="text"
+                        onClick={() => {
+                            // dispatch(setClassroomDetail(classroom));
+                            router.push(`${userDashboardRouter.CLASSROOM}/${classroom?.classCode}`);
+                        }}
                         className="z-10 text-2xl text-gray-700 font-normal ml-3 line-clamp-1 hover:underline"
                     >
                         {classroom?.name}
-                    </Link>
+                    </Button>
                 )}
             </div>
             {!isMyClassroom && classroom?.teacher?.name && (

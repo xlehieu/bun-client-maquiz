@@ -1,6 +1,6 @@
 'use client';
 import * as AuthService from '@/api/auth.service';
-import siteRouter from '@/config';
+import MAIN_ROUTE from '@/config/routes';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { ILoginForm } from '@/interface';
 import { useAppDispatch } from '@/redux/hooks';
@@ -130,13 +130,13 @@ const SignInPage = () => {
             <div className="mt-3 mx-auto w-full md:max-w-96">
                 <p>
                     Bạn chưa có tài khoản?{' '}
-                    <Link href={siteRouter.signUp} className="text-primary font-semibold">
+                    <Link href={MAIN_ROUTE.REGISTER} className="text-primary font-semibold">
                         Đăng ký tài khoản
                     </Link>
                 </p>
             </div>
             <div className="mt-3 mx-auto w-full md:max-w-96">
-                <Link href={siteRouter.forgotPassword} className="text-orange-600 font-semibold">
+                <Link href={MAIN_ROUTE.FORGOT_PASSWORD} className="text-orange-600 font-semibold">
                     Quên mật khẩu ?
                 </Link>
             </div>

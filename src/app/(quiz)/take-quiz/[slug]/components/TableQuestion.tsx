@@ -45,7 +45,7 @@ const TableQuestion = () => {
                 </Col>
                 <Col xs={24}>
                     <div className="grid grid-cols-5 gap-3 w-full">
-                        {quizDetail?.quiz[currentPartIndex]?.questions.map((question, index: number) => (
+                        {quizDetail?.quiz[currentPartIndex]?.questions?.map?.((question, index: number) => (
                             <button
                                 key={index}
                                 onClick={() => {
