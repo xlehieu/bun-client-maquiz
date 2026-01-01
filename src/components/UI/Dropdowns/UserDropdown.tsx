@@ -1,5 +1,5 @@
 'use client';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { resetUser } from '@/redux/slices/user.slice';
 import { persistor } from '@/redux/store';
@@ -35,7 +35,7 @@ const UserDropdown = ({ isDashboard = false }: UserDropdownProps) => {
         {
             key: '2',
             label: (
-                <Link href={userDashboardRouter.MY_DASHBOARD}>
+                <Link href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}>
                     <DashboardOutlined className="pr-2" />
                     My Dashboard
                 </Link>

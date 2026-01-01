@@ -2,7 +2,7 @@
 import React from 'react';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { IUser } from '@/interface';
@@ -28,7 +28,7 @@ export default function UserNavbar() {
                     <a
                         className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
                         href="/my-dashboard"
-                        onClick={() => router.push(userDashboardRouter.MY_DASHBOARD)}
+                        onClick={() => router.push(USER_DASHBOARD_ROUTER.MY_DASHBOARD)}
                     >
                         Dashboard
                     </a>

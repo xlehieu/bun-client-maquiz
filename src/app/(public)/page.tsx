@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import Aos from 'aos';
 import 'aos/dist/aos.css';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import searchIcon from '@/asset/image/search.png';
 import knowledgeIcon from '@/asset/image/knowledge.png';
 import quizIcon from '@/asset/image/qna.png';
@@ -71,7 +71,7 @@ export default function HomePage() {
                         </div>
                         <div className="flex justify-center">
                             <button
-                                onClick={() => router.push(userDashboardRouter.CLASSROOM)}
+                                onClick={() => router.push(USER_DASHBOARD_ROUTER.CLASSROOM)}
                                 className="bg-primary -rotate-1 text-white px-10 py-3  border border-black  rounded-full text-lg hover:bg-primary-bold transition hover:scale-105 hover:shadow-xl duration-150"
                             >
                                 Lớp học

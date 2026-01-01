@@ -78,5 +78,8 @@
         "@types/node": "^20",
         "@types/react": "19",
         "typescript": "^5"
+    },
+    "overrides": {
+        "rc-picker": "4.6.15"
     }
 }

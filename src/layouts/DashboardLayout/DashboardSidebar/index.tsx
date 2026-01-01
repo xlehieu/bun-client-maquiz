@@ -16,7 +16,7 @@ import {
     faPeopleRoof,
 } from '@fortawesome/free-solid-svg-icons';
 import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter, userDashboardRouter } from '@/config/routes';
+import { adminRouter, USER_DASHBOARD_ROUTER } from '@/config/routes';
 import BlurBackground from '@/components/UI/BlurBackground';
 import { useSelector } from 'react-redux';
 
@@ -28,13 +28,13 @@ const items = [
                 key: '1.1',
                 label: 'Thư viện của tôi',
                 icon: faHouse,
-                to: userDashboardRouter.MY_DASHBOARD,
+                to: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
             },
             {
                 key: '1.2',
                 label: 'Truy cập gần đây',
                 icon: faClockRotateLeft,
-                to: userDashboardRouter.HISTORY_ACCESS,
+                to: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
             },
         ],
         key: '1',
@@ -47,13 +47,13 @@ const items = [
                 key: '2.1',
                 label: 'Đề thi',
                 icon: faBookOpen,
-                to: userDashboardRouter.MYQUIZ,
+                to: USER_DASHBOARD_ROUTER.MYQUIZ,
             },
             {
                 key: '2.2',
                 label: 'Lớp học',
                 icon: faChalkboardUser,
-                to: userDashboardRouter.CLASSROOM,
+                to: USER_DASHBOARD_ROUTER.CLASSROOM,
             },
         ],
     },
@@ -156,33 +156,70 @@ const UserSidebar = () => {
                         <hr className="my-4 md:min-w-full" />
                         {/* Navigation */}
 
-                        <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+                        {/* NAVIGATION LIST */}
+                        <ul className="md:flex-col md:min-w-full flex flex-col list-none gap-8 mt-4">
                             {items.map((item, index) => (
-                                <li key={index}>
-                                    <div className="text-sm pl-2 text-gray-400 py-2">{item.label}</div>
-                                    <div>
-                                        <ul className="flex flex-col">
-                                            {item.children.map((child, i) => (
-                                                <li className="flex" key={i}>
+                                <li key={index} className="md:min-w-full">
+                                    {/* Menu Group Label - Thiết kế lại cho chuyên nghiệp hơn */}
+                                    <div className="flex items-center px-4 mb-4">
+                                        <span className="text-[10px] font-black uppercase tracking-[2px] text-slate-400">
+                                            {item.label}
+                                        </span>
+                                        <div className="flex-1 h-[1px] bg-slate-100 ml-3 opacity-50" />
+                                    </div>
+
+                                    {/* Sub-menu Items */}
+                                    <ul className="flex flex-col list-none gap-1.5">
+                                        {item.children.map((child, i) => {
+                                            const isActive = path === child.to;
+                                            return (
+                                                <li className="flex w-full px-2" key={i}>
                                                     <button
-                                                        key={i}
                                                         onClick={() => {
                                                             router.push(child.to);
                                                             setPath(child.to);
                                                         }}
-                                                        className={`pl-8 text-gray-700 flex-1 text-base text-left py-3 px-2 hover:text-primary ease-linear duration-200 transition-all  hover:bg-slate-600/10 hover:rounded-3xl ${
-                                                            path == child.to
-                                                                ? 'text-primary bg-slate-600/10 rounded-3xl'
-                                                                : ''
+                                                        className={`group w-full flex items-center px-4 py-3 rounded-[18px] transition-all duration-300 relative ${
+                                                            isActive
+                                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                                : 'text-slate-500 hover:bg-slate-50 hover:text-primary'
                                                         }`}
                                                     >
-                                                        <FontAwesomeIcon className="mr-2" icon={child.icon} />
-                                                        {child.label}
+                                                        <div
+                                                            className={`w-9 h-9 flex items-center justify-center rounded-xl mr-3 transition-all duration-300 ${
+                                                                isActive
+                                                                    ? 'bg-white/20 scale-110'
+                                                                    : 'bg-slate-50 group-hover:bg-primary/10 group-hover:scale-110'
+                                                            }`}
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={child.icon}
+                                                                className={`text-sm ${
+                                                                    isActive
+                                                                        ? 'text-white'
+                                                                        : 'text-slate-400 group-hover:text-primary'
+                                                                }`}
+                                                            />
+                                                        </div>
+
+                                                        {/* Label text */}
+                                                        <span
+                                                            className={`text-sm font-bold text-left transition-colors ${
+                                                                isActive ? 'text-white' : 'text-slate-600'
+                                                            }`}
+                                                        >
+                                                            {child.label}
+                                                        </span>
+
+                                                        {/* Active Indicator Bar - Thanh nhỏ bên phải khi active */}
+                                                        {isActive && (
+                                                            <div className="absolute right-3 w-1 h-4 rounded-full bg-white/40 animate-in fade-in zoom-in duration-300" />
+                                                        )}
                                                     </button>
                                                 </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                            );
+                                        })}
+                                    </ul>
                                 </li>
                             ))}
                         </ul>

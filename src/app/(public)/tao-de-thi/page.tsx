@@ -9,13 +9,13 @@ import * as FileService from '@/api/file.service';
 import * as QuizService from '@/api/quiz.service';
 import BlurBackground from '@/components/UI/BlurBackground';
 //
-import { faClipboard, faFileImport, faQuestionCircle, faReply } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faClipboard, faFileImport, faQuestionCircle, faReply } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Input, Modal, Select, Tabs } from 'antd';
 
 import CreateMatchQuestion from '@/components/Quiz/Questions/CreateMatchQuestion';
 import OneNNAnswer from '@/components/Quiz/Questions/OneNNAnswer';
-import { userDashboardRouter } from '@/config/routes';
+import { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { BodyUpsertQuestionQuiz } from '@/types/quiz.type';
 import { useRouter } from 'next/navigation';
@@ -271,7 +271,7 @@ const ImportQuestions = () => {
             toast.error('Import câu hỏi thất bại');
         }
         if (countdown === 0) {
-            router.push(userDashboardRouter.EDIT_MY_QUIZ_NO_PARAMS + currentCreateQuizId);
+            router.push(USER_DASHBOARD_ROUTER.EDIT_MY_QUIZ_NO_PARAMS + currentCreateQuizId);
         }
     }, [importDataMutation.isSuccess, importDataMutation.isError, countdown]);
     useEffect(() => {}, []);
@@ -303,14 +303,22 @@ const CreateQuizPageMain = () => {
     const router = useRouter();
     return (
         <div className="bg-opacity-40 py-10">
-            <div className="w-full m-auto flex justify-between">
-                <h4 className="font-semibold">Tạo đề thi mới</h4>
-                <button onClick={() => router.back()} className="rounded-lg bg-red-500 px-2 py-1 text-white">
-                    <FontAwesomeIcon icon={faReply} className="mr-1" />
-                    Quay lại
-                </button>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6">
+                <div>
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">Thêm đề thi</h1>
+                    <p className="text-slate-500 text-sm font-medium">Thông tin chung đề thi</p>
+                </div>
+
+                <Button
+                    className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 rounded-xl px-5 py-2.5 font-bold transition-all duration-200 shadow-sm"
+                    onClick={() => router.back()}
+                >
+                    <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
+                    Trở lại
+                </Button>
             </div>
-            <Tabs
+
+            {/* <Tabs
                 defaultActiveKey="1"
                 onChange={(activeKey: string) => {
                     if (activeKey === 'Question' && currentCreateQuizId) {
@@ -360,7 +368,8 @@ const CreateQuizPageMain = () => {
                 >
                     <ImportQuestions />
                 </Tabs.TabPane>
-            </Tabs>
+            </Tabs> */}
+            <CreateGeneralInfoQuiz />
         </div>
     );
 };

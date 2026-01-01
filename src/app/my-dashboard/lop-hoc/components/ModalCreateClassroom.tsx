@@ -1,5 +1,5 @@
 import { createClassroom } from '@/api/classrooms.service';
-import { userDashboardRouter } from '@/config/routes';
+import { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { BodyCreateClassroom } from '@/types/classroom.type';
 import { Form, Input, Modal } from 'antd';
@@ -29,7 +29,7 @@ const ModalCreateClassroom = ({ isOpen, onClose }: Props) => {
         if (createClassroomMutation.isSuccess) {
             toast.success('Tạo lớp học thành công');
             onClose();
-            router.push(`${userDashboardRouter.CLASSROOM}/${createClassroomMutation.data?.classCode}`);
+            router.push(`${USER_DASHBOARD_ROUTER.CLASSROOM}/${createClassroomMutation.data?.classCode}`);
         } else if (createClassroomMutation.isError) {
             toast.error('Tạo lớp học thất bại');
         }

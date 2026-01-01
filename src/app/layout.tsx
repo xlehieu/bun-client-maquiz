@@ -11,7 +11,10 @@ import { Toaster } from 'sonner';
 import './globals.css';
 import AppLayout from '@/layouts/AppLayout';
 import { ConfigProvider } from 'antd';
-
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import viVN from 'antd/locale/vi_VN';
+dayjs.locale('vi');
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -30,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en" title="Maquiz">
             <body>
                 <ConfigProvider
+                    locale={viVN}
                     theme={{
                         token: {
                             colorPrimary: '#3178c6',

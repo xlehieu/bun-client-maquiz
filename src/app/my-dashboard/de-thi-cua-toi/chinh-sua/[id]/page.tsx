@@ -2,24 +2,31 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faClipboard, faQuestionCircle, faReply } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faQuestionCircle, faReply, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { Tabs, ConfigProvider } from 'antd';
+import type { TabsProps } from 'antd';
+
 import EditGeneralInformationTab from './components/EditGeneralInformationTab';
+import EditQuizQuestionTab from './components/EditQuizQuestionTab';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchQuizDetail } from '@/redux/slices/quiz.slice';
-import EditQuizQuestionTab from './components/EditQuizQuestionTab';
 import { fetchListQuestionType } from '@/redux/slices/questionType.slice';
+import ButtonBack from '@/components/UI/ButtonBack';
+
 const EditMyQuizPage = () => {
     const params = useParams();
     const id = params?.id;
     const router = useRouter();
-    const { listQuestionType } = useAppSelector((state) => state.questionType);
-    const [currentKey, setCurrentKey] = useState<number>(1); // key của tabs
     const dispatch = useAppDispatch();
+
+    const { listQuestionType } = useAppSelector((state) => state.questionType);
+
     useEffect(() => {
         if (id && !Array.isArray(id)) {
             dispatch(fetchQuizDetail(id));
         }
-    }, [id]);
+    }, [id, dispatch]);
+
     useEffect(() => {
         if (listQuestionType.length <= 0) {
             dispatch(fetchListQuestionType());
@@ -28,60 +35,65 @@ const EditMyQuizPage = () => {
             top: 0,
             behavior: 'smooth',
         });
-    }, []);
-    const tabs = [
+    }, [listQuestionType.length, dispatch]);
+
+    // Cấu hình các Items cho Tabs của Ant Design
+    const items: TabsProps['items'] = [
         {
-            key: 1,
-            label: 'Thông tin chung',
-            icon: faCircleInfo,
+            key: '1',
+            label: (
+                <div className="flex items-center gap-2 px-2 py-1">
+                    <FontAwesomeIcon icon={faCircleInfo} />
+                    <span className="font-bold text-base">Thông tin chung</span>
+                </div>
+            ),
+            children: (
+                <div className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <EditGeneralInformationTab />
+                </div>
+            ),
         },
         {
-            key: 2,
-            label: 'Các câu hỏi',
-            icon: faQuestionCircle,
+            key: '2',
+            label: (
+                <div className="flex items-center gap-2 px-2 py-1">
+                    <FontAwesomeIcon icon={faQuestionCircle} />
+                    <span className="font-bold text-base">Các câu hỏi</span>
+                </div>
+            ),
+            children: (
+                <div className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <EditQuizQuestionTab />
+                </div>
+            ),
         },
-        //   {
-        //       key: 3,
-        //       label: 'Nâng cao',
-        //       icon: faClipboard,
-        //   },
     ];
-    const tabItems: Record<number, React.JSX.Element> = {
-        1: <EditGeneralInformationTab />,
-        2: <EditQuizQuestionTab />,
-        //   3: <EditDetailInformationTab />,
-    };
 
     return (
-        <Fragment>
-            <div className="ml-2 py-2 flex justify-between">
-                <h4 className="font-semibold">Chỉnh sửa đề thi</h4>
-                <button className="bg-red-500 text-white rounded-lg px-2" onClick={() => router.back()}>
-                    <FontAwesomeIcon className="mr-1" icon={faReply} />
-                    Trở lại
-                </button>
-            </div>
-            <div className="w-full bg-white px-5 py-5 rounded-md shadow-sm">
-                <div className="flex gap-9">
-                    {tabs.map((item, index) => (
-                        <div
-                            key={item.key}
-                            className={`${
-                                currentKey === item.key
-                                    ? 'border-b-4 border-b-primary text-primary cursor-default'
-                                    : 'hover:opacity-50 cursor-pointer border-b-4 border-b-white'
-                            } flex flex-wrap items-center text-lg pb-2 px-1 transition-all duration-200 ease-linear text-gray-700`}
-                            onClick={() => setCurrentKey(item.key)}
-                        >
-                            <FontAwesomeIcon className="block" icon={item.icon} />
-                            <p className="pl-2">{item.label}</p>
-                        </div>
-                    ))}
+        <div className="max-w-[1200px] mx-auto pb-10 px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6">
+                <div>
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">Chỉnh sửa đề thi</h1>
+                    <p className="text-slate-500 text-sm font-medium">
+                        Cập nhật nội dung và cấu trúc câu hỏi cho bộ đề
+                    </p>
                 </div>
+
+                <ButtonBack />
             </div>
-            <div className="mt-9 w-full">{tabItems?.[currentKey] ?? <></>}</div>{' '}
-            {/* <BlurBackground isActive={isActiveQuizPartNameDialog} /> */}
-        </Fragment>
+
+            {/* Main Content with Ant Design Tabs */}
+            <div className="bg-white p-2 sm:p-6 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
+                <Tabs
+                    defaultActiveKey="1"
+                    items={items}
+                    className="custom-antd-tabs"
+                    size="large"
+                    animated={{ inkBar: true, tabPane: true }}
+                />
+            </div>
+        </div>
     );
 };
 

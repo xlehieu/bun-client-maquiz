@@ -1,5 +1,5 @@
 'use client';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import { faExpand } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DashboardOutlined, IdcardOutlined, LogoutOutlined } from '@ant-design/icons';
@@ -66,7 +66,7 @@ export default function UserInfoHeader() {
                                 Thông tin tài khoản
                             </Link>
                             <Link
-                                href={userDashboardRouter.MY_DASHBOARD}
+                                href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}
                                 className="bg-white text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
                             >
                                 Dashboard

@@ -1,4 +1,4 @@
-import { BodyCreatePost } from '@/types/posr.type';
+import { BodyCreatePost } from '@/types/post.type';
 import axiosCredentials from '../config/axios.credential';
 export const createPost = async (data: BodyCreatePost) => {
     const res = await axiosCredentials.post('/posts', data);

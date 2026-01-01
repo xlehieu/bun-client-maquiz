@@ -4,7 +4,7 @@ import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import LazyImage from '@/components/UI/LazyImage';
 import LoadingIcon from '@/components/UI/LoadingIcon';
 import MaquizLogoImage from '@/components/UI/MaquizLogo';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import { useAppSelector } from '@/redux/hooks';
 import { resetUser } from '@/redux/slices/user.slice';
 import { persistor } from '@/redux/store';
@@ -32,7 +32,7 @@ const headerTippyMenu = [
     {
         icon: <DashboardOutlined className="pr-2" />,
         label: 'Dashboard',
-        route: userDashboardRouter.MY_DASHBOARD,
+        route: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
     },
     {
         icon: <LogoutOutlined className="pr-2" />,
@@ -145,7 +145,7 @@ const HeaderComponent = () => {
                                             Thông tin tài khoản
                                         </Link>
                                         <Link
-                                            href={userDashboardRouter.MY_DASHBOARD}
+                                            href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}
                                             className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
                                         >
                                             Dashboard

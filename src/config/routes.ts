@@ -12,7 +12,7 @@ const MAIN_ROUTE = {
     RESET_PASSWORD: '/auth/reset-password',
     NOT_FOUND_PAGE: '/*',
 };
-export const userDashboardRouter = {
+export const USER_DASHBOARD_ROUTER = {
     MY_DASHBOARD: '/my-dashboard',
     HISTORY_ACCESS: '/my-dashboard/truy-cap-gan-day',
     MYQUIZ: '/my-dashboard/de-thi-cua-toi/',

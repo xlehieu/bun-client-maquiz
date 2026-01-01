@@ -129,8 +129,8 @@ export const quizSlice = createSlice({
             })
             .addCase(fetchQuizDetail.fulfilled, (state, action) => {
                 state.quizDetail = action.payload || null;
-                const partId = action.payload?.quiz?.[0].partId;
-                const questionId = action.payload?.quiz?.[0]?.questions?.[0].questionId;
+                const partId = action.payload?.quiz?.[0]?.partId;
+                const questionId = action.payload?.quiz?.[0]?.questions?.[0]?.questionId;
                 if (partId) {
                     state.currentQuizPartId = partId;
                 }

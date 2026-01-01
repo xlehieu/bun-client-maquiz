@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import Link from 'next/link';
-import MAIN_ROUTE, { userDashboardRouter } from '@/config/routes';
+import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import * as AuthService from '@/api/auth.service';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useRouter } from 'next/navigation';
@@ -57,7 +57,7 @@ export default function AdminNavbar({ user }: any) {
                                     Thông tin tài khoản
                                 </Link>
                                 <Link
-                                    href={userDashboardRouter.MY_DASHBOARD}
+                                    href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}
                                     className="bg-white text-sm py-2 px-3 list-none text-left min-w-48 hover:bg-gray-100"
                                 >
                                     Dashboard

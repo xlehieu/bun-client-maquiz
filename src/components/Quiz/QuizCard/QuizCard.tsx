@@ -3,21 +3,19 @@ import { reactjxColors } from '@/common/constants';
 import LazyImage from '@/components/UI/LazyImage';
 import {
     faBookOpenReader,
-    faCalendar,
-    faChartSimple,
+    faCalendarAlt,
+    faChartLine,
     faCircleQuestion,
     faEdit,
     faEye,
-    faPlayCircle,
-    faTrashCan,
+    faPlay,
+    faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Fragment, memo, useEffect, useMemo } from 'react';
-import { ScaleLoader } from 'react-spinners';
-// import { Link, useNavigate } from 'react-router-dom';
 import * as UserService from '@/api/user.service';
 import * as QuizService from '@/api/quiz.service';
-import { quizRouter, userDashboardRouter } from '@/config/routes';
+import { quizRouter, USER_DASHBOARD_ROUTER } from '@/config/routes';
 import useMutationHooks from '@/hooks/useMutationHooks';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { favoriteQuiz } from '@/redux/slices/user.slice';
@@ -30,23 +28,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { fetchMyListQuiz } from '@/redux/slices/quiz.slice';
+
 type QuizCardProps = {
     quizDetail: QuizDetailRecord;
     allowEdit?: boolean;
     showButton?: boolean;
 };
+
 const QuizCard = ({ quizDetail, allowEdit = false, showButton = true }: QuizCardProps) => {
-    // nếu onDelete truyền vào là false thì không cho xóa nếu là hàm thì cho xóa
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { userProfile } = useAppSelector((state) => state.user);
+
     const favoriteMutation = useMutationHooks((data: { id: string }) => UserService.favoriteQuiz(data));
     const deleteMutation = useMutationHooks((id: string) => QuizService.deleteQuiz(id));
+
     const handleFavoriteQuiz = (id: string, slug: string) => {
         if (!id) return;
         favoriteMutation.mutate({ id });
         dispatch(favoriteQuiz({ slug }));
     };
+
     useEffect(() => {
         if (favoriteMutation.isSuccess) {
             favoriteMutation.reset();
@@ -57,119 +59,115 @@ const QuizCard = ({ quizDetail, allowEdit = false, showButton = true }: QuizCard
             dispatch(fetchMyListQuiz());
         }
     }, [favoriteMutation.isSuccess, deleteMutation.isSuccess]);
+
     const isFavorite = useMemo(
         () => userProfile?.favoriteQuiz.some((quiz) => quiz?.slug === quizDetail?.slug),
         [quizDetail?.slug, userProfile?.favoriteQuiz],
     );
+
     const handleDelete = () => {
         deleteMutation.mutate(quizDetail?._id);
     };
+
     return (
         <Fragment>
             {quizDetail && (
-                <div className="shrink-0 max-w-80 transition-all duration-300 shadow-lg rounded hover:shadow-2xl border-2">
-                    <div
-                        // onClick={() => router.push(`${quizRouter.REVIEW_QUIZ}/${quizDetail?.slug}`)}
-                        className="w-full h-52 flex justify-center content-center hover:cursor-pointer"
-                    >
-                        <LazyImage src={quizDetail?.thumb} alt={quizDetail?.name} />
-                    </div>
-                    <div className="px-2 py-3">
-                        <p className="font-bold text-base line-clamp-2">{quizDetail?.name}</p>
+                <div className="group relative flex flex-col w-full max-w-[320px] bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    {/* Image Section */}
+                    <div className="relative h-48 overflow-hidden">
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors z-10" />
+                        <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+                            <LazyImage src={quizDetail?.thumb} alt={quizDetail?.name} />
+                        </div>
+                        {/* Overlay Badge Date */}
                         {quizDetail?.createdAt && (
-                            <div className="flex items-center gap-1">
-                                <FontAwesomeIcon className="text-orange-900" icon={faCalendar} />
-                                <p className="text-gray-700">{dayjs(quizDetail?.createdAt).format('DD/MM/YYYY')}</p>
+                            <div className="absolute top-3 left-3 z-20 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-[11px] font-semibold text-gray-600 shadow-sm">
+                                <FontAwesomeIcon icon={faCalendarAlt} className="mr-1 text-primary" />
+                                {dayjs(quizDetail?.createdAt).format('DD/MM/YYYY')}
                             </div>
                         )}
-                        <div className="mt-2">
-                            <div className="text-base flex gap-3">
-                                <Popover trigger={'hover'} content={'Câu hỏi'}>
-                                    <FontAwesomeIcon icon={faCircleQuestion} className="mr-1 text-yellow-500" />
-                                    <span className="text-gray-700">{quizDetail?.questionCount || 0}</span>
-                                </Popover>
-                                <Popover trigger={'hover'} content={'Lượt truy cập'}>
-                                    <FontAwesomeIcon icon={faChartSimple} className="mr-1 text-blue-500" />
-                                    <span className="text-gray-700">{quizDetail?.accessCount || 0}</span>
-                                </Popover>
-                                <Popover trigger={'hover'} content={'Số lượt thi'}>
-                                    <FontAwesomeIcon icon={faBookOpenReader} className="mr-1 text-green-500" />
-                                    <span className="text-gray-700">{quizDetail?.examCount || 0}</span>
-                                </Popover>
-                            </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="flex flex-col flex-grow p-4">
+                        <h3 className="text-gray-800 font-bold text-lg leading-tight line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+                            {quizDetail?.name}
+                        </h3>
+
+                        <div className="flex items-center gap-4 mt-auto">
+                            <Popover content="Câu hỏi">
+                                <div className="flex items-center text-sm font-medium text-gray-500 bg-amber-50 px-2 py-1 rounded-md">
+                                    <FontAwesomeIcon icon={faCircleQuestion} className="mr-1.5 text-amber-500" />
+                                    {quizDetail?.questionCount || 0}
+                                </div>
+                            </Popover>
+                            <Popover content="Lượt truy cập">
+                                <div className="flex items-center text-sm font-medium text-gray-500 bg-blue-50 px-2 py-1 rounded-md">
+                                    <FontAwesomeIcon icon={faChartLine} className="mr-1.5 text-blue-500" />
+                                    {quizDetail?.accessCount || 0}
+                                </div>
+                            </Popover>
+                            <Popover content="Lượt thi">
+                                <div className="flex items-center text-sm font-medium text-gray-500 bg-emerald-50 px-2 py-1 rounded-md">
+                                    <FontAwesomeIcon icon={faBookOpenReader} className="mr-1.5 text-emerald-500" />
+                                    {quizDetail?.examCount || 0}
+                                </div>
+                            </Popover>
                         </div>
                     </div>
+
+                    {/* Edit Tools (Only for Owner) */}
                     {allowEdit && (
-                        <div className="px-2 py-2 border-t-2">
-                            <div className="mt-2">
-                                <div className="text-base flex gap-3">
-                                    <>
-                                        <Popover
-                                            trigger={'hover'}
-                                            content={'Xem chi tiết'}
-                                            className="hover:cursor-pointer"
-                                        >
-                                            <button
-                                                onClick={() =>
-                                                    router.push(`${userDashboardRouter.MYQUIZ}/${quizDetail?._id}`)
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faEye} className="pr-1 text-[#f27735]" />
-                                            </button>
-                                        </Popover>
-                                        <Popover
-                                            trigger={'hover'}
-                                            content={'Chỉnh sửa đề thi'}
-                                            className="hover:cursor-pointer"
-                                        >
-                                            <button
-                                                onClick={() =>
-                                                    router.push(
-                                                        `${userDashboardRouter.MYQUIZ}/chinh-sua/${quizDetail?._id}`,
-                                                    )
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faEdit} className="pr-1 text-[#851e3f]" />
-                                            </button>
-                                        </Popover>
-                                        <Popconfirm
-                                            title="Xác nhận xoá đề thi"
-                                            okText="Xoá"
-                                            cancelText="Hủy bỏ"
-                                            showCancel={false}
-                                            okType="danger"
-                                            onConfirm={handleDelete}
-                                        >
-                                            <Popover
-                                                trigger={'hover'}
-                                                content={'Xóa đề thi'}
-                                                className="hover:cursor-pointer"
-                                            >
-                                                <button>
-                                                    <FontAwesomeIcon icon={faTrashCan} className="pr-1 text-red-500" />
-                                                </button>
-                                            </Popover>
-                                        </Popconfirm>
-                                    </>
-                                </div>
-                            </div>
+                        <div className="px-4 py-2 bg-gray-50/50 border-t border-gray-100 flex gap-4">
+                            <button
+                                onClick={() => router.push(`${USER_DASHBOARD_ROUTER.MYQUIZ}/${quizDetail?._id}`)}
+                                className="text-gray-400 hover:text-blue-500 transition-colors"
+                            >
+                                <FontAwesomeIcon icon={faEye} />
+                            </button>
+                            <button
+                                onClick={() =>
+                                    router.push(`${USER_DASHBOARD_ROUTER.MYQUIZ}/chinh-sua/${quizDetail?._id}`)
+                                }
+                                className="text-gray-400 hover:text-amber-500 transition-colors"
+                            >
+                                <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                            <Popconfirm
+                                title="Xác nhận xoá đề thi?"
+                                onConfirm={handleDelete}
+                                okText="Xoá"
+                                cancelText="Hủy"
+                                okButtonProps={{ danger: true }}
+                            >
+                                <button className="text-gray-400 hover:text-red-500 transition-colors">
+                                    <FontAwesomeIcon icon={faTrashAlt} />
+                                </button>
+                            </Popconfirm>
                         </div>
                     )}
+
+                    {/* Footer Actions */}
                     {showButton && (
-                        <div className="px-3 py-3 border-t-2 flex justify-between">
+                        <div className="p-4 pt-2 flex items-center justify-between border-t border-gray-100">
                             <Link
                                 href={`${quizRouter.REVIEW_QUIZ}/${quizDetail?.slug}`}
-                                className="inline-block rounded border hover:text-white hover:opacity-80 ease-linear transition-all duration-200 text-white bg-gradient-to-r from-primary to-[#1e998c] px-2 py-2"
+                                className="flex-1 mr-4 py-2.5 px-4 bg-gradient-to-r from-primary to-emerald-500 text-white rounded-xl text-sm font-bold text-center shadow-md shadow-emerald-200 hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                             >
-                                <FontAwesomeIcon icon={faPlayCircle} className="pr-1" />
+                                <FontAwesomeIcon icon={faPlay} className="text-[10px]" />
                                 Vào ôn thi
                             </Link>
+
                             <button
                                 onClick={() => handleFavoriteQuiz(quizDetail?._id, quizDetail?.slug)}
-                                className="hover:cursor-pointer"
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                                    isFavorite
+                                        ? 'bg-red-50 text-red-500'
+                                        : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400'
+                                }`}
                             >
                                 <FontAwesomeIcon
-                                    className="text-red-500 text-2xl"
+                                    className="text-xl"
                                     icon={isFavorite ? faHeartSolid : faHeartRegular}
                                 />
                             </button>
@@ -180,5 +178,5 @@ const QuizCard = ({ quizDetail, allowEdit = false, showButton = true }: QuizCard
         </Fragment>
     );
 };
-// dùng memo tránh rerender lại => khi props thay đổi thì mới rerender
+
 export default memo(QuizCard);
