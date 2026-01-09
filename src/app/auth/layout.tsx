@@ -65,7 +65,7 @@ function SignInUpLayout({ children, title }: any) {
                 </header>
             </div>
 
-            <div className="flex content-center justify-center mt-16 px-2">{children}</div>
+            <div className="flex content-center justify-center mt-3 px-2">{children}</div>
         </div>
     );
 }

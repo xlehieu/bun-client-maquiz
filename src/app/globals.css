@@ -7,7 +7,31 @@
     --background: #ffffff;
     --foreground: #171717;
 }
+/* Tắt scrollbar cho toàn bộ trang */
+@layer base {
+    ::-webkit-scrollbar {
+        display: none;
+    }
 
+    html,
+    body {
+        /* Cho các trình duyệt Chrome, Safari và Opera */
+        -ms-overflow-style: none; /* IE và Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+}
+@layer utilities {
+    /* Ẩn thanh cuộn cho Chrome, Safari và Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ẩn thanh cuộn cho IE, Edge và Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+}
 @theme inline {
     --tw-border-style: rgb(229 231 235);
     --color-background: var(--background);

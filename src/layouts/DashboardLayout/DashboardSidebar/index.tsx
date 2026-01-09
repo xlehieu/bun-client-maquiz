@@ -1,40 +1,40 @@
 /*eslint-disable*/
 'use client';
-import React, { memo, use, useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import BlurBackground from '@/components/UI/BlurBackground';
 import NotificationDropdown from '@/components/UI/Dropdowns/NotificationDropdown';
 import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import MaquizLogo from '@/components/UI/MaquizLogo';
+import { adminRouter, USER_DASHBOARD_ROUTER } from '@/config/routes';
 import {
     faBars,
-    faTimes,
     faBookOpen,
     faChalkboardUser,
     faClockRotateLeft,
     faHouse,
     faPeopleRoof,
+    faTimes,
 } from '@fortawesome/free-solid-svg-icons';
-import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter, USER_DASHBOARD_ROUTER } from '@/config/routes';
-import BlurBackground from '@/components/UI/BlurBackground';
-import { useSelector } from 'react-redux';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { memo, useMemo, useState } from 'react';
 const items = [
     {
         label: 'Cá nhân',
         children: [
             {
-                key: '1.1',
+                key: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
                 label: 'Thư viện của tôi',
                 icon: faHouse,
                 to: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
+                keyActive: '',
             },
             {
-                key: '1.2',
+                key: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
                 label: 'Truy cập gần đây',
                 icon: faClockRotateLeft,
                 to: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
+                keyActive: 'truy-cap-gan-day',
             },
         ],
         key: '1',
@@ -44,16 +44,18 @@ const items = [
         label: 'Quản lý',
         children: [
             {
-                key: '2.1',
+                key: USER_DASHBOARD_ROUTER.MYQUIZ,
                 label: 'Đề thi',
                 icon: faBookOpen,
                 to: USER_DASHBOARD_ROUTER.MYQUIZ,
+                keyActive: 'de-thi-cua-toi',
             },
             {
-                key: '2.2',
+                key: USER_DASHBOARD_ROUTER.CLASSROOM,
                 label: 'Lớp học',
                 icon: faChalkboardUser,
                 to: USER_DASHBOARD_ROUTER.CLASSROOM,
+                keyActive: 'lop-hoc',
             },
         ],
     },
@@ -63,7 +65,7 @@ const sidebarAdmin = {
     label: 'Quản trị hệ thống',
     children: [
         {
-            key: '2.1',
+            key: '3.1',
             label: 'Admin dashboard',
             icon: faPeopleRoof,
             to: adminRouter.USER_LIST,
@@ -71,18 +73,23 @@ const sidebarAdmin = {
     ],
 };
 const setItem = new Set(items.map((item) => item.key));
-const UserSidebar = () => {
+const UserDashboardSidebar = () => {
     const router = useRouter();
     const pathName = usePathname();
     const [path, setPath] = useState(pathName);
-    const user = useSelector((state: any) => state.user);
-    if (!setItem.has('3') && user.isAdmin) {
-        console.log(setItem);
-        setItem.add('3');
-        items.push(sidebarAdmin);
-    }
+    // const user = useSelector((state: any) => state.user);
+    // if (!setItem.has('3') && user.isAdmin) {
+    //     console.log(setItem);
+    //     setItem.add('3');
+    //     items.push(sidebarAdmin);
+    // }
     const [collapseShow, setCollapseShow] = React.useState('hidden');
     const [isShowBg, setIsShowBg] = useState(false);
+
+    const keyActive = useMemo(() => {
+        const path = pathName.split('/').slice(2);
+        return path?.[0] || '';
+    }, [pathName]);
     return (
         <>
             <aside className="bg-white flex flex-wrap items-center justify-between relative z-30 py-4 px-6">
@@ -117,7 +124,7 @@ const UserSidebar = () => {
                     {/* Collapse */}
                     <div
                         className={
-                            'md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-20 overflow-y-auto overflow-x-hidden items-center flex-1 rounded ' +
+                            'md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-20 overflow-y-auto overflow-x-hidden items-center flex-1 rounded no-scrollbar ' +
                             collapseShow
                         }
                     >
@@ -157,7 +164,7 @@ const UserSidebar = () => {
                         {/* Navigation */}
 
                         {/* NAVIGATION LIST */}
-                        <ul className="md:flex-col md:min-w-full flex flex-col list-none gap-8 mt-4">
+                        <ul className="md:flex-col md:min-w-full flex flex-col list-none gap-8 mt-4 no-scrollbar">
                             {items.map((item, index) => (
                                 <li key={index} className="md:min-w-full">
                                     {/* Menu Group Label - Thiết kế lại cho chuyên nghiệp hơn */}
@@ -169,24 +176,24 @@ const UserSidebar = () => {
                                     </div>
 
                                     {/* Sub-menu Items */}
-                                    <ul className="flex flex-col list-none gap-1.5">
+                                    <ul className="flex flex-col list-none gap-1.5 no-scrollbar">
                                         {item.children.map((child, i) => {
-                                            const isActive = path === child.to;
+                                            const isActive = child.keyActive === keyActive;
                                             return (
-                                                <li className="flex w-full px-2" key={i}>
+                                                <li className="flex w-full px-2 group" key={i}>
                                                     <button
                                                         onClick={() => {
                                                             router.push(child.to);
                                                             setPath(child.to);
                                                         }}
-                                                        className={`group w-full flex items-center px-4 py-3 rounded-[18px] transition-all duration-300 relative ${
+                                                        className={`group w-full flex items-center px-4 py-3 rounded-[18px] transition-all duration-300 relative group-hover:scale-110 ${
                                                             isActive
                                                                 ? 'bg-primary text-white shadow-lg shadow-primary/20'
                                                                 : 'text-slate-500 hover:bg-slate-50 hover:text-primary'
                                                         }`}
                                                     >
                                                         <div
-                                                            className={`w-9 h-9 flex items-center justify-center rounded-xl mr-3 transition-all duration-300 ${
+                                                            className={`w-9 h-9 flex items-center justify-center rounded-xl mr-3 transition-all duration-300 group-hover:rotate-12  ${
                                                                 isActive
                                                                     ? 'bg-white/20 scale-110'
                                                                     : 'bg-slate-50 group-hover:bg-primary/10 group-hover:scale-110'
@@ -230,4 +237,4 @@ const UserSidebar = () => {
         </>
     );
 };
-export default memo(UserSidebar);
+export default memo(UserDashboardSidebar);

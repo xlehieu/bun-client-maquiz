@@ -8,10 +8,10 @@ function DefaultLayout({ children, title }: { children: React.ReactNode; title?:
         document.title = title ?? 'Maquiz';
     });
     return (
-        <main className="relative overflow-hidden">
+        <main className="relative overflow-hidden no-scrollbar">
             <HeaderComponent></HeaderComponent>
             <div className="bg-background pb-10 custom-view [min-height:calc(100vh-550px)]">
-                <div className="container mx-auto">{children}</div>
+                <div className="container mx-auto pt-28">{children}</div>
             </div>
             <Footer />
         </main>

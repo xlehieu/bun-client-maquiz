@@ -1,9 +1,7 @@
 import axiosCredentials from '@/config/axios.credential';
 import { File } from 'buffer';
-export const ExportPdf = async (data: any) => {
-    const { id, collection } = data;
+export const ExportPdf = async (data: { id: string; collection: string }) => {
     const res = await axiosCredentials.post('/file/exportPdf', JSON.stringify(data));
-    console.log(res);
     if (!res?.data?.data?.data) {
         throw 'Lỗi';
     }

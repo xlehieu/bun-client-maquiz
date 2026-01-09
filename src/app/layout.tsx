@@ -18,8 +18,11 @@ dayjs.locale('vi');
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            refetchOnReconnect: false,
+            staleTime: 10 * 60 * 1000, // ✅ 10 phút
+            refetchOnMount: false,
             refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            retry: false,
         },
     },
 });

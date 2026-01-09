@@ -16,7 +16,7 @@ const AdminLayout = ({ children, title = 'Maquiz' }: { children: React.ReactNode
         <Suspense fallback={<LoadingComponent />}>
             <AdminSidebar />
             <AdminNavbar user={user} />
-            <div className="absolute top-0 md:top-14 right-0 left-0 md:left-64 px-4 bg-background">
+            <div className="absolute top-0 md:top-14 right-0 left-0 md:left-64 px-4 bg-background no-scrollbar">
                 <div className="w-full mt-40 md:mt-0">{children}</div>
                 <div className="px-4 md:px-10 mx-auto w-full">
                     <FooterAdmin />

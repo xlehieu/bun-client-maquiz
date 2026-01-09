@@ -1,174 +1,190 @@
 'use client';
 import BlurBackground from '@/components/UI/BlurBackground';
 import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
-import LazyImage from '@/components/UI/LazyImage';
-import LoadingIcon from '@/components/UI/LoadingIcon';
 import MaquizLogoImage from '@/components/UI/MaquizLogo';
 import MAIN_ROUTE, { USER_DASHBOARD_ROUTER } from '@/config/routes';
 import { useAppSelector } from '@/redux/hooks';
 import { resetUser } from '@/redux/slices/user.slice';
 import { persistor } from '@/redux/store';
-import { DashboardOutlined, IdcardOutlined, LogoutOutlined } from '@ant-design/icons';
-import { faBars, faClose } from '@fortawesome/free-solid-svg-icons';
+import {
+    faBars,
+    faClose,
+    faNewspaper,
+    faEnvelope,
+    faUser,
+    faSignOutAlt,
+    faChartPie,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Dropdown } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 const menuVariants = {
-    hidden: { x: '100%', opacity: 0 },
-    visible: { x: 0, opacity: 1 },
-    exit: { x: '100%', opacity: 0 },
+    hidden: { x: '100%' },
+    visible: { x: 0 },
+    exit: { x: '100%' },
 };
-const headerTippyMenu = [
-    {
-        label: 'Thông tin tài khoản',
-        icon: <IdcardOutlined className="pr-2" />,
-        route: MAIN_ROUTE.PROFILE,
-    },
-    {
-        icon: <DashboardOutlined className="pr-2" />,
-        label: 'Dashboard',
-        route: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
-    },
-    {
-        icon: <LogoutOutlined className="pr-2" />,
-        label: 'Đăng xuất',
-        type: 'logout',
-    },
-];
+
 const HeaderComponent = () => {
     const router = useRouter();
     const { userProfile } = useAppSelector((state) => state.user);
-    const [loading, setLoading] = useState({
-        isLoading: false,
-        index: -1,
-    });
     const dispatch = useDispatch();
+    const [isMobileResponsive, setIsMobileResponsive] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    // Xử lý hiệu ứng khi cuộn trang
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const handleLogOut = async () => {
         persistor.purge();
         dispatch(resetUser());
+        setIsMobileResponsive(false);
     };
-    const handleClick = async (item: any, index: number) => {
-        setLoading({
-            isLoading: true,
-            index,
-        });
-        if (!item.type && item.route) {
-            router.push(item.route);
-        } else {
-            handleLogOut();
-        }
-    };
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setLoading({
-    //             isLoading: false,
-    //             index: -1,
-    //         });
-    //     }, 10000);
-    // }, [loading]);
-    const [isMobileResponsive, setIsMobileResponsive] = useState(false);
+
     return (
-        <header className="w-full border-b-2 bg-transparent relative z-999">
-            <div className={'container mx-auto flex justify-between items-centers px-5 py-4'}>
-                <div className="block">
-                    <Link className="w-2/4 block" href={MAIN_ROUTE.HOME}>
+        <header
+            className={`fixed top-0 left-0 w-full transition-all duration-300 z-[1000] border-b 
+            ${
+                scrolled
+                    ? 'bg-white/80 backdrop-blur-md py-2 border-slate-100 shadow-sm'
+                    : 'bg-transparent py-4 border-transparent'
+            }`}
+        >
+            <div className="container mx-auto flex justify-between items-center px-6">
+                {/* LOGO */}
+                <div className="flex-shrink-0">
+                    <Link href={MAIN_ROUTE.HOME} className="block transition-transform hover:scale-105 active:scale-95">
                         <MaquizLogoImage
-                            className="w-full scale-110 hover:scale-150 transition-all duration-300"
+                            className="h-10 w-auto" // Cố định chiều cao logo để tránh vỡ layout
                             alt="logo"
                         />
                     </Link>
                 </div>
-                <nav className="hidden md:flex items-center justify-end gap-12">
-                    <Link
-                        className=" hover:scale-115 hover:rotate-2 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
-                        href={MAIN_ROUTE.NEWS}
-                    >
-                        Tin tức
-                    </Link>
-                    <Link
-                        className=" hover:scale-115 hover:rotate-2 flex items-center justify-center text-primary text-lg  duration-300 hover:text-camdat"
-                        href={MAIN_ROUTE.CONTACT}
-                    >
-                        Liên hệ
-                    </Link>
-                    {userProfile?.email ? ( // Menu tippy
+
+                {/* DESKTOP NAV */}
+                <nav className="hidden md:flex items-center gap-10">
+                    {[
+                        { label: 'Tin tức', href: MAIN_ROUTE.NEWS },
+                        { label: 'Liên hệ', href: MAIN_ROUTE.CONTACT },
+                    ].map((link) => (
+                        <Link
+                            key={link.label}
+                            className="relative text-slate-600 font-bold hover:text-primary transition-colors group"
+                            href={link.href}
+                        >
+                            {link.label}
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+                        </Link>
+                    ))}
+
+                    <div className="h-6 w-[1px] bg-slate-200 mx-2" />
+
+                    {userProfile?.email ? (
                         <UserDropdown />
                     ) : (
                         <Link
-                            className=" flex items-center justify-center text-primary text-lg hover:scale-115 hover:rotate-2 duration-300 hover:text-camdat"
+                            className="bg-primary text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-blue-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
                             href={MAIN_ROUTE.LOGIN}
                         >
                             Đăng nhập
                         </Link>
                     )}
                 </nav>
-                <div className="md:hidden z-40 flex items-center">
-                    <button className="px-2 py-2" onClick={() => setIsMobileResponsive(!isMobileResponsive)}>
-                        <FontAwesomeIcon className="text-2xl" icon={isMobileResponsive ? faClose : faBars} />
+
+                {/* MOBILE BURGER */}
+                <div className="md:hidden">
+                    <button
+                        className={`p-2 rounded-xl transition-colors ${
+                            isMobileResponsive ? 'bg-slate-100 text-rose-500' : 'text-slate-700'
+                        }`}
+                        onClick={() => setIsMobileResponsive(!isMobileResponsive)}
+                    >
+                        <FontAwesomeIcon icon={isMobileResponsive ? faClose : faBars} className="text-xl" />
                     </button>
                 </div>
+
+                {/* MOBILE MENU SIDEBAR */}
                 <AnimatePresence>
                     {isMobileResponsive && (
                         <>
                             <motion.nav
-                                key="mobile-menu"
                                 initial="hidden"
                                 animate="visible"
-                                exit="hidden"
+                                exit="exit"
                                 variants={menuVariants}
-                                transition={{ duration: 0.5, ease: 'easeInOut' }}
-                                className="absolute z-30 py-10 h-full bg-white shadow-lg min-w-72 max-w-full right-0 top-0 flex flex-col text-3xl space-y-5 items-start"
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                className="fixed top-0 right-0 h-screen w-[85%] max-w-sm bg-white shadow-2xl z-[1001] flex flex-col p-8"
                             >
-                                <Link
-                                    className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
-                                    href={'/'}
-                                >
-                                    Tin tức
-                                </Link>
-                                <Link
-                                    className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
-                                    href={'/'}
-                                >
-                                    Liên hệ
-                                </Link>
-                                {userProfile?.email ? (
-                                    <>
+                                <div className="mb-10 flex justify-between items-center">
+                                    <MaquizLogoImage className="h-8" alt="logo" />
+                                    <button onClick={() => setIsMobileResponsive(false)} className="text-slate-400">
+                                        <FontAwesomeIcon icon={faClose} />
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-col gap-4">
+                                    <MobileNavLink
+                                        href={MAIN_ROUTE.NEWS}
+                                        icon={faNewspaper}
+                                        label="Tin tức"
+                                        onClick={() => setIsMobileResponsive(false)}
+                                    />
+                                    <MobileNavLink
+                                        href={MAIN_ROUTE.CONTACT}
+                                        icon={faEnvelope}
+                                        label="Liên hệ"
+                                        onClick={() => setIsMobileResponsive(false)}
+                                    />
+
+                                    <div className="h-[1px] bg-slate-100 my-4" />
+
+                                    {userProfile?.email ? (
+                                        <>
+                                            <MobileNavLink
+                                                href={MAIN_ROUTE.PROFILE}
+                                                icon={faUser}
+                                                label="Tài khoản"
+                                                onClick={() => setIsMobileResponsive(false)}
+                                            />
+                                            <MobileNavLink
+                                                href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}
+                                                icon={faChartPie}
+                                                label="Dashboard"
+                                                onClick={() => setIsMobileResponsive(false)}
+                                            />
+                                            <button
+                                                onClick={handleLogOut}
+                                                className="flex items-center gap-4 p-4 rounded-2xl text-rose-500 font-bold hover:bg-rose-50 transition-all"
+                                            >
+                                                <FontAwesomeIcon icon={faSignOutAlt} /> Đăng xuất
+                                            </button>
+                                        </>
+                                    ) : (
                                         <Link
-                                            className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
-                                            href={MAIN_ROUTE.PROFILE}
+                                            href={MAIN_ROUTE.LOGIN}
+                                            onClick={() => setIsMobileResponsive(false)}
+                                            className="bg-primary text-white p-4 rounded-2xl font-bold text-center shadow-lg shadow-blue-100"
                                         >
-                                            Thông tin tài khoản
+                                            Đăng nhập ngay
                                         </Link>
-                                        <Link
-                                            href={USER_DASHBOARD_ROUTER.MY_DASHBOARD}
-                                            className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
-                                        >
-                                            Dashboard
-                                        </Link>
-                                        <button
-                                            className="mt-10 w-full px-6 py-3 text-gray-600 text-left font-semibold border-b-2 transition-all duration-300"
-                                            onClick={handleLogOut}
-                                        >
-                                            Đăng xuất
-                                        </button>
-                                    </>
-                                ) : (
-                                    <Link
-                                        href={MAIN_ROUTE.LOGIN}
-                                        className="mt-10 w-full px-6 py-3 text-gray-600 font-semibold border-b-2 transition-all duration-300"
-                                    >
-                                        Đăng nhập
-                                    </Link>
-                                )}
+                                    )}
+                                </div>
+
+                                <div className="mt-auto text-center text-slate-400 text-xs font-medium">
+                                    Maquiz v2.0 • 2024
+                                </div>
                             </motion.nav>
+
                             <BlurBackground
                                 isActive={isMobileResponsive}
-                                onClick={() => setIsMobileResponsive(!isMobileResponsive)}
+                                onClick={() => setIsMobileResponsive(false)}
                             />
                         </>
                     )}
@@ -177,5 +193,19 @@ const HeaderComponent = () => {
         </header>
     );
 };
+
+// Helper component cho Mobile Link
+const MobileNavLink = ({ href, icon, label, onClick }: any) => (
+    <Link
+        href={href}
+        onClick={onClick}
+        className="flex items-center gap-4 p-4 rounded-2xl text-slate-600 font-bold hover:bg-slate-50 hover:text-primary transition-all"
+    >
+        <div className="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 group-hover:bg-blue-50 group-hover:text-primary">
+            <FontAwesomeIcon icon={icon} />
+        </div>
+        {label}
+    </Link>
+);
 
 export default HeaderComponent;

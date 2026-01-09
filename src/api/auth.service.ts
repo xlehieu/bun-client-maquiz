@@ -1,13 +1,12 @@
 'use client';
 import axiosCredentials from '@/config/axios.credential';
-import axiosNoCredential from '@/config/axios.nointerceptor';
 import { ILoginForm } from '@/interface';
 export const callLogin = async (data: ILoginForm) => {
     const { email, password } = data;
     if (!email || !password) {
         throw new Error('Vui lòng điền đầy đủ thông tin');
     }
-    const res = await axiosNoCredential.post<{
+    const res = await axiosCredentials.post<{
         data: {
             access_token: string;
             email: string;
@@ -28,18 +27,18 @@ export const logout = async () => {
 export const forgotPassword = async (data: any) => {
     const { email } = data;
     if (!email) return null;
-    const res = await axiosNoCredential.post(`auth/forgot-password`, { email });
+    const res = await axiosCredentials.post(`auth/forgot-password`, { email });
     return res.data;
 };
 export const resetPassword = async (data: any) => {
     const { newPassword, token } = data;
-    const res = await axiosNoCredential.post(`/auth/reset-password`, {
+    const res = await axiosCredentials.post(`/auth/reset-password`, {
         token,
         newPassword,
     });
     return res.data;
 };
 export const register = async (data: any) => {
-    const res = await axiosNoCredential.post(`/auth/sign-up`, data);
+    const res = await axiosCredentials.post(`/auth/sign-up`, data);
     return res?.data?.data;
 };

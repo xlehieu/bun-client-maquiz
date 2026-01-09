@@ -7,6 +7,7 @@ import authReducer from './slices/auth.slice';
 import takeQuizReducer from './slices/takeQuiz.slice';
 import questionTypeReducer from './slices/questionType.slice';
 import classroomReducer from './slices/classrooms.slice';
+import takeExamReducer from './slices/takeExam.slice';
 const rootReducer = combineReducers({
     auth: authReducer,
     user: userSlice,
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
     takeQuiz: takeQuizReducer,
     questionType: questionTypeReducer,
     classroom: classroomReducer,
+    takeExam: takeExamReducer,
 });
 const persistConfig = {
     key: 'root',

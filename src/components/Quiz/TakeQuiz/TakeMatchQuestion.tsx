@@ -1,268 +1,251 @@
-"use client";
-import React, { Fragment, useEffect, useRef, useState } from "react";
-import Xarrow from "react-xarrows";
+'use client';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+import Xarrow from 'react-xarrows';
 
-import { reactjxColors } from "@/common/constants";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { chooseQuestionType3 } from "@/redux/slices/takeQuiz.slice";
-import { MatchQuestion } from "@/@types/quiz.type";
-import { AnswerChoiceType3 } from "@/@types/shared.type";
-import { Button, Modal } from "antd";
+import { reactjxColors } from '@/common/constants';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { chooseQuestionType3 } from '@/redux/slices/takeQuiz.slice';
+import { MatchQuestion } from '@/@types/quiz.type';
+import { AnswerChoiceType3 } from '@/@types/shared.type';
+import { Button, Modal } from 'antd';
+
 type XArrowType = {
-  question: string;
-  match: string;
-  answer?: string;
+    question: string;
+    match: string;
+    answer?: string;
 };
+
 export default function TakeMatchQuestion() {
-  const {
-    currentQuizPreviewDetail: quizDetail,
-    currentPartIndex,
-    currentQuestionIndex,
-    answerChoices,
-  } = useAppSelector((state) => state.takeQuiz);
-  const dispatch = useAppDispatch();
-  // const { shuffleMatchQuestion, setShuffleMatchQuestion, answerMatchingQuestion, dispatchAnswerMatchingQuestion } =
-  //     useContext(TakeMatchingQuestionContext);
-  const refQuestion = useRef<any[]>([]);
-  const [elementCurrentMouseDown, setElementCurrentMouseDown] = useState("");
-  const [xArrows, setXArrows] = useState<XArrowType[]>([]);
-  const [dragging, setDragging] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const mouseRef = useRef<HTMLDivElement>(null);
-  // di chuyển div ẩn theo chuột
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [left, setLeft] = useState(0);
-  const [top, setTop] = useState(0);
-  useEffect(() => {
-    const matchQuestion = [
-      ...((answerChoices?.[currentPartIndex]?.[
-        currentQuestionIndex
-      ] as AnswerChoiceType3[]) || []),
-    ];
-    setIsDisabled(
-      currentQuestionIndex in (answerChoices?.[currentPartIndex] || {})
-        ? true
-        : false
-    );
-    const timeout = setTimeout(() => {
-      setXArrows(Array.isArray(matchQuestion) ? matchQuestion : []);
-    }, 600);
-    return () => clearTimeout(timeout);
-  }, [answerChoices]);
-  const handleMouseDown = (
-    e: React.MouseEvent<HTMLDivElement>,
-    match: string
-  ) => {
-    e.preventDefault(); // chặn default drag
-    setDragging(true);
-    const startId = e.currentTarget.id;
-    if (startId) setElementCurrentMouseDown(startId);
-    setXArrows((prevValue) => {
-      const newValue = [...(prevValue || [])];
-      // tìm index trong mảng và chỉnh sửa index đó {idx và indexElement hoàn toàn khác nhau}
-      const idxArr = newValue?.findIndex((item) => item?.match === match);
-      if (idxArr === -1) {
-        newValue.push({
-          question: startId,
-          match,
-        });
-      } else {
-        newValue[idxArr] = {
-          question: startId,
-          match,
-        };
-      }
-      return newValue?.filter(Boolean);
-    });
-  };
-  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>, match: any) => {
-    const targetAnswerId = e.currentTarget.id;
-    // nếu nhả chuột vào ô hiện tại thì return, xóa luôn current element
-
-    if (elementCurrentMouseDown === targetAnswerId) {
-      setElementCurrentMouseDown("");
-      return;
-    }
-    //lấy id của current => gán vào thằng nhả ra là ok
-    setXArrows((prevValue) => {
-      const newValue = [...prevValue];
-      // start cũng đang là element current luôn => tìm ông nào bắt đầu bằng startId và gán thêm end => phần tử hiện tại vừa mouse up
-      const idxArr = newValue?.findIndex(
-        (item) => item?.question === elementCurrentMouseDown
-      );
-      if (newValue && newValue.length > 0 && newValue?.[idxArr]) {
-        newValue[idxArr] = {
-          ...newValue[idxArr],
-          answer: targetAnswerId,
-        };
-      }
-      return newValue?.filter(Boolean);
-    });
-    // dispatchAnswerMatchingQuestion({
-    //     // Không có action
-    //     payload: {
-    //         currentPartIndex,
-    //         currentQuestionIndex,
-    //         answer: match,
-    //         currentQuestion: currentQuestion,
-    //     },
-    // });
-    setElementCurrentMouseDown("");
-    setDragging(false);
-    // mouseRef.current = null;
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (mouseRef.current && containerRef) {
-        const rect = containerRef.current?.getBoundingClientRect();
-        mouseRef.current.style.left = e.clientX - (rect?.x || 0) + "px";
-        mouseRef.current.style.top = e.clientY - (rect?.y || 0) + "px";
-        // console.log(mouseRef.current.style.left, mouseRef.current.style.top);
-        setLeft(e.clientX);
-        setTop(e.clientY);
-      }
-    };
-    if (dragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-    }
-    return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, [dragging]);
-  // Hết xử lý câu hỏi
-  const handleConfirm = () => {
-    // const matchQuestion = answerMatchingQuestion?.[currentPartIndex]?.[currentQuestionIndex];
-    // dispatchAnswerChoices({
-    //     type: ANSWER_CHOICE_ACTION.ADD_ANSWER_QUESTION_TYPE_3,
-    //     payload: {
-    //         currentPartIndex,
-    //         currentQuestionIndex,
-    //         matchQuestion,
-    //     },
-    // });
-    dispatch(
-      chooseQuestionType3({
+    const {
+        currentQuizTakeDetail: quizDetail,
         currentPartIndex,
         currentQuestionIndex,
-        matchQuestion: xArrows,
-      })
-    );
-    setOpenModal(false);
-  };
-  const [openModal, setOpenModal] = useState(false);
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-  return (
-    <>
-      <div className="relative w-full" ref={containerRef}>
-        <div className="grid grid-cols-2 gap-32">
-          <div className="flex flex-col gap-10">
-            {(
-              quizDetail?.quiz?.[currentPartIndex]?.questions?.[
-                currentQuestionIndex
-              ] as MatchQuestion
-            )?.mappingMatchQuestion?.optionMatchQuestion_Question?.map(
-              (optionQuestion, index) => (
-                <div
-                  key={index + Math.random()}
-                  ref={(el) => {
-                    refQuestion.current[index] = el;
-                  }}
-                  id={`question-${optionQuestion.answerId}`}
-                  onMouseDown={(e) =>
-                    handleMouseDown(e, optionQuestion.answerId)
-                  }
-                  className="px-2 py-2 border-2 border-camdat rounded"
-                >
-                  {optionQuestion.questionContent}
-                </div>
-              )
-            )}
-          </div>
-          <div className="flex flex-col gap-10">
-            {(
-              quizDetail?.quiz?.[currentPartIndex]?.questions?.[
-                currentQuestionIndex
-              ] as MatchQuestion
-            )?.mappingMatchQuestion?.optionMatchQuestion_Answer?.map(
-              (optionQuestion, index) => (
-                <div
-                  key={index + Math.random()}
-                  ref={(el) => {
-                    refQuestion.current[index] = el;
-                  }}
-                  id={`answer-${optionQuestion.answerId}`}
-                  onMouseUp={(e) => handleMouseUp(e, optionQuestion.answerId)}
-                  className="px-2 py-2 border-2 border-primary rounded"
-                >
-                  {optionQuestion?.answer}
-                </div>
-              )
-            )}
-          </div>
-        </div>
-        <Fragment key={top + left + Math.random()}>
-          {xArrows?.map((el, index) => (
-            <Fragment key={index}>
-              {el?.question && el?.answer && (
-                <Xarrow
-                  color={reactjxColors.primary}
-                  headSize={3}
-                  strokeWidth={3}
-                  start={el.question}
-                  end={el.answer}
-                />
-              )}
-            </Fragment>
-          ))}
-        </Fragment>
-        {/* div ẩn bám theo chuột */}
-        <div
-          id="mousePointer"
-          ref={mouseRef}
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            top: 0,
-            left: 0,
-            pointerEvents: "none", // tránh block chuột
-          }}
-        />
+        answerChoices,
+    } = useAppSelector((state) => state.takeQuiz);
+    const dispatch = useAppDispatch();
 
-        {/* Xarrow khi drag */}
-        <Fragment key={left + top + Math.random()}>
-          {dragging && elementCurrentMouseDown && (
-            <Xarrow
-              start={elementCurrentMouseDown}
-              end="mousePointer"
-              color={reactjxColors.primary}
-              headSize={3}
-              strokeWidth={3}
-            />
-          )}
-        </Fragment>
-        <div className="flex flex-1 justify-end">
-          <Button
-            className="mt-4"
-            disabled={isDisabled}
-            onClick={handleOpenModal}
-          >
-            Xác nhận
-          </Button>
-        </div>
-      </div>
-      <Modal
-        open={openModal}
-        onCancel={() => setOpenModal(false)}
-        onOk={handleConfirm}
-        centered
-        okText="Xác nhận"
-        cancelText="Hủy"
-        title="Xác nhận⚠️⚠️⚠️⚠️⚠️"
-      >
-        <p>Xác nhận sau khi xác nhận sẽ không còn được trả lời lại</p>
-      </Modal>
-    </>
-  );
+    const refQuestion = useRef<any[]>([]);
+    const [elementCurrentMouseDown, setElementCurrentMouseDown] = useState('');
+    const [xArrows, setXArrows] = useState<XArrowType[]>([]);
+    const [dragging, setDragging] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
+    const mouseRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [left, setLeft] = useState(0);
+    const [top, setTop] = useState(0);
+
+    useEffect(() => {
+        const matchQuestion = [
+            ...((answerChoices?.[currentPartIndex]?.[currentQuestionIndex] as AnswerChoiceType3[]) || []),
+        ];
+        setIsDisabled(currentQuestionIndex in (answerChoices?.[currentPartIndex] || {}) ? true : false);
+        const timeout = setTimeout(() => {
+            setXArrows(Array.isArray(matchQuestion) ? matchQuestion : []);
+        }, 600);
+        return () => clearTimeout(timeout);
+    }, [answerChoices, currentQuestionIndex, currentPartIndex]);
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, match: string) => {
+        if (isDisabled) return;
+        e.preventDefault();
+        setDragging(true);
+        const startId = e.currentTarget.id;
+        if (startId) setElementCurrentMouseDown(startId);
+        setXArrows((prevValue) => {
+            const newValue = [...(prevValue || [])];
+            const idxArr = newValue?.findIndex((item) => item?.match === match);
+            if (idxArr === -1) {
+                newValue.push({ question: startId, match });
+            } else {
+                newValue[idxArr] = { question: startId, match };
+            }
+            return newValue?.filter(Boolean);
+        });
+    };
+
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>, match: any) => {
+        if (isDisabled) return;
+        const targetAnswerId = e.currentTarget.id;
+
+        if (elementCurrentMouseDown === targetAnswerId) {
+            setElementCurrentMouseDown('');
+            setDragging(false);
+            return;
+        }
+
+        setXArrows((prevValue) => {
+            const newValue = [...prevValue];
+            const idxArr = newValue?.findIndex((item) => item?.question === elementCurrentMouseDown);
+            if (newValue && newValue.length > 0 && newValue?.[idxArr]) {
+                newValue[idxArr] = { ...newValue[idxArr], answer: targetAnswerId };
+            }
+            return newValue?.filter(Boolean);
+        });
+
+        setElementCurrentMouseDown('');
+        setDragging(false);
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (mouseRef.current && containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                mouseRef.current.style.left = e.clientX - rect.x + 'px';
+                mouseRef.current.style.top = e.clientY - rect.y + 'px';
+                setLeft(e.clientX);
+                setTop(e.clientY);
+            }
+        };
+        if (dragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+        }
+        return () => document.removeEventListener('mousemove', handleMouseMove);
+    }, [dragging]);
+
+    const handleConfirm = () => {
+        dispatch(
+            chooseQuestionType3({
+                currentPartIndex,
+                currentQuestionIndex,
+                matchQuestion: xArrows,
+            }),
+        );
+        setOpenModal(false);
+    };
+
+    const [openModal, setOpenModal] = useState(false);
+    const handleOpenModal = () => setOpenModal(true);
+
+    // Helper styles cho Xarrow
+    const commonXarrowProps = {
+        color: reactjxColors.primary,
+        strokeWidth: 3,
+        headSize: 4,
+        path: 'smooth' as const, // Tạo đường cong mềm mại
+        startAnchor: 'right' as const,
+        endAnchor: 'left' as const,
+        animateDrawing: 0.1, // Hiệu ứng vẽ đường nối
+    };
+
+    const currentQuestions = (quizDetail?.quiz?.[currentPartIndex]?.questions?.[currentQuestionIndex] as MatchQuestion)
+        ?.mappingMatchQuestion;
+
+    return (
+        <>
+            <div className="relative w-full p-6" ref={containerRef}>
+                <div className="grid grid-cols-2 gap-x-24 gap-y-6">
+                    {/* CỘT CÂU HỎI */}
+                    <div className="flex flex-col gap-6">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Vế trái</h4>
+                        {currentQuestions?.optionMatchQuestion_Question?.map((optionQuestion, index) => (
+                            <div
+                                key={`q-${index}`}
+                                id={`question-${optionQuestion.answerId}`}
+                                onMouseDown={(e) => handleMouseDown(e, optionQuestion.answerId)}
+                                className={`group relative px-4 py-4 bg-white border-2 rounded-2xl transition-all duration-200 cursor-crosshair
+                  ${
+                      elementCurrentMouseDown === `question-${optionQuestion.answerId}`
+                          ? 'border-blue-500 shadow-md scale-[1.02]'
+                          : 'border-slate-100 hover:border-blue-300 shadow-sm'
+                  }
+                  ${isDisabled ? 'opacity-80 cursor-not-allowed' : ''}
+                `}
+                            >
+                                <div className="text-slate-700 font-medium">{optionQuestion.questionContent}</div>
+                                {/* Điểm nối (dot) */}
+                                <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-4 h-4 bg-blue-500 border-4 border-white rounded-full shadow-sm z-10 group-hover:scale-125 transition-transform" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* CỘT ĐÁP ÁN */}
+                    <div className="flex flex-col gap-6">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 text-right">
+                            Vế phải
+                        </h4>
+                        {currentQuestions?.optionMatchQuestion_Answer?.map((optionAnswer, index) => (
+                            <div
+                                key={`a-${index}`}
+                                id={`answer-${optionAnswer.answerId}`}
+                                onMouseUp={(e) => handleMouseUp(e, optionAnswer.answerId)}
+                                className={`group relative px-4 py-4 bg-white border-2 rounded-2xl transition-all duration-200 cursor-pointer
+                  ${
+                      isDisabled
+                          ? 'border-slate-200'
+                          : 'border-slate-100 hover:border-emerald-300 shadow-sm hover:bg-emerald-50/30'
+                  }
+                  ${isDisabled ? 'cursor-not-allowed' : ''}
+                `}
+                            >
+                                <div className="text-slate-700 font-medium">{optionAnswer?.answer}</div>
+                                {/* Điểm nối (dot) */}
+                                <div className="absolute left-[-8px] top-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full shadow-sm z-10 group-hover:scale-125 transition-transform" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* RENDER CÁC ĐƯỜNG NỐI ĐÃ CHỐT */}
+                <div className="pointer-events-none">
+                    {xArrows?.map((el, index) => (
+                        <Fragment key={`arrow-${index}`}>
+                            {el?.question && el?.answer && (
+                                <Xarrow {...commonXarrowProps} start={el.question} end={el.answer} />
+                            )}
+                        </Fragment>
+                    ))}
+                </div>
+
+                {/* DIV ẨN BÁM THEO CHUỘT */}
+                <div
+                    id="mousePointer"
+                    ref={mouseRef}
+                    className="absolute w-1 h-1 pointer-events-none"
+                    style={{ top: 0, left: 0 }}
+                />
+
+                {/* ĐƯỜNG NỐI KHI ĐANG KÉO (DRAGGING) */}
+                {dragging && elementCurrentMouseDown && (
+                    <Xarrow
+                        {...commonXarrowProps}
+                        start={elementCurrentMouseDown}
+                        end="mousePointer"
+                        // dashness={dragging ? { strokeLen: 10, nonStrokeLen: 10, animation: true } : false} // Hiệu ứng nét đứt khi đang kéo
+                    />
+                )}
+
+                <div className="flex justify-end mt-10">
+                    <Button
+                        type="primary"
+                        size="large"
+                        className="rounded-xl px-8 h-12 font-bold shadow-lg shadow-blue-200 transition-all hover:scale-105 active:scale-95"
+                        disabled={isDisabled}
+                        onClick={handleOpenModal}
+                    >
+                        Xác nhận
+                    </Button>
+                </div>
+            </div>
+
+            <Modal
+                open={openModal}
+                onCancel={() => setOpenModal(false)}
+                onOk={handleConfirm}
+                centered
+                okText="Xác nhận"
+                cancelText="Hủy"
+                title={
+                    <div className="flex items-center gap-2 text-amber-500">
+                        <span>⚠️</span> <span>Xác nhận kết quả</span>
+                    </div>
+                }
+                okButtonProps={{ className: 'rounded-lg' }}
+                cancelButtonProps={{ className: 'rounded-lg' }}
+            >
+                <p className="text-slate-600">
+                    Bạn có chắc chắn muốn xác nhận không? Sau khi xác nhận, các đường nối sẽ <b>không thể thay đổi</b>.
+                </p>
+            </Modal>
+        </>
+    );
 }

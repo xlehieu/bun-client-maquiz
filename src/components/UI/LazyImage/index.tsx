@@ -1,36 +1,58 @@
 'use client';
-import React, { ImgHTMLAttributes, memo, useState } from 'react';
-import { FadeLoader } from 'react-spinners';
-import { reactjxColors } from '@/common/constants';
+import React, { memo, useState, useEffect } from 'react';
 import { Spin } from 'antd';
+
 type LazyImageProp = {
-    src?: string | Blob;
+    src?: string; // Thường là string URL
     alt?: string;
     className?: string;
-    children?: React.ReactNode;
+    skeletonClassName?: string; // Custom riêng cho khung loading
 };
-const LazyImage = ({ src, alt, className = '', children = null }: LazyImageProp) => {
-    const [isLoaded, setIsLoaded] = useState(true);
+
+const LazyImage = ({ src, alt, className = '', skeletonClassName = '' }: LazyImageProp) => {
+    const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+    const [currentSrc, setCurrentSrc] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        // Reset trạng thái khi src thay đổi
+        if (src) {
+            setStatus('loading');
+            setCurrentSrc(src);
+        } else {
+            setStatus('error');
+        }
+    }, [src]);
+
     return (
-        <div className={className}>
-            {children}
-            {/* Placeholder (hiển thị trong khi ảnh chưa tải xong) */}
-            {isLoaded && (
-                // <div className="flex z-0 w-full h-full items-center justify-center bg-white">
-                //     {placeholder || <FadeLoader className="w-full h-full" color={colors?.primary ?? '#fff'} />}
-                // </div>
-                <div className="h-full flex flex-1 items-center justify-center">
-                    <Spin />
+        <div className={`relative overflow-hidden ${className}`}>
+            {/* 1. Placeholder / Skeleton: Hiển thị khi đang loading */}
+            {status === 'loading' && (
+                <div
+                    className={`absolute inset-0 z-10 flex items-center justify-center bg-slate-100 animate-pulse ${skeletonClassName}`}
+                >
+                    {/* Bạn có thể dùng Spin của Antd hoặc một Icon mờ */}
+                    <Spin size="small" className="text-primary" />
                 </div>
             )}
+
+            {/* 2. Fallback khi ảnh lỗi */}
+            {status === 'error' && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-200 text-slate-400 p-2 text-center">
+                    <span className="text-lg">🖼️</span>
+                    <span className="text-[10px] mt-1 font-medium">No Image</span>
+                </div>
+            )}
+
+            {/* 3. Thẻ Image chính */}
             <img
-                src={src}
-                alt={alt}
-                className={`w-full z-0 h-full object-cover transition-opacity duration-1000 ${
-                    !isLoaded ? 'opacity-100' : 'opacity-0'
+                src={currentSrc}
+                alt={alt || 'MaQuiz Image'}
+                className={`w-full h-full object-cover transition-all duration-700 ease-in-out ${
+                    status === 'loaded' ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-lg'
                 }`}
-                onLoad={() => setIsLoaded(false)}
-                onError={() => setIsLoaded(false)} // Ẩn placeholder nếu ảnh bị lỗi
+                onLoad={() => setStatus('loaded')}
+                onError={() => setStatus('error')}
+                loading="lazy" // Tận dụng lazy load trình duyệt
             />
         </div>
     );

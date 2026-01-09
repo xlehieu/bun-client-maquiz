@@ -1,13 +1,12 @@
 'use client';
-import React, { ReactNode } from 'react';
-import Link from 'next/link';
+import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import MaquizLogo from '@/components/UI/MaquizLogo';
 import MAIN_ROUTE from '@/config/routes';
-import UserInfoHeader from './components/UserInfoHeader';
-import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
+import Link from 'next/link';
+import { ReactNode } from 'react';
 const SubLayout = ({ children }: { children: ReactNode }) => {
     return (
-        <div className="bg-[#fcfcfc] select-none min-h-svh">
+        <div className="bg-[#fcfcfc] select-none min-h-svh ">
             <header className="w-full bg-white md:h-20 md:shadow-md">
                 <div className="container px-0 md:px-5 mx-0 md:mx-auto hidden md:flex justify-between items-center h-full">
                     <Link href={MAIN_ROUTE.HOME} className="w-40 h-full">

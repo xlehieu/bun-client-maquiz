@@ -1,12 +1,9 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 // import dynamic from 'next/dynamic';
-import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
-import Masonry from 'react-masonry-css';
-import HTMLReactParser from 'html-react-parser';
 import * as NewsService from '@/api/news.service';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Dispatch } from 'react';
+import useMutationHooks from '@/hooks/useMutationHooks';
+import { INewsItem } from '@/interface';
 import {
     faArrowLeft,
     faCirclePlus,
@@ -15,11 +12,11 @@ import {
     faPenNib,
     faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import useMutationHooks from '@/hooks/useMutationHooks';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { message, Modal, Popover } from 'antd';
-import configEditor from '@/config/editor';
-import JoditEditor from 'jodit-react';
-import { INewsItem } from '@/interface';
+import HTMLReactParser from 'html-react-parser';
+import React, { createContext, Dispatch, useContext, useEffect, useReducer, useState } from 'react';
+import Masonry from 'react-masonry-css';
 
 const action_type = {
     SET_NEWS: 'SET_NEWS',
