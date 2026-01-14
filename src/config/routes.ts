@@ -30,12 +30,11 @@ export const quizRouter = {
     REVIEW_QUIZ: '/review-quiz',
     TAKE_QUIZ: '/take-quiz',
 };
-export const adminRouter = {
+export const ADMIN_ROUTER = {
     USER_LIST: '/admin/users-management',
-    USER_DETAIL: '/admin/users-management/detail',
     CLASSROOM_LIST: '/admin/classrooms-management',
     QUIZ_LIST: '/admin/quizzes-management',
-    QUIZ_DETAIL: '/admin/quizzes-management/detail',
+    TAI_NGUYEN_HE_THONG: '/admin/tai-nguyen-he-thong',
 };
 
 export const getRouteConfigParam = (route: string, params: string[]) => {

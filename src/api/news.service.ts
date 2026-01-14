@@ -1,5 +1,5 @@
 import { INewsItem } from '@/interface';
-import axiosCredentials from '../config/axios.credential';
+import axiosCredentials from '../config/axios.instance';
 
 export const getNews = async () => {
     const response = await axiosCredentials.get('/news');

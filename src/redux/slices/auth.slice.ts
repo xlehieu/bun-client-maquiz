@@ -1,37 +1,31 @@
-import { getUserDetail } from "@/api/user.service";
-import { UserDetail } from "@/@types/user.type";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // localStorage
-import { toast } from "sonner";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // localStorage
 type AuthState = {
-  isFetching: boolean;
-  access_token: string | null;
+    isFetching: boolean;
+    access_token: string | null;
 };
 const initStateAuth: AuthState = {
-  isFetching: false,
-  access_token: null,
+    isFetching: false,
+    access_token: null,
 };
 
 const authSlice = createSlice({
-  name: "auth",
-  initialState: initStateAuth,
-  reducers: {
-    setAccessToken: (
-      state,
-      action: PayloadAction<AuthState["access_token"]>
-    ) => {
-      state.access_token = action.payload;
+    name: 'auth',
+    initialState: initStateAuth,
+    reducers: {
+        setAccessToken: (state, action: PayloadAction<AuthState['access_token']>) => {
+            state.access_token = action.payload;
+        },
     },
-  },
-  extraReducers(builder) {
-    builder;
-  },
+    extraReducers(builder) {
+        builder;
+    },
 });
 const authPersistConfig = {
-  key: "auth",
-  storage,
-  whitelist: ["access_token"],
+    key: 'auth',
+    storage,
+    whitelist: ['access_token'],
 };
 export const { setAccessToken } = authSlice.actions;
 

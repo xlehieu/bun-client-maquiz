@@ -1,195 +1,198 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
-import { message, Pagination } from 'antd';
+
+import ButtonBack from '@/components/UI/ButtonBack';
+import { ADMIN_ROUTER } from '@/config/routes';
+import { useAdminClassroomList, ADMIN_CLASSROOM_QUERY_KEY } from '@/features/admin/adminClassroom.query';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Empty, Input, Switch, Table, Tag } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import React, { useEffect, useReducer, useState } from 'react';
-import { PAGE_SIZE } from '@/common/constants';
-import useMutationHooks from '@/hooks/useMutationHooks';
-import * as ClassroomManagementService from '@/api/admin/classroommanagement.service';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import useDebounce from '@/hooks/useDebounce';
+import { AdminClassroomRecord } from '@/@types/adminClassroom.type';
+import { setAdminClassroomFilter } from '@/redux/slices/admin.slice';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { changeClassroomDisabled } from '@/api/admin/classroommanagement.service';
 import { toast } from 'sonner';
-const active_type = {
-    CHANGE_DISABLED: 'CHANGE_DISABLED',
-    SET_CLASSROOM_LIST: 'SET_CLASSROOM_LIST',
-};
-const classroomManageReducer = (state: any, action: any) => {
-    switch (action.type) {
-        case active_type.SET_CLASSROOM_LIST: {
-            if (action.payload.classrooms) return action.payload.classrooms;
-            return state;
-        }
-        case active_type.CHANGE_DISABLED: {
-            const classrooms = [...state];
-            if (action.payload.id) {
-                const idx = classrooms.findIndex((classrooms) => classrooms._id == action.payload.id);
-                console.log(idx);
-                console.log('before change', [...classrooms]);
-                if (idx !== -1) {
-                    classrooms[idx] = { ...classrooms[idx], isDisabled: !classrooms[idx].isDisabled };
-                }
-                console.log('after change', [...classrooms]);
-                return [...classrooms];
-            }
-            return state;
-        }
-        default:
-            return state;
-    }
-};
+
 const ClassroomManagement = () => {
-    const [classroomList, dispatchQuizzesList] = useReducer(classroomManageReducer, []);
-    const [totalClassroom, setTotalClassroom] = useState(0);
-    const classroomListQuery = useQuery({
-        queryKey: ['quizzesListQuery'],
-        queryFn: () => ClassroomManagementService.getClassroomList({}),
+    const queryClient = useQueryClient();
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+
+    const { adminClassroomFilter } = useAppSelector((state) => state.admin);
+    const { data, isLoading } = useAdminClassroomList(adminClassroomFilter);
+
+    /* ================= SEARCH ================= */
+    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
+    const searchDebounce = useDebounce(searchValue, 600);
+
+    useEffect(() => {
+        dispatch(
+            setAdminClassroomFilter({
+                keyword: searchDebounce,
+            }),
+        );
+    }, [searchDebounce]);
+
+    const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(e.target.value || undefined);
+    }, []);
+
+    /* ================= PAGINATION ================= */
+    const handleChangePagination = (page: number, pageSize: number) => {
+        dispatch(
+            setAdminClassroomFilter({
+                skip: (page - 1) * pageSize,
+                limit: pageSize,
+            }),
+        );
+    };
+
+    const handleClickClassroom = (id: string) => {
+        router.push(`${ADMIN_ROUTER.CLASSROOM_LIST}/${id}`);
+    };
+    const changeQuizDisabledMutation = useMutation({
+        mutationFn: (id: string) => changeClassroomDisabled(id),
+        onSuccess() {
+            toast.success('Cập nhật trạng thái thành công');
+            queryClient.invalidateQueries({ queryKey: [ADMIN_CLASSROOM_QUERY_KEY.ADMIN_USER_QUERY_KEY_LIST] });
+        },
     });
-    const getClassroomsListMutation = useMutationHooks((data: any) =>
-        ClassroomManagementService.getClassroomList(data),
-    );
-    useEffect(() => {
-        if (classroomListQuery.data) {
-            setTotalClassroom(classroomListQuery.data?.total);
-            dispatchQuizzesList({
-                type: active_type.SET_CLASSROOM_LIST,
-                payload: {
-                    classrooms: classroomListQuery.data?.classrooms,
-                },
-            });
-        } else if (classroomListQuery.isError) {
-            message.error('Đã có lỗi xảy ra');
-        }
-    }, [classroomListQuery]);
-    useEffect(() => {
-        if (getClassroomsListMutation.isSuccess) {
-            dispatchQuizzesList({
-                type: active_type.SET_CLASSROOM_LIST,
-                payload: {
-                    classrooms: getClassroomsListMutation.data?.classrooms,
-                },
-            });
-        }
-    }, [getClassroomsListMutation]);
-    const handlePageChange = (page: number) => {
-        getClassroomsListMutation.mutate({ skip: (Number(page - 1) || 0) * PAGE_SIZE });
-    };
-
-    const changeQuizDisabledMutation = useMutationHooks((data: any) =>
-        ClassroomManagementService.changeClassroomDisabled(data),
-    );
-    const handleChangeQuizDisabled = (id: string) => {
-        if (!id) return toast.error('Không tìm thấy lớp học');
-        changeQuizDisabledMutation.mutate({ id });
-        dispatchQuizzesList({
-            type: active_type.CHANGE_DISABLED,
-            payload: {
-                id,
-            },
-        });
-        toast.success('Cập nhật trạng thái thành công');
-    };
-    useEffect(() => {
-        console.log(classroomList);
-    }, [classroomList]);
-    return (
-        <>
-            <section className="p-6 overflow-x-scroll px-0 pt-0 pb-2">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl my-5 text-gray-700">DANH SÁCH LỚP HỌC</h1>
-                    <p className="text-lg">
-                        Tổng số: <span className="text-primary text-xl">{totalClassroom}</span>
-                    </p>
+    /* ================= TABLE ================= */
+    const columns: ColumnsType<AdminClassroomRecord> = [
+        {
+            title: 'Lớp học',
+            dataIndex: 'name',
+            key: 'name',
+            render: (_, record) => (
+                <div
+                    className="flex items-center gap-4 cursor-pointer"
+                    onClick={() => handleClickClassroom(record._id)}
+                >
+                    <Avatar size={44} src={record.thumb} />
+                    <div>
+                        <p className="font-bold text-slate-700 text-sm">{record.name}</p>
+                        <p className="text-xs text-slate-400">Mã lớp: {record.classCode}</p>
+                    </div>
                 </div>
-                <table className="w-full min-w-[640px] table-auto">
-                    <thead>
-                        <tr>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Lớp học
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Mã lớp
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Số thành viên
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Ngày tạo
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Chặn
-                                </p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {classroomList?.map((classroom: any, idx: number) => (
-                            <tr key={idx}>
-                                {/* image */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50">
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src={classroom.thumb}
-                                            alt="Avatar"
-                                            className="inline-block relative object-cover object-center w-24 h-24 rounded-md"
-                                        />
-                                        <div>
-                                            <p className="block antialiased font-sans text-normal leading-normal text-blue-gray-900 font-semibold">
-                                                {classroom.name || ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                {/* student length */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <p className="block antialiased font-sans text-base font-semibold text-blue-gray-600">
-                                        {classroom?.classCode || ''}
-                                    </p>
-                                </td>
-                                {/* student length */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <p className="block antialiased font-sans text-base font-semibold text-blue-gray-600">
-                                        {classroom?.students?.length || 0}
-                                    </p>
-                                </td>
-                                {/* Ngày tạo */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <p className="block antialiased font-sans text-basefont-semibold text-blue-gray-600">
-                                        {classroom.createdAt ? dayjs(classroom.createdAt).format('DD/MM/YYYY') : 'null'}
-                                    </p>
-                                </td>
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <label className="inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            onChange={() => handleChangeQuizDisabled(classroom._id)}
-                                            checked={classroom.isDisabled}
-                                        />
-                                        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary dark:peer-checked:bg-primary"></div>
-                                        <span className="ms-3 text-base font-medium text-gray-900 dark:text-gray-300"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            ),
+        },
+        {
+            title: 'Môn học',
+            dataIndex: 'subject',
+            key: 'subject',
+            align: 'center',
+            render: (subject) => <Tag color="blue">{subject || '---'}</Tag>,
+        },
+        {
+            title: 'Giáo viên',
+            key: 'teacherInfo',
+            align: 'center',
+            render: (_, record) =>
+                record.teacherInfo ? (
+                    <div className="flex items-center justify-center gap-2">
+                        <Avatar size={32} src={record.teacherInfo.avatar} icon={<UserOutlined />} />
+                        <span className="text-sm font-medium">{record.teacherInfo.name}</span>
+                    </div>
+                ) : (
+                    '---'
+                ),
+        },
+        {
+            title: 'Số học sinh',
+            key: 'students',
+            align: 'center',
+            render: (_, record) => record.students?.length || 0,
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            align: 'center',
+            render: (date: string) => (date ? dayjs(date).format('DD MMM, YYYY') : 'N/A'),
+        },
+        {
+            title: 'Trạng thái',
+            key: 'isDisabled',
+            align: 'center',
+            render: (_, record) => (
+                <div className="flex justify-center items-center gap-3">
+                    <span
+                        className={`text-[10px] font-black px-2 py-0.5 rounded ${
+                            !record.isAdminDisabled ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
+                        }`}
+                    >
+                        {!record.isAdminDisabled ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}
+                    </span>
+                    <Switch
+                        checked={!record.isAdminDisabled}
+                        onChange={() => changeQuizDisabledMutation.mutate(record._id)}
+                    />
+                </div>
+            ),
+        },
+    ];
 
-                <Pagination
-                    className="mt-3"
-                    onChange={(e) => handlePageChange(e)}
-                    defaultCurrent={1}
-                    defaultPageSize={PAGE_SIZE}
-                    total={totalClassroom || PAGE_SIZE}
+    return (
+        <div className="p-6 bg-slate-50 min-h-screen">
+            {/* ================= HEADER ================= */}
+            <div className="mb-10">
+                <div className="flex items-center gap-2 mb-2 ml-1">
+                    <ButtonBack />
+                </div>
+
+                <div className="flex flex-col justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl font-extrabold text-primary mb-2">Quản lý lớp học</h1>
+
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full border">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                <span className="text-lg font-semibold text-slate-600">
+                                    {data?.pagination.total || 0} lớp học
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SEARCH */}
+                    <div className="max-w-sm">
+                        <Input
+                            prefix={<SearchOutlined />}
+                            placeholder="Tìm kiếm lớp học"
+                            allowClear
+                            onChange={handleSearch}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-8 h-[1px] w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent" />
+            </div>
+
+            {/* ================= TABLE ================= */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <Table
+                    rowKey="_id"
+                    columns={columns}
+                    dataSource={data?.classrooms || []}
+                    loading={isLoading}
+                    pagination={{
+                        current: data?.pagination.currentPage,
+                        pageSize: adminClassroomFilter.limit,
+                        total: data?.pagination.total,
+                        showSizeChanger: true,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange: handleChangePagination,
+                    }}
+                    locale={{
+                        emptyText: <Empty description="Không có lớp học nào" />,
+                    }}
                 />
-            </section>
-        </>
+            </div>
+        </div>
     );
 };
 

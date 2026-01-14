@@ -1,7 +1,7 @@
 import { ApiResponse } from '@/@types/api.type';
 import { BodyCreateGeneralInformationQuiz, BodyUpsertQuestionQuiz, QuizDetailRecord } from '@/@types/quiz.type';
 import { IQuerySkipLimit } from '@/interface';
-import axiosCredentials from '../config/axios.credential';
+import axiosCredentials from '../config/axios.instance';
 
 export const getMyQuizzes = async (params?: Partial<IQuerySkipLimit>) => {
     const res = await axiosCredentials.get<

@@ -1,4 +1,4 @@
-import axiosCredentials from '../config/axios.credential';
+import axiosCredentials from '../config/axios.instance';
 
 export const saveQuizHistory = async (data: any) => {
     const res = await axiosCredentials.post('/quiz-history', data);

@@ -12,9 +12,10 @@ import { toast } from 'sonner';
 
 type Props = {
     exam: ClassExamItem;
+    viewByAdmin?: boolean;
 };
 
-const ClassExamCard = ({ exam }: Props) => {
+const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
     const router = useRouter();
     // Logic kiểm tra trạng thái thời gian
     const dispatch = useAppDispatch();
@@ -129,29 +130,31 @@ const ClassExamCard = ({ exam }: Props) => {
                     </div>
 
                     {/* Action Button */}
-                    <button
-                        disabled={isEnded}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            if (classroomDetail?.classCode) {
-                                const routeTakeClassExam = getRouteConfigParam(USER_DASHBOARD_ROUTER.TAKE_CLASS_EXAM, [
-                                    classroomDetail?.classCode,
-                                    exam._id,
-                                ]);
+                    {!viewByAdmin && (
+                        <button
+                            disabled={isEnded}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (classroomDetail?.classCode) {
+                                    const routeTakeClassExam = getRouteConfigParam(
+                                        USER_DASHBOARD_ROUTER.TAKE_CLASS_EXAM,
+                                        [classroomDetail?.classCode, exam._id],
+                                    );
 
-                                router.push(routeTakeClassExam);
-                            }
-                        }}
-                        className={`mt-5 w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all 
+                                    router.push(routeTakeClassExam);
+                                }
+                            }}
+                            className={`mt-5 w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all 
                         ${
                             !isEnded
                                 ? 'bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-blue-200 hover:shadow-blue-300 active:scale-95'
                                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                         }`}
-                    >
-                        {isEnded ? 'Đã đóng' : isOpen ? 'Vào thi ngay' : 'Vào chuẩn bị thi'}
-                        {!isEnded && <FontAwesomeIcon icon={faArrowRight} className="text-xs" />}
-                    </button>
+                        >
+                            {isEnded ? 'Đã đóng' : isOpen ? 'Vào thi ngay' : 'Vào chuẩn bị thi'}
+                            {!isEnded && <FontAwesomeIcon icon={faArrowRight} className="text-xs" />}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

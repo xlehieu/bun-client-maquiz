@@ -7,7 +7,7 @@ import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faFaceSmile, faChalkboardTeacher, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter } from '@/config/routes';
+import { ADMIN_ROUTER } from '@/config/routes';
 import BlurBackground from '@/components/UI/BlurBackground';
 import { useRouter } from 'next/navigation';
 const items = [
@@ -18,19 +18,19 @@ const items = [
                 key: '1.1',
                 label: 'Danh sách user',
                 icon: faFaceSmile,
-                to: adminRouter.USER_LIST,
+                to: ADMIN_ROUTER.USER_LIST,
             },
             {
                 key: '1.2',
                 label: 'Danh sách lớp học',
                 icon: faChalkboardTeacher,
-                to: adminRouter.CLASSROOM_LIST,
+                to: ADMIN_ROUTER.CLASSROOM_LIST,
             },
             {
                 key: '1.3',
                 label: 'Danh sách đề thi',
                 icon: faBookOpen,
-                to: adminRouter.QUIZ_LIST,
+                to: ADMIN_ROUTER.QUIZ_LIST,
             },
         ],
     },

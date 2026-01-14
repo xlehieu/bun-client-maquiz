@@ -1,7 +1,7 @@
 import { ApiResponse } from '@/@types/api.type';
 import { ExamHistoryRecord, UserDetail } from '@/@types/user.type';
 import axios from 'axios';
-import axiosCredentials from '../config/axios.credential';
+import axiosCredentials from '../config/axios.instance';
 
 //sử dụng headers để truyền token và thằng middleware phía backend sẽ nhận được token
 //để kiểm tra xem có quyền lấy data người dùng không

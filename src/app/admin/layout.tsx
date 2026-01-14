@@ -1,13 +1,29 @@
 'use client';
-import AdminLayout from '@/layouts/AdminLayout';
-import { notFound } from 'next/navigation';
-import React from 'react';
-import { useSelector } from 'react-redux';
+import DashboardLayout from '@/layouts/DashboardLayout';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { fetchUserProfile } from '@/redux/slices/user.slice';
+import React, { Fragment, useEffect } from 'react';
+import NotFound from '../not-found';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const user = useSelector((state: any) => state.user);
-    if (!user.isAdmin) return notFound();
-    return <AdminLayout>{children}</AdminLayout>;
+    const dispatch = useAppDispatch();
+    const { userProfile, isFetchingUserProfile } = useAppSelector((state) => state.user);
+    useEffect(() => {
+        console.log('userProfile', userProfile);
+        if (!userProfile?._id) {
+            dispatch(fetchUserProfile());
+        }
+    }, []);
+    // if (isFetchingUserProfile) return <LoadingComponent />;
+    return (
+        <Fragment>
+            {!userProfile?.isAdmin && !isFetchingUserProfile ? (
+                <NotFound />
+            ) : (
+                <DashboardLayout>{children}</DashboardLayout>
+            )}
+        </Fragment>
+    );
 };
 
 export default Layout;

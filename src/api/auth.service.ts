@@ -1,5 +1,5 @@
 'use client';
-import axiosCredentials from '@/config/axios.credential';
+import axiosCredentials from '@/config/axios.instance';
 import { ILoginForm } from '@/interface';
 export const callLogin = async (data: ILoginForm) => {
     const { email, password } = data;

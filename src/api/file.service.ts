@@ -1,4 +1,4 @@
-import axiosCredentials from '@/config/axios.credential';
+import axiosCredentials from '@/config/axios.instance';
 import { File } from 'buffer';
 export const ExportPdf = async (data: { id: string; collection: string }) => {
     const res = await axiosCredentials.post('/file/exportPdf', JSON.stringify(data));

@@ -1,183 +1,177 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
-import { Pagination } from 'antd';
-import dayjs from 'dayjs';
-import { toast } from 'sonner';
-import React, { useEffect, useReducer, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { adminRouter } from '@/config/routes';
-import { PAGE_SIZE } from '@/common/constants';
-import useMutationHooks from '@/hooks/useMutationHooks';
+
 import * as UserManagementService from '@/api/admin/usermanagement.service';
-const active_type = {
-    CHANGE_ACTIVE: 'CHANGE_ACTIVE',
-    SET_USER_LIST: 'SET_USER_LIST',
-};
-const userManageReducer = (state: any, action: any) => {
-    switch (action.type) {
-        case active_type.SET_USER_LIST: {
-            if (action.payload.users) return action.payload.users;
-            return state;
-        }
-        case active_type.CHANGE_ACTIVE: {
-            const users = [...state];
-            if (action.payload.id) {
-                const index = users.findIndex((user) => user._id === action.payload.id);
-                if (index !== -1) {
-                    users[index] = { ...users[index], isActive: !users[index].isActive };
-                }
-                return users;
-            }
-            return state;
-        }
-        default:
-            return state;
-    }
-};
+import ButtonBack from '@/components/UI/ButtonBack';
+import { ADMIN_ROUTER } from '@/config/routes';
+import { ADMIN_USER_QUERY_KEY, useAdminUserList } from '@/features/admin/adminUser.query';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setAdminUserFilter } from '@/redux/slices/admin.slice';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Avatar, Empty, Switch, Table, Input } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useCallback, useEffect, useState } from 'react';
+import useDebounce from '@/hooks/useDebounce';
+
 const UserManagement = () => {
+    const queryClient = useQueryClient();
     const router = useRouter();
-    const [userList, dispatchUserList] = useReducer(userManageReducer, []);
-    const [totalUser, setTotalUser] = useState(0);
-    const userListQuery = useQuery({
-        queryKey: ['userListQueryasdfadf'],
-        queryFn: () => UserManagementService.getUserList({}),
+    const dispatch = useAppDispatch();
+
+    const { adminUserFilter } = useAppSelector((state) => state.admin);
+    const { data: dataAdminUserList, isLoading } = useAdminUserList(adminUserFilter);
+
+    const changeActiveUserMutation = useMutation({
+        mutationFn: (id: string) => UserManagementService.changeActiveUser(id),
+        onSuccess: () => {
+            toast.success('Cập nhật trạng thái thành công');
+            queryClient.invalidateQueries({
+                queryKey: [ADMIN_USER_QUERY_KEY.ADMIN_USER_QUERY_KEY_LIST],
+            });
+        },
     });
-    const getUserListMutation = useMutationHooks((data: any) => UserManagementService.getUserList(data));
-    useEffect(() => {
-        if (userListQuery.data) {
-            setTotalUser(userListQuery.data?.total);
-            dispatchUserList({
-                type: active_type.SET_USER_LIST,
-                payload: {
-                    users: userListQuery.data?.users,
-                },
-            });
-        } else if (userListQuery.isError) {
-            toast.error('đã có lỗi xảy ra');
-        }
-    }, [userListQuery.data, userListQuery.isError]);
-    useEffect(() => {
-        if (getUserListMutation.isSuccess) {
-            dispatchUserList({
-                type: active_type.SET_USER_LIST,
-                payload: {
-                    users: getUserListMutation.data?.users,
-                },
-            });
-        }
-    }, [getUserListMutation]);
-    const handlePageChange = (page: number) => {
-        getUserListMutation.mutate({ skip: (Number(page - 1) || 0) * PAGE_SIZE });
-    };
 
-    const changeActiveUserMutation = useMutationHooks((data: any) => UserManagementService.changeActiveUser(data));
     const handleChangeActiveUser = (id: string) => {
-        if (!id) return toast.error('ID không hợp lệ');
-        changeActiveUserMutation.mutate({ id });
-        dispatchUserList({
-            type: active_type.CHANGE_ACTIVE,
-            payload: {
-                id,
-            },
-        });
+        changeActiveUserMutation.mutate(id);
     };
-    const handleClickUser = (userId: string) => {
-        if (!userId) return;
-        router.push(`${adminRouter.USER_DETAIL}/${userId}`);
-    };
-    return (
-        <>
-            <section className="p-6 overflow-x-scroll px-0 pt-0 pb-2">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl my-5 text-gray-700">DANH SÁCH NGƯỜI DÙNG</h1>
-                    <p className="text-lg">
-                        Tổng số: <span className="text-primary text-xl">{totalUser}</span>
-                    </p>
-                </div>
-                <table className="w-full min-w-[640px] table-auto">
-                    <thead>
-                        <tr>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                <p className="block antialiased text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Người dùng
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased text-[13px] font-bold uppercase text-blue-gray-400">
-                                    SĐT
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Thời điểm đăng ký
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Hoạt động
-                                </p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {userList?.map((user: any, idx: number) => (
-                            <tr key={idx} className="hover:cursor-pointer">
-                                <td
-                                    className="py-3 px-5 border-b border-lime-800 text-center"
-                                    onClick={() => handleClickUser(user._id)}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src={user.avatar}
-                                            alt="Avatar"
-                                            className="inline-block relative object-cover object-center w-9 h-9 rounded-md"
-                                        />
-                                        <div>
-                                            <p className="block antialiased text-base leading-normal text-blue-gray-900 font-semibold">
-                                                {user.name || ''}
-                                            </p>
-                                            <p className="block antialiased text-base font-normal text-blue-gray-500">
-                                                {user.email || ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="py-3 px-5 border-b border-lime-800 text-center">
-                                    <p className="block antialiased text-base font-semibold text-blue-gray-600">
-                                        {user.phone || ''}
-                                    </p>
-                                </td>
-                                <td className="py-3 px-5 border-b border-lime-800 text-center">
-                                    <p className="block antialiased text-base font-semibold text-blue-gray-600">
-                                        {user.createdAt ? dayjs(user.createdAt).format('DD/MM/YYYY') : 'null'}
-                                    </p>
-                                </td>
-                                <td className="py-3 px-5 border-b border-lime-800 text-center">
-                                    <label className="inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            onChange={() => handleChangeActiveUser(user._id)}
-                                            checked={user.isActive}
-                                        />
-                                        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary dark:peer-checked:bg-primary"></div>
-                                        <span className="ms-3 text-base font-medium text-gray-900 dark:text-gray-300"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
 
-                <Pagination
-                    className="mt-3"
-                    onChange={(e) => handlePageChange(e)}
-                    defaultCurrent={1}
-                    defaultPageSize={PAGE_SIZE}
-                    total={totalUser || PAGE_SIZE}
+    const handleClickUser = (userId: string) => {
+        router.push(`${ADMIN_ROUTER.USER_LIST}/${userId}`);
+    };
+
+    const handleChangePagination = (page: number, pageSize: number) => {
+        dispatch(
+            setAdminUserFilter({
+                skip: (page - 1) * pageSize,
+                limit: pageSize,
+            }),
+        );
+    };
+
+    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
+    const searchDebounce = useDebounce(searchValue, 600);
+    useEffect(() => {
+        dispatch(
+            setAdminUserFilter({
+                name: searchDebounce,
+            }),
+        );
+    }, [searchDebounce]);
+    const handleSearch = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchValue(e.target.value || undefined);
+        },
+        [dispatch],
+    );
+
+    const columns: ColumnsType<any> = [
+        {
+            title: 'Người dùng',
+            dataIndex: 'name',
+            key: 'user',
+            render: (_: any, user: any) => (
+                <div className="flex items-center gap-4 cursor-pointer" onClick={() => handleClickUser(user._id)}>
+                    <Avatar size={40} src={user.avatar} icon={!user.avatar && <UserOutlined />} />
+                    <div>
+                        <p className="font-bold text-slate-700 uppercase text-sm">{user.name || 'N/A'}</p>
+                        <p className="text-xs text-slate-400 font-medium">{user.email}</p>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            title: 'Số điện thoại',
+            dataIndex: 'phone',
+            key: 'phone',
+            align: 'center',
+            render: (phone: string) => phone || '---',
+        },
+        {
+            title: 'Ngày đăng ký',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            align: 'center',
+            render: (date: string) => (date ? dayjs(date).format('DD MMM, YYYY') : 'N/A'),
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'isActive',
+            key: 'status',
+            align: 'center',
+            render: (_: any, user: any) => (
+                <div className="flex justify-center items-center gap-3">
+                    <span
+                        className={`text-[10px] font-black px-2 py-0.5 rounded ${
+                            user.isActive ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
+                        }`}
+                    >
+                        {user.isActive ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}
+                    </span>
+                    <Switch checked={user.isActive} onChange={() => handleChangeActiveUser(user._id)} />
+                </div>
+            ),
+        },
+    ];
+
+    return (
+        <div className="p-6 bg-slate-50 min-h-screen">
+            {/* ================= HEADER ================= */}
+            <div className="mb-10">
+                <div className="flex items-center gap-2 mb-2 ml-1">
+                    <ButtonBack />
+                </div>
+
+                <div className="flex flex-col justify-between gap-6">
+                    <div className="flex-1">
+                        <h1 className="text-4xl font-extrabold text-primary tracking-tight mb-2">Quản lý người dùng</h1>
+
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                                <span className="text-lg font-semibold text-slate-600">
+                                    {dataAdminUserList?.pagination.total || 0} tài khoản
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SEARCH */}
+                    <div className="max-w-sm">
+                        <Input
+                            prefix={<SearchOutlined />}
+                            placeholder="Tìm kiếm theo tên"
+                            allowClear
+                            onChange={handleSearch}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-8 h-[1px] w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"></div>
+            </div>
+
+            <div className="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <Table
+                    rowKey="_id"
+                    columns={columns}
+                    dataSource={dataAdminUserList?.users || []}
+                    loading={isLoading}
+                    pagination={{
+                        current: dataAdminUserList?.pagination.currentPage,
+                        pageSize: adminUserFilter.limit,
+                        total: dataAdminUserList?.pagination.total,
+                        showSizeChanger: true,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange: handleChangePagination,
+                    }}
+                    locale={{
+                        emptyText: <Empty description="Không tìm thấy người dùng nào" />,
+                    }}
                 />
-            </section>
-        </>
+            </div>
+        </div>
     );
 };
 

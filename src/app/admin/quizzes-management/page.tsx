@@ -1,193 +1,205 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
-import { message, Pagination } from 'antd';
+
+import * as QuizManagementService from '@/api/admin/quizmanagement.service'; // Giả định service của bạn
+import ButtonBack from '@/components/UI/ButtonBack';
+import { ADMIN_ROUTER } from '@/config/routes';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setAdminQuizFilter } from '@/redux/slices/admin.slice'; // Giả định slice filter của bạn
+import { SearchOutlined, FileTextOutlined, UserOutlined } from '@ant-design/icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Avatar, Empty, Switch, Table, Input, Tag } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import React, { useEffect, useReducer, useState } from 'react';
-import { PAGE_SIZE } from '@/common/constants';
-import useMutationHooks from '@/hooks/useMutationHooks';
-import * as QuizManagementService from '@/api/admin/quizmanagement.service';
-const active_type = {
-    CHANGE_DISABLED: 'CHANGE_DISABLED',
-    SET_QUIZZES_LIST: 'SET_USER_LIST',
-};
-const quizManageReducer = (state: any, action: any) => {
-    switch (action.type) {
-        case active_type.SET_QUIZZES_LIST: {
-            if (action.payload.quizzes) return action.payload.quizzes;
-            return state;
-        }
-        case active_type.CHANGE_DISABLED: {
-            const quizzes = [...state];
-            if (action.payload.id) {
-                quizzes.forEach((quiz) => {
-                    if (quiz._id == action.payload.id) {
-                        quiz.isDisabled = !quiz.isDisabled;
-                    }
-                });
-                return quizzes;
-            }
-            return state;
-        }
-        default:
-            return state;
-    }
-};
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useCallback, useEffect, useState } from 'react';
+import useDebounce from '@/hooks/useDebounce';
+import { ADMIN_QUIZ_QUERY_KEY, useAdminQuizList } from '@/features/admin/adminQuiz.query';
+import { AdminQuizRecord } from '@/@types/adminQuiz.type';
+
 const QuizManagement = () => {
-    const [quizzesList, dispatchQuizzesList] = useReducer(quizManageReducer, []);
-    const [totalQuiz, setTotalQuiz] = useState(0);
-    const quizListQuery = useQuery({
-        queryKey: ['quizzesListQuery'],
-        queryFn: () => QuizManagementService.getQuizList({}),
+    const queryClient = useQueryClient();
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+
+    // Lấy filter từ Redux (bạn thay đổi logic filter tùy theo slice của mình)
+    const { adminQuizFilter } = useAppSelector((state) => state.admin);
+    const { data: dataQuizList, isLoading } = useAdminQuizList(adminQuizFilter);
+
+    // Mutation thay đổi trạng thái ẩn/hiện của Quiz (Admin disable)
+    const toggleDisableQuizMutation = useMutation({
+        mutationFn: (id: string) => QuizManagementService.changeQuizDisabled(id),
+        onSuccess: () => {
+            toast.success('Cập nhật trạng thái bộ đề thành công');
+            queryClient.invalidateQueries({
+                queryKey: [ADMIN_QUIZ_QUERY_KEY.ADMIN_QUIZ_QUERY_KEY_LIST],
+            });
+        },
     });
-    const getQuizListMutation = useMutationHooks((data: any) => QuizManagementService.getQuizList(data));
-    useEffect(() => {
-        if (quizListQuery.data) {
-            setTotalQuiz(quizListQuery.data?.total);
-            dispatchQuizzesList({
-                type: active_type.SET_QUIZZES_LIST,
-                payload: {
-                    quizzes: quizListQuery.data?.quizzes,
-                },
-            });
-        } else if (quizListQuery.isError) {
-            message.error('đã có lỗi xảy ra');
-        }
-    }, [quizListQuery]);
-    useEffect(() => {
-        if (getQuizListMutation.isSuccess) {
-            dispatchQuizzesList({
-                type: active_type.SET_QUIZZES_LIST,
-                payload: {
-                    quizzes: getQuizListMutation.data?.quizzes,
-                },
-            });
-        }
-    }, [getQuizListMutation]);
-    const handlePageChange = (page: number) => {
-        getQuizListMutation.mutate({ skip: (Number(page - 1) || 0) * PAGE_SIZE });
+
+    const handleToggleStatus = (id: string) => {
+        toggleDisableQuizMutation.mutate(id);
     };
 
-    const changeQuizDisabledMutation = useMutationHooks((data: any) => QuizManagementService.changeQuizDisabled(data));
-    const handleChangeQuizDisabled = (id: string) => {
-        if (!id) return;
-        changeQuizDisabledMutation.mutate({ id });
-        dispatchQuizzesList({
-            type: active_type.CHANGE_DISABLED,
-            payload: {
-                id,
-            },
-        });
+    const handleClickQuiz = (quizId: string) => {
+        router.push(`${ADMIN_ROUTER.QUIZ_LIST}/${quizId}`);
     };
-    return (
-        <>
-            <section className="p-6 overflow-x-scroll px-0 pt-0 pb-2">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl my-5 text-gray-700">DANH SÁCH ĐỀ TRẮC NGHIỆM</h1>
-                    <p className="text-lg">
-                        Tổng số: <span className="text-primary text-xl">{totalQuiz}</span>
-                    </p>
+
+    const handleChangePagination = (page: number, pageSize: number) => {
+        dispatch(
+            setAdminQuizFilter({
+                skip: (page - 1) * pageSize,
+                limit: pageSize,
+            }),
+        );
+    };
+
+    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
+    const searchDebounce = useDebounce(searchValue, 600);
+
+    useEffect(() => {
+        dispatch(
+            setAdminQuizFilter({
+                keyword: searchDebounce,
+            }),
+        );
+    }, [searchDebounce, dispatch]);
+
+    const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(e.target.value || undefined);
+    }, []);
+
+    const columns: ColumnsType<AdminQuizRecord> = [
+        {
+            title: 'Bộ đề',
+            dataIndex: 'name',
+            key: 'quiz',
+            className: 'max-w-[300px]',
+            width: 500,
+            render: (_: any, record: AdminQuizRecord) => (
+                <div className="flex items-center gap-4 cursor-pointer" onClick={() => handleClickQuiz(record._id)}>
+                    <Avatar
+                        shape="square"
+                        size={48}
+                        src={record.thumb}
+                        icon={<FileTextOutlined />}
+                        className="border border-slate-200"
+                    />
+                    <div className="max-w-[200px]">
+                        <p className="font-bold text-slate-700 text-sm uppercase">{record.name || 'Không có tên'}</p>
+                        <p className="text-xs text-slate-400 font-medium">Môn: {record.subject}</p>
+                    </div>
                 </div>
-                <table className="w-full min-w-[640px] table-auto">
-                    <thead>
-                        <tr>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Tên đề trắc nghiệm
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Người tạo
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Số câu hỏi
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[13px] font-bold uppercase text-blue-gray-400">
-                                    Ngày tạo
-                                </p>
-                            </th>
-                            <th className="border-b border-blue-gray-50 py-3 px-5 text-center">
-                                <p className="block antialiased font-sans text-[14px] font-bold uppercase text-blue-gray-400">
-                                    Chặn
-                                </p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {quizzesList?.map((quiz: any, idx: number) => (
-                            <tr key={idx}>
-                                {/* image */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50">
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src={quiz.thumb}
-                                            alt="Avatar"
-                                            className="inline-block relative object-cover object-center w-24 h-24 rounded-md border-2"
-                                        />
-                                        <div>
-                                            <p className="block antialiased font-sans text-base leading-normal text-blue-gray-900 font-semibold">
-                                                {quiz.name || ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                {/* Người tạo */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src={quiz?.userInfo?.avatar}
-                                            alt="Avatar"
-                                            className="inline-block relative object-cover object-center w-10 h-10 rounded-full border-2"
-                                        />
-                                        <div>
-                                            <p className="block antialiased font-sans text-base leading-normal text-blue-gray-900 font-semibold">
-                                                {quiz?.userInfo?.name || ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                {/* question count */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <p className="block antialiased font-sans text-base font-semibold text-blue-gray-600">
-                                        {quiz.questionCount || 0}
-                                    </p>
-                                </td>
-                                {/* Ngày tạo */}
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <p className="block antialiased font-sans text-base font-semibold text-blue-gray-600">
-                                        {quiz.createdAt ? dayjs(quiz.createdAt).format('DD/MM/YYYY') : 'null'}
-                                    </p>
-                                </td>
-                                <td className="py-3 px-5 border-b border-blue-gray-50 text-center">
-                                    <label className="inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            onChange={() => handleChangeQuizDisabled(quiz._id)}
-                                            checked={quiz.isDisabled || false}
-                                        />
-                                        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary dark:peer-checked:bg-primary"></div>
-                                        <span className="ms-3 text-base font-medium text-gray-900 dark:text-gray-300"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            ),
+        },
+        {
+            title: 'Tác giả',
+            dataIndex: 'userInfo',
+            key: 'author',
+            render: (user: AdminQuizRecord['userInfo']) => (
+                <div className="flex items-center gap-2">
+                    <Avatar size={24} src={user?.avatar} icon={<UserOutlined />} />
+                    <span className="text-xs text-slate-600 font-medium">{user?.name || 'Ẩn danh'}</span>
+                </div>
+            ),
+        },
+        {
+            title: 'Thông số',
+            key: 'stats',
+            align: 'center',
+            render: (_: any, record: AdminQuizRecord) => (
+                <div className="flex flex-col items-center">
+                    <Tag color="blue" className="m-0 mb-1">
+                        {record.questionCount} câu hỏi
+                    </Tag>
+                    <span className="text-[10px] text-slate-400">{record.accessCount} lượt xem</span>
+                </div>
+            ),
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            align: 'center',
+            render: (date: string) => (date ? dayjs(date).format('DD/MM/YYYY') : '---'),
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'isAdminDisabled',
+            key: 'status',
+            align: 'center',
+            render: (isDisabled: boolean, record: AdminQuizRecord) => (
+                <div className="flex justify-center items-center gap-3">
+                    <span
+                        className={`text-[10px] font-black px-2 py-0.5 rounded ${
+                            !isDisabled ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
+                        }`}
+                    >
+                        {!isDisabled ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}
+                    </span>
+                    <Switch checked={!isDisabled} onChange={() => handleToggleStatus(record._id)} />
+                </div>
+            ),
+        },
+    ];
 
-                <Pagination
-                    className="mt-3"
-                    onChange={(e) => handlePageChange(e)}
-                    defaultCurrent={1}
-                    defaultPageSize={PAGE_SIZE}
-                    total={totalQuiz || PAGE_SIZE}
+    return (
+        <div className="p-6 bg-slate-50 min-h-screen">
+            {/* ================= HEADER ================= */}
+            <div className="mb-10">
+                <div className="flex items-center gap-2 mb-2 ml-1">
+                    <ButtonBack />
+                </div>
+
+                <div className="flex flex-col md:flex-row justify-between gap-6">
+                    <div className="flex-1">
+                        <h1 className="text-4xl font-extrabold text-primary tracking-tight mb-2">Quản lý Bộ đề</h1>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
+                                <span className="text-lg font-semibold text-slate-600">
+                                    {dataQuizList?.pagination.total || 0} bộ đề thi
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SEARCH */}
+                    <div className="w-full max-w-sm">
+                        <Input
+                            prefix={<SearchOutlined className="text-slate-400" />}
+                            placeholder="Tìm kiếm bộ đề..."
+                            className="rounded-xl h-10 shadow-sm"
+                            allowClear
+                            onChange={handleSearch}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-8 h-[1px] w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"></div>
+            </div>
+
+            {/* ================= TABLE ================= */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <Table
+                    rowKey="_id"
+                    columns={columns}
+                    dataSource={dataQuizList?.quizzes || []}
+                    loading={isLoading}
+                    pagination={{
+                        current: dataQuizList?.pagination.currentPage,
+                        pageSize: adminQuizFilter.limit,
+                        total: dataQuizList?.pagination.total,
+                        showSizeChanger: true,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange: handleChangePagination,
+                    }}
+                    locale={{
+                        emptyText: <Empty description="Không tìm thấy bộ đề nào" />,
+                    }}
                 />
-            </section>
-        </>
+            </div>
+        </div>
     );
 };
 

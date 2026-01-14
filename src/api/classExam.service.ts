@@ -1,4 +1,4 @@
-import axiosCredentials from '@/config/axios.credential';
+import axiosCredentials from '@/config/axios.instance';
 import { BodyCreateClassExam, ClassExamItem } from '@/@types/classExam.type';
 import { ApiResponse } from '@/@types/api.type';
 

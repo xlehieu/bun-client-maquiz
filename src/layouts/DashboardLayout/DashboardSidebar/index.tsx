@@ -4,92 +4,123 @@ import BlurBackground from '@/components/UI/BlurBackground';
 import NotificationDropdown from '@/components/UI/Dropdowns/NotificationDropdown';
 import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
 import MaquizLogo from '@/components/UI/MaquizLogo';
-import { adminRouter, USER_DASHBOARD_ROUTER } from '@/config/routes';
+import { ADMIN_ROUTER, USER_DASHBOARD_ROUTER } from '@/config/routes';
+import { useAppSelector } from '@/redux/hooks';
 import {
     faBars,
     faBookOpen,
+    faChalkboard,
     faChalkboardUser,
     faClockRotateLeft,
+    faFileLines,
     faHouse,
+    faLayerGroup,
     faPeopleRoof,
     faTimes,
+    faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { memo, useMemo, useState } from 'react';
-const items = [
-    {
-        label: 'Cá nhân',
-        children: [
-            {
-                key: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
-                label: 'Thư viện của tôi',
-                icon: faHouse,
-                to: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
-                keyActive: '',
-            },
-            {
-                key: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
-                label: 'Truy cập gần đây',
-                icon: faClockRotateLeft,
-                to: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
-                keyActive: 'truy-cap-gan-day',
-            },
-        ],
-        key: '1',
-    },
-    {
-        key: '2',
-        label: 'Quản lý',
-        children: [
-            {
-                key: USER_DASHBOARD_ROUTER.MYQUIZ,
-                label: 'Đề thi',
-                icon: faBookOpen,
-                to: USER_DASHBOARD_ROUTER.MYQUIZ,
-                keyActive: 'de-thi-cua-toi',
-            },
-            {
-                key: USER_DASHBOARD_ROUTER.CLASSROOM,
-                label: 'Lớp học',
-                icon: faChalkboardUser,
-                to: USER_DASHBOARD_ROUTER.CLASSROOM,
-                keyActive: 'lop-hoc',
-            },
-        ],
-    },
-];
-const sidebarAdmin = {
-    key: '3',
-    label: 'Quản trị hệ thống',
-    children: [
-        {
-            key: '3.1',
-            label: 'Admin dashboard',
-            icon: faPeopleRoof,
-            to: adminRouter.USER_LIST,
-        },
-    ],
-};
-const setItem = new Set(items.map((item) => item.key));
-const UserDashboardSidebar = () => {
+
+const DashboardSidebar = () => {
     const router = useRouter();
     const pathName = usePathname();
-    const [path, setPath] = useState(pathName);
     // const user = useSelector((state: any) => state.user);
     // if (!setItem.has('3') && user.isAdmin) {
     //     console.log(setItem);
     //     setItem.add('3');
     //     items.push(sidebarAdmin);
     // }
+    const { userProfile } = useAppSelector((state) => state.user);
     const [collapseShow, setCollapseShow] = React.useState('hidden');
     const [isShowBg, setIsShowBg] = useState(false);
+    const [keyActive, setKeyActive] = useState<string | null>(pathName.split('/')?.slice?.(1)?.[1] || 'my-library');
+    // region List sidebar
+    const items = useMemo(
+        () => [
+            {
+                label: 'Cá nhân',
+                children: [
+                    {
+                        key: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
+                        label: 'Thư viện của tôi',
+                        icon: faHouse,
+                        to: USER_DASHBOARD_ROUTER.MY_DASHBOARD,
+                        keyActive: 'my-library',
+                    },
+                    {
+                        key: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
+                        label: 'Truy cập gần đây',
+                        icon: faClockRotateLeft,
+                        to: USER_DASHBOARD_ROUTER.HISTORY_ACCESS,
+                        keyActive: 'truy-cap-gan-day',
+                    },
+                ],
+                key: '1',
+            },
+            {
+                key: '2',
+                label: 'Quản lý',
+                children: [
+                    {
+                        key: USER_DASHBOARD_ROUTER.MYQUIZ,
+                        label: 'Đề thi',
+                        icon: faBookOpen,
+                        to: USER_DASHBOARD_ROUTER.MYQUIZ,
+                        keyActive: 'de-thi-cua-toi',
+                    },
+                    {
+                        key: USER_DASHBOARD_ROUTER.CLASSROOM,
+                        label: 'Lớp học',
+                        icon: faChalkboardUser,
+                        to: USER_DASHBOARD_ROUTER.CLASSROOM,
+                        keyActive: 'lop-hoc',
+                    },
+                ],
+            },
+            userProfile?.isAdmin
+                ? {
+                      label: 'Admin',
+                      children: [
+                          {
+                              key: ADMIN_ROUTER.USER_LIST,
+                              label: 'Quản lý người dùng',
+                              icon: faUsers,
+                              to: ADMIN_ROUTER.USER_LIST,
+                              keyActive: 'users-management',
+                          },
+                          {
+                              key: ADMIN_ROUTER.CLASSROOM_LIST,
+                              label: 'Quản lý các lớp học',
+                              icon: faChalkboard,
+                              to: ADMIN_ROUTER.CLASSROOM_LIST,
+                              keyActive: 'classrooms-management',
+                          },
+                          {
+                              key: ADMIN_ROUTER.QUIZ_LIST,
+                              label: 'Quản lý các bài trắc nghiệm',
+                              icon: faFileLines,
+                              to: ADMIN_ROUTER.QUIZ_LIST,
+                              keyActive: 'quizzes-management',
+                          },
+                          {
+                              key: ADMIN_ROUTER.TAI_NGUYEN_HE_THONG,
+                              label: 'Tài nguyên hệ thống',
+                              icon: faLayerGroup,
+                              to: ADMIN_ROUTER.TAI_NGUYEN_HE_THONG,
+                              keyActive: 'tai-nguyen-he-thong',
+                          },
+                      ],
+                      key: 'admin',
+                  }
+                : {},
+        ],
+        [userProfile?._id],
+    );
+    // const setItem = new Set(items.map((item) => item.key));
 
-    const keyActive = useMemo(() => {
-        const path = pathName.split('/').slice(2);
-        return path?.[0] || '';
-    }, [pathName]);
     return (
         <>
             <aside className="bg-white flex flex-wrap items-center justify-between relative z-30 py-4 px-6">
@@ -170,21 +201,22 @@ const UserDashboardSidebar = () => {
                                     {/* Menu Group Label - Thiết kế lại cho chuyên nghiệp hơn */}
                                     <div className="flex items-center px-4 mb-4">
                                         <span className="text-[10px] font-black uppercase tracking-[2px] text-slate-400">
-                                            {item.label}
+                                            {item?.label || ''}
                                         </span>
                                         <div className="flex-1 h-[1px] bg-slate-100 ml-3 opacity-50" />
                                     </div>
 
                                     {/* Sub-menu Items */}
                                     <ul className="flex flex-col list-none gap-1.5 no-scrollbar">
-                                        {item.children.map((child, i) => {
+                                        {item?.children?.map((child, i) => {
                                             const isActive = child.keyActive === keyActive;
                                             return (
                                                 <li className="flex w-full px-2 group" key={i}>
                                                     <button
-                                                        onClick={() => {
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setKeyActive(child.keyActive);
                                                             router.push(child.to);
-                                                            setPath(child.to);
                                                         }}
                                                         className={`group w-full flex items-center px-4 py-3 rounded-[18px] transition-all duration-300 relative group-hover:scale-110 ${
                                                             isActive
@@ -237,4 +269,4 @@ const UserDashboardSidebar = () => {
         </>
     );
 };
-export default memo(UserDashboardSidebar);
+export default memo(DashboardSidebar);

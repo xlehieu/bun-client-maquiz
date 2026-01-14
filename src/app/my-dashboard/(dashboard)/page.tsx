@@ -11,7 +11,7 @@ import LazyImage from '@/components/UI/LazyImage';
 const MyLibrary = () => {
     const dispatch = useAppDispatch();
     const { userProfile, isFetchingExamHistory, examHistory } = useAppSelector((state) => state.user);
-
+    console.log('userProfile', userProfile);
     useEffect(() => {
         document.title = 'Thư viện của tôi | Maquiz';
         dispatch(fetchExamHistory());

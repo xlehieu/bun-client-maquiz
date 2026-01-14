@@ -10,7 +10,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { persistor } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 import UserDropdown from '@/components/UI/Dropdowns/UserDropdown';
-export default function UserNavbar() {
+export default function DashboardNavbar() {
     const router = useRouter();
     const logoutMutation = useMutationHooks(() => AuthService.logout());
     const { userProfile } = useAppSelector((state) => state.user);

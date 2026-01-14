@@ -6,7 +6,7 @@ import {
     ExamAttemptRecord,
 } from '@/@types/examAttempt.type';
 import { AnswerChoices } from '@/@types/shared.type';
-import axiosCredentials from '@/config/axios.credential';
+import axiosCredentials from '@/config/axios.instance';
 
 export const createExamAttempt = async (bodyCreateAttempt: BodyCreateExamAttempt) => {
     const response = await axiosCredentials.post<ApiResponse<ExamAttempt>>(`/examAttempt`, bodyCreateAttempt);
