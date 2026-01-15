@@ -1,5 +1,5 @@
-import TabSubject from '@/features/admin/tai-nguyen-he-thong/subject/components/TabSubject';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
+import TabCollection from '@/features/admin/tai-nguyen-he-thong/subject/components/TabCollection';
+import { faBook, faSchool } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tabs, TabsProps } from 'antd';
 import React from 'react';
@@ -14,7 +14,17 @@ const page = () => {
                     <span className="font-bold text-base">Môn học</span>
                 </div>
             ),
-            children: <TabSubject />,
+            children: <TabCollection collection="subject" />,
+        },
+        {
+            key: 'schools',
+            label: (
+                <div className="flex items-center gap-2 px-2 py-1">
+                    <FontAwesomeIcon icon={faSchool} />
+                    <span className="font-bold text-base">Trường học</span>
+                </div>
+            ),
+            children: <TabCollection collection="schools" />,
         },
     ];
     return (

@@ -11,3 +11,6 @@ export const createCollection = async <T = any>(collection: string, body: T) => 
 export const updateCollection = async <T = any>(collection: string, id: string, body: T) => {
     return axiosCredentials.put<ApiResponse<T>>(`/collection/${collection}/${id}`, body);
 };
+export const deleteCollection = async <T = any>(collection: string, id: string) => {
+    return axiosCredentials.delete<ApiResponse<T>>(`/collection/${collection}/${id}`);
+};
