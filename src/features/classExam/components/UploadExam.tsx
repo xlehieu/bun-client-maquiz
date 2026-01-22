@@ -160,7 +160,7 @@ const UploadExam = () => {
                                 </Card>
                             </Col>
 
-                            <Col xs={24} lg={12}>
+                            {/* <Col xs={24} lg={12}>
                                 <Card className="h-full border-2 border-purple-100 hover:border-purple-300 hover:shadow-md transition-all rounded-xl bg-gradient-to-br from-purple-50 to-pink-50">
                                     <div className="flex items-center gap-2 mb-3">
                                         <span className="text-2xl">🔢</span>
@@ -182,7 +182,7 @@ const UploadExam = () => {
                                         Số lần tối đa học sinh có thể làm bài (0-10 lần)
                                     </p>
                                 </Card>
-                            </Col>
+                            </Col> */}
                         </Row>
                         <Form.Item<BodyCreateClassExam>
                             name="quizId"

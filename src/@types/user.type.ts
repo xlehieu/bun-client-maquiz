@@ -2,6 +2,7 @@ export type UserDetail = {
     _id: string;
     email?: string;
     isAdmin?: boolean;
+    isSuperAdmin?: boolean;
     phone?: string;
     address?: string;
     avatar?: string;

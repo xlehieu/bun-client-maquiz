@@ -31,6 +31,7 @@ export type ClassroomDetailRecord = {
     posts?: PostItem[];
     classExams: ClassExamItem[];
     examAndPostList: (ClassExamItem | PostItem)[];
+    examAttempt: { score: number; classExamId: string }[];
     thumb: string;
 };
 export type BodyCreateClassroom = {

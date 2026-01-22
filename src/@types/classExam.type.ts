@@ -8,7 +8,7 @@ export type BodyCreateClassExam = {
     startTime: string;
     endTime: string;
     duration: number;
-    maxAttempts: number;
+    // maxAttempts: number;
 };
 
 export type ClassExamItem = {

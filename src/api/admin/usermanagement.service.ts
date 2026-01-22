@@ -16,6 +16,9 @@ export const getAdminUserListAPI = async (params: QueryListParams<{ name?: strin
         params,
     });
 };
+export const createAdminAccount = (body: { email: string; password: string; confirmPassword: string }) => {
+    return axiosInstance.post('/admin/user-management', body);
+};
 export const changeActiveUser = async (id: string) => {
     const res = await axiosInstance.patch(`/admin/user-management/activeUser/${id}`);
     if (res.data) {

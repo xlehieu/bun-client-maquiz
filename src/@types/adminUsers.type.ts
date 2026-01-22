@@ -18,3 +18,8 @@ export type AdminUserRecord = {
     // quizAccessHistory: [];
     isActive: false;
 };
+export type BodyCreateAdmin = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+};

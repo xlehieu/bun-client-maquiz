@@ -13,9 +13,10 @@ import { toast } from 'sonner';
 type Props = {
     exam: ClassExamItem;
     viewByAdmin?: boolean;
+    score?: number;
 };
 
-const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
+const ClassExamCard = ({ exam, viewByAdmin = false, score }: Props) => {
     const router = useRouter();
     // Logic kiểm tra trạng thái thời gian
     const dispatch = useAppDispatch();
@@ -33,11 +34,6 @@ const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
             <div className="flex flex-col md:flex-row h-full">
                 {/* Left Side: Thumbnail & Status Badge */}
                 <div className="relative w-full md:w-48 h-32 md:h-auto overflow-hidden flex items-end">
-                    {/* <img
-            src={exam.quizDetail.thumb}
-            alt={exam.quizDetail.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          /> */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1">
                         {isEnded ? (
                             <span className="bg-gray-500/80 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-lg uppercase font-bold">
@@ -53,6 +49,11 @@ const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
                             </span>
                         )}
                     </div>
+                    {typeof score === 'number' && (
+                        <span className="text-2xl absolute w-32 top-1/2 -translate-y-1/2 left-14 text-center backdrop-blur-md font-bold">
+                            {score} điểm
+                        </span>
+                    )}
                     {classroomDetail?.teacher._id === userProfile?._id && (
                         <Button
                             type="primary"
@@ -77,7 +78,6 @@ const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
                     )}
                 </div>
 
-                {/* Right Side: Details */}
                 <div className="flex-1 p-5 flex flex-col justify-between">
                     <div>
                         <h3 className="text-lg font-bold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
@@ -130,7 +130,7 @@ const ClassExamCard = ({ exam, viewByAdmin = false }: Props) => {
                     </div>
 
                     {/* Action Button */}
-                    {!viewByAdmin && (
+                    {!viewByAdmin && !(typeof score === 'number') && (
                         <button
                             disabled={isEnded}
                             onClick={(e) => {

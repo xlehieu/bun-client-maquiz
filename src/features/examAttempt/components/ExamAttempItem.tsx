@@ -22,21 +22,6 @@ export const ExamRecordItem = ({ record }: { record: ExamAttemptRecord }) => {
 
             <div className="text-right">
                 <p className="font-bold text-lg text-indigo-600">{record.score} điểm</p>
-                <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                        record.status === 'submitted'
-                            ? 'bg-green-100 text-green-700'
-                            : record.status === 'doing'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-red-100 text-red-700'
-                    }`}
-                >
-                    {record.status === 'doing'
-                        ? 'ĐANG LÀM BÀI'
-                        : record.status === 'timeout'
-                        ? 'QUÁ GIỜ LÀM BÀI'
-                        : 'ĐÃ NỘP BÀI'}
-                </span>
             </div>
         </div>
     );

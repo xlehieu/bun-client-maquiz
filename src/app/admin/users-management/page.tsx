@@ -8,13 +8,14 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setAdminUserFilter } from '@/redux/slices/admin.slice';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Empty, Switch, Table, Input } from 'antd';
+import { Avatar, Empty, Switch, Table, Input, Button, Row } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCallback, useEffect, useState } from 'react';
 import useDebounce from '@/hooks/useDebounce';
+import ModalCreateAdmin from './components/ModalCreateAdmin';
 
 const UserManagement = () => {
     const queryClient = useQueryClient();
@@ -23,7 +24,7 @@ const UserManagement = () => {
 
     const { adminUserFilter } = useAppSelector((state) => state.admin);
     const { data: dataAdminUserList, isLoading } = useAdminUserList(adminUserFilter);
-
+    const [isOpenModalCreateAdmin, setIsOpenModalCreateAdmin] = useState(false);
     const changeActiveUserMutation = useMutation({
         mutationFn: (id: string) => UserManagementService.changeActiveUser(id),
         onSuccess: () => {
@@ -139,13 +140,14 @@ const UserManagement = () => {
                     </div>
 
                     {/* SEARCH */}
-                    <div className="max-w-sm">
+                    <div className="flex gap-3">
                         <Input
                             prefix={<SearchOutlined />}
                             placeholder="Tìm kiếm theo tên"
                             allowClear
                             onChange={handleSearch}
                         />
+                        <Button onClick={() => setIsOpenModalCreateAdmin(true)}>Thêm tài khoản Admin</Button>
                     </div>
                 </div>
 
@@ -171,6 +173,7 @@ const UserManagement = () => {
                     }}
                 />
             </div>
+            <ModalCreateAdmin isOpenModal={isOpenModalCreateAdmin} onClose={() => setIsOpenModalCreateAdmin(false)} />
         </div>
     );
 };

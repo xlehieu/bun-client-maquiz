@@ -126,7 +126,14 @@ const TabNewFeeds = () => {
                                 {postOrExam.type == 'post' ? (
                                     <ClassPostCard handleOpenModal={handleOpenModalConfirmDelete} post={postOrExam} />
                                 ) : (
-                                    <ClassExamCard exam={postOrExam} />
+                                    <ClassExamCard
+                                        exam={postOrExam}
+                                        score={
+                                            classroomDetail.examAttempt.find(
+                                                (item) => item.classExamId === postOrExam._id,
+                                            )?.score
+                                        }
+                                    />
                                 )}
                             </div>
                         ))}
