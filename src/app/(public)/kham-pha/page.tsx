@@ -214,7 +214,7 @@ const DiscoverPage = () => {
     return (
         <div className="max-w-[1600px] mx-auto px-6">
             <header className="mb-10">
-                <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">
+                <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight mr-1">
                     KHÁM PHÁ
                     <span className="text-primary underline decoration-blue-100 underline-offset-8">ĐỀ THI</span>
                 </h1>
