@@ -90,6 +90,7 @@ const TakeQuizPageMain = () => {
         isTimeout,
         countQuestionQuizDetail,
     } = useAppSelector((state) => state.takeQuiz);
+    console.log('quizDetail?.isUseChatBot', quizDetail?.isUseChatBot);
     const slug = useParams()?.slug as string;
     // useEffect(() => {
     //     dispatch(fetchQuizPreview(slug));
