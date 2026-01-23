@@ -216,7 +216,7 @@ const DiscoverPage = () => {
             <header className="mb-10">
                 <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight mr-1">
                     KHÁM PHÁ
-                    <span className="text-primary underline decoration-blue-100 underline-offset-8">ĐỀ THI</span>
+                    <span className="text-primary underline decoration-blue-100 underline-offset-8 ml-1">ĐỀ THI</span>
                 </h1>
                 <p className="text-slate-500 mt-2 font-medium">
                     Tìm kiếm hàng nghìn đề thi chất lượng từ cộng đồng Maquiz.

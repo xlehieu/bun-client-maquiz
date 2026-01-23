@@ -24,6 +24,7 @@ export type QuizDetailRecord = {
     deleted: boolean;
     isUseChatBot: boolean;
     isAdminDisabled: boolean;
+    isDisabled: boolean;
 };
 export type AnswerType_1_2 = {
     content: string;

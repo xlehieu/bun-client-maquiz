@@ -101,12 +101,12 @@ const MyLibrary = () => {
                                                             {exam.score}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-slate-400 border-l pl-4">
+                                                    {/* <div className="flex items-center gap-1.5 text-slate-400 border-l pl-4">
                                                         <FontAwesomeIcon icon={faCalendarAlt} className="text-xs" />
                                                         <span className="text-xs font-medium">
                                                             {new Date(exam.createdAt).toLocaleDateString('vi-VN')}
                                                         </span>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
                                         </div>

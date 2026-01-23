@@ -3,7 +3,7 @@ import * as QuizService from '@/api/quiz.service';
 import { educationLevels, imageQuizThumbDefault, UNIVERSITIES } from '@/common/constants';
 import LazyImage from '@/components/UI/LazyImage';
 import UploadComponent from '@/components/UI/UploadComponent';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { BodyCreateGeneralInformationQuiz } from '@/@types/quiz.type';
 import { LoadingOutlined } from '@ant-design/icons';
 import { faSave } from '@fortawesome/free-regular-svg-icons';
@@ -15,12 +15,14 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { COLLECTION_NAME, useCollection } from '@/features/admin/tai-nguyen-he-thong/subject/collection.tanstack';
+import { fetchQuizDetail } from '@/redux/slices/quiz.slice';
 
 const EditGeneralInformationTab = () => {
     const params = useParams();
     const { quizDetail } = useAppSelector((state) => state.quiz);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useAppDispatch();
     const { data: listSchool } = useCollection(COLLECTION_NAME.SCHOOL, [COLLECTION_NAME.SCHOOL]);
     const { data: listSubject } = useCollection(COLLECTION_NAME.SUBJECT, [COLLECTION_NAME.SUBJECT]);
     const handleSubmitForm = async (formValue: BodyCreateGeneralInformationQuiz) => {
@@ -36,7 +38,6 @@ const EditGeneralInformationTab = () => {
             setIsLoading(false);
         }
     };
-    console.log('quizDetail', quizDetail);
     useEffect(() => {
         if (quizDetail) {
             form.setFieldsValue({ ...quizDetail });
@@ -175,6 +176,23 @@ const EditGeneralInformationTab = () => {
                                 <Form.Item name="isUseChatBot" valuePropName="checked" className="mb-0">
                                     <Switch className="bg-slate-300" />
                                 </Form.Item>
+                            </div>
+                            <div className="p-5 bg-blue-50/50 rounded-2xl flex items-center justify-between border border-blue-100">
+                                <div className="flex items-center gap-3">
+                                    <div>
+                                        <p className="font-bold text-slate-700 leading-none">Ẩn bài thi</p>
+                                    </div>
+                                </div>
+                                <Switch
+                                    className="bg-slate-300"
+                                    value={quizDetail?.isDisabled || false}
+                                    onChange={async () => {
+                                        if (quizDetail?._id) {
+                                            await QuizService.changeUserQuizDisabled(quizDetail?._id);
+                                            dispatch(fetchQuizDetail(quizDetail?._id));
+                                        }
+                                    }}
+                                />
                             </div>
                         </div>
                     </Col>

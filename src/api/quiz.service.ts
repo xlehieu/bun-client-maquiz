@@ -74,6 +74,9 @@ export const getQuizzesBySlugs = async (data: any) => {
 
     return res.data.data;
 };
+export const changeUserQuizDisabled = async (id: string) => {
+    return axiosCredentials.patch(`/quizzes/disabledQuiz/${id}`);
+};
 const buildParams = (params: Record<string, any>) => {
     const result: Record<string, any> = {};
 
