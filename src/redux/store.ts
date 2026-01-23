@@ -9,6 +9,7 @@ import questionTypeReducer from './slices/questionType.slice';
 import classroomReducer from './slices/classrooms.slice';
 import takeExamReducer from './slices/takeExam.slice';
 import adminFilterReducer from './slices/admin.slice';
+import discoveryFilterReducer from './slices/discover.slice';
 const rootReducer = combineReducers({
     auth: authReducer,
     user: userSlice,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
     classroom: classroomReducer,
     takeExam: takeExamReducer,
     admin: adminFilterReducer,
+    discovery: discoveryFilterReducer,
 });
 const persistConfig = {
     key: 'root',

@@ -53,24 +53,16 @@ export const deleteQuiz = async (id: string) => {
     const res = await axiosCredentials.delete(`/quizzes/${id}/deleteQuiz`);
     return res.data.data;
 };
-export const getDiscoveryQuizzes = async (data: any) => {
-    const { name, page, limit, skip, subject, topic, schoolYear, educationLevel } = data;
-    const params = new URLSearchParams();
-    Object.entries({
-        name,
-        page,
-        limit,
-        skip,
-        subject,
-        topic,
-        schoolYear,
-        educationLevel,
-    }).forEach(([key, value]) => {
-        if (value !== undefined) {
-            params.append(key, String(value));
-        }
+export const getDiscoveryQuizzes = async (params: any) => {
+    const buildParam = buildParams(params);
+    const res = await axiosCredentials.get<
+        ApiResponse<{
+            quizzes: QuizDetailRecord[];
+            total: number;
+        }>
+    >(`/quizzes/discovery`, {
+        params: buildParam,
     });
-    const res = await axiosCredentials.get(`/quizzes/discovery?${params}`);
 
     return res.data.data;
 };
@@ -81,4 +73,17 @@ export const getQuizzesBySlugs = async (data: any) => {
     const res = await axiosCredentials.get(`/quizzes/getQuizzesBySlugs?slugs=${query}`);
 
     return res.data.data;
+};
+const buildParams = (params: Record<string, any>) => {
+    const result: Record<string, any> = {};
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+            result[key] = value.join(',');
+        } else {
+            result[key] = value;
+        }
+    });
+
+    return result;
 };
