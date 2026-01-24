@@ -143,7 +143,7 @@ const CreateGeneralInfoQuiz = () => {
                                     label={<span className="font-bold text-slate-600">Trường học</span>}
                                     rules={[{ required: true, message: 'Vui lòng chọn trình độ' }]}
                                 >
-                                    <Select className="" placeholder="Chọn trường học">
+                                    <Select mode="tags" className="" placeholder="Chọn trường học">
                                         {listSchool?.map((school) => (
                                             <Select.Option value={school.TenMuc} key={school._id}>
                                                 {school.TenMuc}
@@ -156,7 +156,7 @@ const CreateGeneralInfoQuiz = () => {
                                     label={<span className="font-bold text-slate-600">Môn học</span>}
                                     rules={[{ required: true, message: 'Chọn ít nhất một môn học' }]}
                                 >
-                                    <Select mode="multiple" className="" placeholder="Toán, Lý, Hóa...">
+                                    <Select mode="tags" className="" placeholder="Toán, Lý, Hóa...">
                                         {listSubject?.map((subject) => (
                                             <Select.Option value={subject.TenMuc} key={subject._id}>
                                                 {subject.TenMuc}
